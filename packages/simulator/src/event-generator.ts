@@ -1,4 +1,4 @@
-import { createRng } from "../seed-random";
+import { createRng } from "./seed-random";
 import type { BusinessEvent, EventType } from "@beerfest/domain";
 import { PRESET_EVENTS } from "./data/events";
 
