@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Visitor {
+  visitorId       String             @id @map("visitor_id") @db.VarChar(50)
+  name            String             @db.VarChar(100)
+  type            VisitorType        @default(normal)
+  age             Int
+  alcoholVerified Boolean            @default(false) @map("alcohol_verified")
+  memberLevel     MemberLevel        @default(regular) @map("member_level")
+  currentZone     String?            @map("current_zone") @db.VarChar(50)
+  preferences     Json               @default("[]")
+  registeredAt    DateTime           @default(now()) @map("registered_at") @db.DateTime(3)
+
+  coupons         Coupon[]
+  orders          Order[]
+  assignments     ExperimentAssignment[]
+
+  @@map("visitors")
+}
+
+model Zone {
+  zoneId           String   @id @map("zone_id") @db.VarChar(50)
+  name             String   @db.VarChar(100)
+  currentVisitors  Int      @default(0) @map("current_visitors")
+  baselineVisitors Int      @default(0) @map("baseline_visitors")
+  avgWaitTime      Int      @default(0) @map("avg_wait_time")
+  status           ZoneStatus @default(normal)
+
+  merchants        Merchant[]
+
+  @@map("zones")
+}
+
+model Merchant {
+  merchantId String           @id @map("merchant_id") @db.VarChar(50)
+  zoneId     String           @map("zone_id") @db.VarChar(50)
+  name       String           @db.VarChar(100)
+  category   MerchantCategory @default(food)
+  operating  Boolean          @default(true)
+
+  zone       Zone             @relation(fields: [zoneId], references: [zoneId])
+  products   Product[]
+  inventory  Inventory[]
+
+  @@map("merchants")
+}
+
+model Product {
+  productId       String          @id @map("product_id") @db.VarChar(50)
+  merchantId      String          @map("merchant_id") @db.VarChar(50)
+  name            String          @db.VarChar(200)
+  category        ProductCategory @default(food)
+  price           Decimal         @db.Decimal(10, 2)
+  containsAlcohol Boolean         @default(false) @map("contains_alcohol")
+  imageUrl        String?         @map("image_url") @db.VarChar(500)
+
+  merchant        Merchant        @relation(fields: [merchantId], references: [merchantId])
+  inventory       Inventory[]
+
+  @@map("products")
+}
+
+model Inventory {
+  productId         String   @id @map("product_id") @db.VarChar(50)
+  merchantId        String   @map("merchant_id") @db.VarChar(50)
+  availableQuantity Int      @default(0) @map("available_quantity")
+  reservedQuantity  Int      @default(0) @map("reserved_quantity")
+  thresholdLow      Int      @default(0) @map("threshold_low")
+  updatedAt         DateTime @default(now()) @map("updated_at") @db.DateTime(3)
+
+  product           Product  @relation(fields: [productId], references: [productId])
+  merchant          Merchant @relation(fields: [merchantId], references: [merchantId])
+
+  @@map("inventory")
+}
+
+model Campaign {
+  campaignId       String         @id @map("campaign_id") @db.VarChar(50)
+  name             String         @db.VarChar(200)
+  description      String         @default("") @db.Text
+  objective        String         @default("") @db.Text
+  budgetLimit      Decimal        @default(0) @map("budget_limit") @db.Decimal(12, 2)
+  budgetConsumed   Decimal        @default(0) @map("budget_consumed") @db.Decimal(12, 2)
+  status           CampaignStatus @default(draft)
+  currentVersion   Int            @default(1) @map("current_version")
+  targetVisitorType VisitorType   @default(normal) @map("target_visitor_type")
+  containsAlcohol  Boolean        @default(false) @map("contains_alcohol")
+  createdAt        DateTime       @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime       @updatedAt @map("updated_at") @db.DateTime(3)
+
+  versions         CampaignVersion[]
+  coupons          Coupon[]
+  orders           Order[]
+  approvals        Approval[]
+  assignments      ExperimentAssignment[]
+
+  @@map("campaigns")
+}
+
+model CampaignVersion {
+  versionId    String   @id @map("version_id") @db.VarChar(50)
+  campaignId   String   @map("campaign_id") @db.VarChar(50)
+  version      Int      @default(1)
+  rules        Json
+  status       VersionStatus @default(draft)
+  createdAt    DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  approvedAt   DateTime? @map("approved_at") @db.DateTime(3)
+
+  campaign     Campaign @relation(fields: [campaignId], references: [campaignId])
+
+  @@map("campaign_versions")
+}
+
+model Coupon {
+  couponId         String       @id @map("coupon_id") @db.VarChar(50)
+  visitorId        String       @map("visitor_id") @db.VarChar(50)
+  campaignId       String       @map("campaign_id") @db.VarChar(50)
+  campaignVersion  Int          @default(1) @map("campaign_version")
+  status           CouponStatus @default(pending)
+  discountAmount   Decimal      @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  claimedAt        DateTime     @default(now()) @map("claimed_at") @db.DateTime(3)
+  expiresAt        DateTime     @map("expires_at") @db.DateTime(3)
+  idempotencyKey   String       @unique @map("idempotency_key") @db.VarChar(100)
+  usedAt           DateTime?    @map("used_at") @db.DateTime(3)
+
+  visitor          Visitor      @relation(fields: [visitorId], references: [visitorId])
+  campaign         Campaign     @relation(fields: [campaignId], references: [campaignId])
+
+  @@index([visitorId])
+  @@map("coupons")
+}
+
+model Order {
+  orderId        String      @id @map("order_id") @db.VarChar(50)
+  visitorId      String      @map("visitor_id") @db.VarChar(50)
+  campaignId     String      @map("campaign_id") @db.VarChar(50)
+  couponId       String      @default("") @map("coupon_id") @db.VarChar(50)
+  products       Json
+  netPayment     Decimal     @default(0) @map("net_payment") @db.Decimal(10, 2)
+  discountAmount Decimal     @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  status         OrderStatus @default(pending)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.DateTime(3)
+  verifiedAt     DateTime?   @map("verified_at") @db.DateTime(3)
+  completedAt    DateTime?   @map("completed_at") @db.DateTime(3)
+
+  visitor        Visitor     @relation(fields: [visitorId], references: [visitorId])
+  campaign       Campaign    @relation(fields: [campaignId], references: [campaignId])
+
+  @@index([visitorId])
+  @@map("orders")
+}
+
+model ExperimentAssignment {
+  assignmentId String          @id @default(uuid()) @map("assignment_id") @db.VarChar(36)
+  visitorId    String          @map("visitor_id") @db.VarChar(50)
+  campaignId   String          @map("campaign_id") @db.VarChar(50)
+  group        ExperimentGroup @default(control)
+  assignedAt   DateTime        @default(now()) @map("assigned_at") @db.DateTime(3)
+
+  visitor      Visitor         @relation(fields: [visitorId], references: [visitorId])
+  campaign     Campaign        @relation(fields: [campaignId], references: [campaignId])
+
+  @@unique([visitorId, campaignId])
+  @@map("experiment_assignments")
+}
+
+model Approval {
+  approvalId        String   @id @map("approval_id") @db.VarChar(50)
+  campaignVersionId String   @map("campaign_version_id") @db.VarChar(50)
+  campaignId        String   @map("campaign_id") @db.VarChar(50)
+  approver          String   @default("") @db.VarChar(100)
+  decision          Decision @default(approved)
+  reason            String   @default("") @db.Text
+  createdAt         DateTime @default(now()) @map("created_at") @db.DateTime(3)
+
+  campaign          Campaign @relation(fields: [campaignId], references: [campaignId])
+
+  @@map("approvals")
+}
+
+model BusinessEvent {
+  eventId   String    @id @map("event_id") @db.VarChar(50)
+  eventType String    @map("event_type") @db.VarChar(50)
+  campaignId String?  @map("campaign_id") @db.VarChar(50)
+  visitorId  String?  @map("visitor_id") @db.VarChar(50)
+  payload    Json
+  timestamp  DateTime @default(now()) @map("timestamp") @db.DateTime(3)
+  traceId    String   @map("trace_id") @db.VarChar(100)
+
+  @@index([timestamp])
+  @@index([campaignId])
+  @@map("business_events")
+}
+
+enum VisitorType {
+  normal
+  family
+}
+
+enum MemberLevel {
+  regular
+  silver
+  gold
+}
+
+enum ZoneStatus {
+  normal
+  busy
+  under_capacity
+}
+
+enum MerchantCategory {
+  food
+  drink
+  cultural
+  combo
+}
+
+enum ProductCategory {
+  food
+  drink
+  cultural_goods
+  combo_bundle
+}
+
+enum CampaignStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  running
+  paused
+  cancelled
+  completed
+}
+
+enum VersionStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+}
+
+enum CouponStatus {
+  pending
+  active
+  used
+  expired
+}
+
+enum OrderStatus {
+  pending
+  paid
+  verified
+  completed
+  cancelled
+  refunded
+}
+
+enum ExperimentGroup {
+  control
+  experiment
+}
+
+enum Decision {
+  approved
+  rejected
+}
