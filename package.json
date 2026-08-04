@@ -1,0 +1,20 @@
+{
+  "name": "beerfest-growth",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "test": "pnpm --filter tests test",
+    "test:unit": "pnpm --filter tests test:unit",
+    "test:e2e": "pnpm --filter tests test:e2e",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "seed": "pnpm --filter web seed",
+    "rehearse": "pnpm --filter web rehearse"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9"
+}
