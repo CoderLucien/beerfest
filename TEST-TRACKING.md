@@ -8,12 +8,12 @@
 
 | ID | 任务 | 负责人 | 状态 | 阻断项 |
 |----|------|--------|------|--------|
-| T1 | Prisma Schema + DataAdapter 层 | @beerfest-rd | ✅ 完成 | 12 实体 + 9 枚举，`0f05919` |
+| T1 | Prisma Schema + DataAdapter 层 | @beerfest-rd | ✅ 完成 | `0f05919` |
 | T2 | 种子数据 & 事件生成器 | @beerfest/simulator | ✅ 完成 | — |
-| T3 | API Routes（17 端点） | @beerfest-rd | ✅ 完成 | 游客 7 + 管理 10，全部 200 OK，`0f05919` |
-| T4 | 游客端页面（首页/校验/券包） | @beerfest-rd | 🟡 部分完成 | 登录页 ✅，首页骨架 ✅ |
-| T5 | 运营端页面（驾驶舱/活动/审批/评估） | @beerfest-rd | 🟡 部分完成 | Dashboard 骨架 ✅ |
-| T6 | V1 业务场景测试 | @beerfest-rd + @beerfest-qa | 🟡 部分完成 | 25/58 已实现 |
+| T3 | API Routes（17 端点） | @beerfest-rd | ✅ 完成 | `0f05919` |
+| T4 | 游客端页面（首页/校验/券包） | @beerfest-rd | ✅ 完成 | `/` + `/verify` + `/coupons` |
+| T5 | 运营端页面（驾驶舱/活动/审批/评估） | @beerfest-rd | ✅ 完成 | `/dashboard` 4 页 |
+| T6 | V1 业务场景测试 | @beerfest-rd + @beerfest-qa | 🟡 部分完成 | 25/58 |
 | T7 | QA 测试执行 & 报告 | @beerfest-qa | 🔴 未开始 | 等待 QA 触发 |
 
 **当前 Sprint 目标**：Web 登录页面可访问，展示演示账号选择入口。

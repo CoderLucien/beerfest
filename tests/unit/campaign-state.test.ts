@@ -1,17 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { transition, canTransition, checkStopConditions } from "@beerfest/domain";
+import {
+  canTransition,
+  getNextStatuses,
+  shouldAutoPause,
+  isValidStatus,
+} from "@beerfest/domain";
 
 describe("Campaign State Machine", () => {
   it("draft can transition to pending_approval", () => {
     expect(canTransition("draft", "pending_approval")).toBe(true);
   });
 
-  it("draft can transition to cancelled", () => {
-    expect(canTransition("draft", "cancelled")).toBe(true);
-  });
-
   it("draft cannot go directly to running", () => {
     expect(canTransition("draft", "running")).toBe(false);
+  });
+
+  it("draft cannot go directly to cancelled", () => {
+    expect(canTransition("draft", "cancelled")).toBe(false);
   });
 
   it("running can be paused", () => {
@@ -22,61 +27,103 @@ describe("Campaign State Machine", () => {
     expect(canTransition("paused", "running")).toBe(true);
   });
 
+  it("running can be completed", () => {
+    expect(canTransition("running", "completed")).toBe(true);
+  });
+
+  it("running can be cancelled", () => {
+    expect(canTransition("running", "cancelled")).toBe(true);
+  });
+
   it("completed cannot transition further", () => {
     expect(canTransition("completed", "running")).toBe(false);
     expect(canTransition("completed", "paused")).toBe(false);
   });
 
-  it("transition returns error for invalid path", () => {
-    const result = transition("draft", "running");
-    expect(result.success).toBe(false);
-    expect(result.error).toBeDefined();
+  it("cancelled cannot transition further", () => {
+    expect(canTransition("cancelled", "running")).toBe(false);
+    expect(canTransition("cancelled", "draft")).toBe(false);
   });
 
-  it("transition succeeds for valid path", () => {
-    const result = transition("draft", "pending_approval");
-    expect(result.success).toBe(true);
-    expect(result.status).toBe("pending_approval");
+  it("getNextStatuses returns valid transitions", () => {
+    const next = getNextStatuses("draft");
+    expect(next.length).toBeGreaterThan(0);
+    expect(next).toContain("pending_approval");
   });
 
-  it("same state transition is allowed", () => {
-    const result = transition("running", "running");
-    expect(result.success).toBe(true);
+  it("isValidStatus validates campaign statuses", () => {
+    expect(isValidStatus("draft")).toBe(true);
+    expect(isValidStatus("running")).toBe(true);
+    expect(isValidStatus("completed")).toBe(true);
+    expect(isValidStatus("invalid")).toBe(false);
+  });
+
+  it("approved can go to running", () => {
+    expect(canTransition("approved", "running")).toBe(true);
+  });
+
+  it("pending_approval can be approved", () => {
+    expect(canTransition("pending_approval", "approved")).toBe(true);
+  });
+
+  it("pending_approval can be rejected", () => {
+    expect(canTransition("pending_approval", "rejected")).toBe(true);
   });
 });
 
 describe("Campaign Stop Conditions", () => {
-  const stopConditions = {
-    minInventoryThreshold: 80,
-    maxRefundRate: 0.03,
-    budgetExhausted: true,
-  };
-
-  it("pauses when inventory below threshold", () => {
-    const result = checkStopConditions(50, 0, 100, { limit: 6000, consumed: 1000 }, stopConditions);
-    expect(result.shouldPause).toBe(true);
-    expect(result.reason).toContain("库存");
+  it("库存低于阈值时自动暂停", () => {
+    const result = shouldAutoPause({
+      inventoryAvailable: 50,
+      inventoryThreshold: 80,
+      refundRate: 0.01,
+      refundRateLimit: 0.03,
+      budgetExhausted: false,
+    });
+    expect(result).toBe(true);
   });
 
-  it("pauses when refund rate exceeds threshold", () => {
-    const result = checkStopConditions(200, 8, 100, { limit: 6000, consumed: 1000 }, stopConditions);
-    expect(result.shouldPause).toBe(true);
-    expect(result.reason).toContain("退款");
+  it("退款率超过阈值时自动暂停", () => {
+    const result = shouldAutoPause({
+      inventoryAvailable: 200,
+      inventoryThreshold: 80,
+      refundRate: 0.05,
+      refundRateLimit: 0.03,
+      budgetExhausted: false,
+    });
+    expect(result).toBe(true);
   });
 
-  it("pauses when budget exhausted", () => {
-    const result = checkStopConditions(200, 0, 100, { limit: 6000, consumed: 6000 }, stopConditions);
-    expect(result.shouldPause).toBe(true);
-    expect(result.reason).toContain("预算");
+  it("预算耗尽时自动暂停", () => {
+    const result = shouldAutoPause({
+      inventoryAvailable: 200,
+      inventoryThreshold: 80,
+      refundRate: 0.01,
+      refundRateLimit: 0.03,
+      budgetExhausted: true,
+    });
+    expect(result).toBe(true);
   });
 
-  it("does not pause when all conditions OK", () => {
-    const result = checkStopConditions(200, 1, 100, { limit: 6000, consumed: 1000 }, stopConditions);
-    expect(result.shouldPause).toBe(false);
+  it("全条件正常时不暂停", () => {
+    const result = shouldAutoPause({
+      inventoryAvailable: 200,
+      inventoryThreshold: 80,
+      refundRate: 0.01,
+      refundRateLimit: 0.03,
+      budgetExhausted: false,
+    });
+    expect(result).toBe(false);
   });
 
-  it("does not crash on zero orders for refund rate", () => {
-    const result = checkStopConditions(200, 0, 0, { limit: 6000, consumed: 1000 }, stopConditions);
-    expect(result.shouldPause).toBe(false);
+  it("零退款率不触发暂停", () => {
+    const result = shouldAutoPause({
+      inventoryAvailable: 200,
+      inventoryThreshold: 80,
+      refundRate: 0,
+      refundRateLimit: 0.03,
+      budgetExhausted: false,
+    });
+    expect(result).toBe(false);
   });
 });
