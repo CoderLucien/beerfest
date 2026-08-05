@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useVisitor } from "@/context/VisitorContext";
 import { useRouter } from "next/navigation";
 import type { Coupon, Order } from "@beerfest/domain";
-import { getAdapter } from "@/lib/db/synthetic";
-import { Ticket, ShoppingCart, Clock, CheckCircle, ArrowLeft } from "lucide-react";
+import { Ticket, ShoppingCart, ArrowLeft } from "lucide-react";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   active: { label: "可使用", color: "bg-green-100 text-green-700" },
@@ -15,37 +14,49 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 };
 
 export default function CouponsPage() {
-  const { visitor } = useVisitor();
+  const { visitor, loading: ctxLoading } = useVisitor();
   const router = useRouter();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (ctxLoading) return;
     if (!visitor) { router.push("/login"); return; }
-    const adapter = getAdapter();
-    Promise.all([
-      adapter.getCouponsByVisitor(visitor.visitorId),
-      adapter.getOrdersByVisitor(visitor.visitorId),
-    ]).then(([c, o]) => {
-      setCoupons(c);
-      setOrders(o);
-      setLoading(false);
-    });
-  }, [visitor, router]);
+    fetch(`/api/v1/coupons?visitor_id=${visitor.visitorId}`)
+      .then(r => r.json())
+      .then(d => setCoupons(d.data ?? []))
+      .catch(() => setCoupons([]));
+    fetch(`/api/v1/orders?visitor_id=${visitor.visitorId}`)
+      .then(r => r.json())
+      .then(d => setOrders(d.data ?? []))
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false));
+  }, [visitor, router, ctxLoading]);
 
   if (!visitor) return null;
 
   const handleOrder = async () => {
-    const p = await getAdapter().getProducts();
-    const products = p.slice(0, 3).filter(x => !x.containsAlcohol || visitor.alcoholVerified);
-    if (products.length > 0) {
-      const order = await getAdapter().createOrder({
-        visitorId: visitor.visitorId,
-        items: products.slice(0, 2).map(p => ({ productId: p.productId, quantity: 1 })),
-      });
-      setOrders(prev => [order, ...prev]);
-    }
+    try {
+      const pr = await fetch("/api/v1/products");
+      const pb = await pr.json();
+      const allProducts = pb.data ?? [];
+      const products = (Array.isArray(allProducts) ? allProducts : []).slice(0, 3).filter((x: any) => !x.containsAlcohol || visitor.alcoholVerified);
+      if (products.length > 0) {
+        const res = await fetch("/api/v1/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            visitorId: visitor.visitorId,
+            items: products.slice(0, 2).map((p: any) => ({ productId: p.productId, quantity: 1 })),
+          }),
+        });
+        const rb = await res.json();
+        if (rb.data) {
+          setOrders(prev => [rb.data, ...prev]);
+        }
+      }
+    } catch {}
   };
 
   if (loading) {
