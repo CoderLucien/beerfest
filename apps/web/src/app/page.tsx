@@ -13,13 +13,14 @@ const ZONE_LABELS: Record<string, string> = {
 };
 
 export default function HomePage() {
-  const { visitor } = useVisitor();
+  const { visitor, loading: ctxLoading } = useVisitor();
   const router = useRouter();
   const [zones, setZones] = useState<Zone[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (ctxLoading) return;
     if (!visitor) { router.push("/login"); return; }
     Promise.all([
       fetch("/api/v1/zones/status").then(r => r.json()),
@@ -29,9 +30,9 @@ export default function HomePage() {
       setCampaigns(c.data ?? []);
       setLoading(false);
     });
-  }, []);
+  }, [ctxLoading, visitor]);
 
-  if (!visitor || loading) {
+  if (!visitor || loading || ctxLoading) {
     return <div className="min-h-screen bg-beerfest-cream flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-beerfest-yellow border-t-transparent rounded-full" /></div>;
   }
 

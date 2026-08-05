@@ -8,20 +8,28 @@ import type { Campaign } from "@beerfest/domain";
 import { Shield, CheckCircle, AlertTriangle, Beer, ArrowRight } from "lucide-react";
 
 export default function VerifyPage() {
-  const { visitor } = useVisitor();
+  const { visitor, loading: ctxLoading } = useVisitor();
   const router = useRouter();
   const params = useSearchParams();
   const campaignId = params.get("campaignId");
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [campaignLoading, setCampaignLoading] = useState(false);
   const [alcoholOk, setAlcoholOk] = useState(false);
 
   useEffect(() => {
+    if (ctxLoading) return;
     if (!visitor) { router.push("/login"); return; }
-    if (campaignId) { getAdapter().getCampaign(campaignId).then(setCampaign); }
-  }, []);
+    if (campaignId) {
+      setCampaignLoading(true);
+      fetch(`/api/v1/admin/campaigns/${campaignId}`)
+        .then(r => r.json())
+        .then(d => { setCampaign(d.data?.campaign ?? d.data ?? null); setCampaignLoading(false); })
+        .catch(() => { setCampaign(null); setCampaignLoading(false); });
+    }
+  }, [ctxLoading, visitor, campaignId]);
 
-  if (!visitor) return null;
+  if (!visitor || ctxLoading) return null;
 
   const isAdult = visitor.age >= 18;
   const canViewAlcohol = visitor.alcoholVerified || visitor.type === "family";

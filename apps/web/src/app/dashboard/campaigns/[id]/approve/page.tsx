@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getAdapter } from "@/lib/db/synthetic";
 import type { Campaign, CampaignVersion } from "@beerfest/domain";
 import { CheckCircle, XCircle, AlertTriangle, Clock, ArrowLeft } from "lucide-react";
 
@@ -16,15 +15,14 @@ export default function ApprovePage() {
 
   useEffect(() => {
     if (!params.id) return;
-    const adapter = getAdapter();
-    Promise.all([
-      adapter.getCampaign(params.id),
-      adapter.getCampaignVersions(params.id),
-    ]).then(([c, vs]) => {
-      setCampaign(c);
-      if (vs.length > 0) setVersion(vs[vs.length - 1]);
-      setLoading(false);
-    });
+    fetch(`/api/v1/admin/campaigns/${params.id}`)
+      .then(r => r.json())
+      .then(d => {
+        setCampaign(d.data?.campaign ?? d.data ?? null);
+        setVersion((d.data?.versions?.length > 0) ? d.data.versions[d.data.versions.length - 1] : null);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, [params.id]);
 
   const handleApprove = async () => {
