@@ -8,13 +8,13 @@
 
 | ID | 任务 | 负责人 | 状态 | 阻断项 |
 |----|------|--------|------|--------|
-| T1 | Prisma Schema + DataAdapter 层 | @beerfest-rd | 🟡 进行中 | — |
+| T1 | Prisma Schema + DataAdapter 层 | @beerfest-rd | ✅ 完成 | 12 实体 + 9 枚举，`0f05919` |
 | T2 | 种子数据 & 事件生成器 | @beerfest/simulator | ✅ 完成 | — |
-| T3 | API Routes（15 端点） | @beerfest-rd | 🔴 未开始 | 阻塞于 T1 |
-| T4 | 游客端页面（首页/校验/券包） | @beerfest-rd | 🟡 部分完成 | 登录页 ✅，其余阻塞于 T3 |
-| T5 | 运营端页面（驾驶舱/活动/审批/评估） | @beerfest-rd | 🟡 部分完成 | Dashboard 骨架 ✅，其余阻塞于 T3 |
+| T3 | API Routes（17 端点） | @beerfest-rd | ✅ 完成 | 游客 7 + 管理 10，全部 200 OK，`0f05919` |
+| T4 | 游客端页面（首页/校验/券包） | @beerfest-rd | 🟡 部分完成 | 登录页 ✅，首页骨架 ✅ |
+| T5 | 运营端页面（驾驶舱/活动/审批/评估） | @beerfest-rd | 🟡 部分完成 | Dashboard 骨架 ✅ |
 | T6 | V1 业务场景测试 | @beerfest-rd + @beerfest-qa | 🟡 部分完成 | 25/58 已实现 |
-| T7 | QA 测试执行 & 报告 | @beerfest-qa | 🔴 未开始 | 阻塞于 T6 |
+| T7 | QA 测试执行 & 报告 | @beerfest-qa | 🔴 未开始 | 等待 QA 触发 |
 
 **当前 Sprint 目标**：Web 登录页面可访问，展示演示账号选择入口。
 
@@ -207,4 +207,4 @@ pnpm --filter tests vitest run --coverage
 | ~~GitHub 推送认证失败~~ | — | ✅ 已解决（SSH 走 443，已推送 `ed1dbff` + `7f4864a`） |
 | apps/web/src/ 为空 | ~~T3-T7 全部阻塞~~ | ✅ 已解决（骨架 + 登录页 + Dashboard 已搭建） |
 | ~~node_modules 未安装~~ | — | ✅ 已解决（pnpm install 完成） |
-| Prisma Schema 未创建 | T3 API Routes 阻塞 | 🟡 待推进 @beerfest-rd |
+| ~~Prisma Schema 未创建~~ | — | ✅ 已解决（T1 完成，`0f05919`） |
