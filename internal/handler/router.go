@@ -15,6 +15,7 @@ func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 		api.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 		})
+		api.GET("/health", Health(s.Health))
 
 		// Dashboard
 		api.GET("/dashboard/:activity_id", Dashboard(s.Dashboard))
