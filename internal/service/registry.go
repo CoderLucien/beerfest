@@ -9,6 +9,7 @@ import (
 type Registry struct {
 	DB         *sql.DB
 	Redis      *redis.Client
+	Health     *HealthService
 	Promotion  *PromotionService
 	Activity   *ActivityService
 	Coupon     *CouponService
@@ -17,8 +18,9 @@ type Registry struct {
 	Segment    *SegmentService
 }
 
-func NewRegistry(db *sql.DB, redis *redis.Client) *Registry {
-	r := &Registry{DB: db, Redis: redis}
+func NewRegistry(db *sql.DB, rdb *redis.Client) *Registry {
+	r := &Registry{DB: db, Redis: rdb}
+	r.Health = NewHealthService(db, rdb)
 	r.Promotion = &PromotionService{db: db}
 	r.Activity = &ActivityService{db: db}
 	r.Coupon = &CouponService{db: db}
