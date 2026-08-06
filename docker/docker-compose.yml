@@ -1,44 +1,45 @@
-version: "3.9"
+# beerfest-api stack — DB via external TiDB Starter cluster (MySQL protocol)
+# Credentials live in .env (not committed); see .env.example
 services:
   api:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    build: .
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=beerfest
-      - DB_PASSWORD=beerfest
-      - DB_NAME=beerfest
+      - PORT=8080
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-4000}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME:-sys}
+      - DB_TLS=${DB_TLS:-}
       - REDIS_ADDR=redis:6379
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
-        condition: service_started
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: beerfest
-      POSTGRES_PASSWORD: beerfest
-      POSTGRES_DB: beerfest
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+        condition: service_healthy
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U beerfest"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
-volumes:
-  pgdata:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    restart: unless-stopped

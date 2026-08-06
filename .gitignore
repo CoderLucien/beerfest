@@ -9,3 +9,8 @@ dist/
 .tmp/
 playwright-report/
 test-results/
+# secrets
+.env
+# build artifacts
+*.log
+/tmp/
