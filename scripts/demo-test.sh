@@ -13,12 +13,22 @@ echo "  青岛啤酒节智能营促销系统 — Demo 流程演示"
 echo "  API: $API"
 echo "=============================================="
 
-# ── 1. 健康检查 ──
+# ── 1. 健康检查 (V1 可观测性) ──
 echo ""
-echo -e "$STEP 1/10 健康检查"
+echo -e "$STEP 1/10 系统健康检查 (V1 可观测性)"
+# Quick ping
 RESP=$(curl -s "$API/api/v1/ping")
 echo "  GET /api/v1/ping → $RESP"
-[[ "$RESP" == *'"ok"'* ]] && echo -e "  $OK 服务正常" || echo -e "  $ERR 失败"
+[[ "$RESP" == *'"ok"'* ]] && echo -e "  $OK ping 正常" || echo -e "  $ERR ping 失败"
+
+# Full health with component checks
+HEALTH=$(curl -s "$API/api/v1/health")
+echo "  GET /api/v1/health →"
+echo "  $(echo $HEALTH | python3 -c "import json,sys; d=json.load(sys.stdin); print('status:', d['status'], 'uptime:', d['uptime'])")" 2>/dev/null || echo "  $HEALTH"
+DB_STATUS=$(echo "$HEALTH" | grep -o '"database":{"status":"[^"]*"' | cut -d'"' -f6)
+REDIS_STATUS=$(echo "$HEALTH" | grep -o '"redis":{"status":"[^"]*"' | cut -d'"' -f6)
+echo "  → DB: $DB_STATUS  Redis: $REDIS_STATUS"
+[[ "$HEALTH" == *'"healthy"'* ]] && echo -e "  $OK 全组件健康" || echo -e "  $ERR 组件异常"
 
 # ── 2. 创建活动 ──
 echo ""
@@ -143,9 +153,11 @@ echo ""
 echo "=============================================="
 echo -e "  全部 10 步业务流程演示完成！"
 echo ""
+echo "  健康状态:   $(echo "$HEALTH" | grep -o '"status":"[^"]*"' | cut -d'"' -f4) / uptime $(echo "$HEALTH" | grep -o '"uptime":"[^"]*"' | cut -d'"' -f4)"
 echo "  活动 ID:    $ACTIVITY_ID"
 echo "  优惠券码:   $CP_CODE"
 echo "  A/B 实验:   $EXP_ID (折扣方案胜出)"
 echo "  服务地址:   $API"
-echo "  落地页:     $API/"
+echo "  落地页:     $API/        (运营看板 Dashboard)"
+echo "  Health API: $API/api/v1/health"
 echo "=============================================="
