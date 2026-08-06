@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青岛啤酒节智能营促销系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d4f2b 100%); min-height: 100vh; color: #e8e8e8; }
+.container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
+.header { text-align: center; padding: 60px 0 40px; }
+.header h1 { font-size: 2.2em; color: #f5c842; margin-bottom: 10px; text-shadow: 0 2px 12px rgba(245,200,66,0.3); }
+.header .sub { color: #8ec8e8; font-size: 1.1em; }
+.status-bar { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+.status-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 20px 28px; min-width: 140px; text-align: center; backdrop-filter: blur(8px); }
+.status-card .label { font-size: 0.85em; color: #8ec8e8; margin-bottom: 6px; }
+.status-card .value { font-size: 1.5em; font-weight: 700; }
+.status-card .ok { color: #4ade80; }
+.status-card .warn { color: #f5c842; }
+.panel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; margin-bottom: 24px; backdrop-filter: blur(8px); }
+.panel h2 { color: #f5c842; font-size: 1.2em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.endpoint { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; background: rgba(0,0,0,0.2); transition: background 0.2s; }
+.endpoint:hover { background: rgba(0,0,0,0.35); }
+.method { font-size: 0.75em; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 52px; text-align: center; text-transform: uppercase; }
+.method.get { background: #1a5c2a; color: #4ade80; }
+.method.post { background: #1a3a5c; color: #60a5fa; }
+.endpoint .path { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.9em; flex: 1; color: #d0d0d0; }
+.endpoint .desc { font-size: 0.82em; color: #8899aa; }
+.try-btn { background: rgba(245,200,66,0.15); border: 1px solid rgba(245,200,66,0.3); color: #f5c842; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78em; transition: all 0.2s; white-space: nowrap; }
+.try-btn:hover { background: rgba(245,200,66,0.25); }
+.output { background: #0a1628; border-radius: 10px; padding: 16px; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82em; max-height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(255,255,255,0.08); color: #4ade80; margin-top: 12px; display: none; }
+.output.show { display: block; }
+.output.error { color: #f87171; }
+.quick-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.quick-form input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 14px; color: #e8e8e8; font-size: 0.9em; outline: none; transition: border 0.2s; flex: 1; min-width: 200px; }
+.quick-form input:focus { border-color: #f5c842; }
+.quick-form button { background: #f5c842; color: #0a1628; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 700; font-size: 0.9em; cursor: pointer; transition: all 0.2s; }
+.quick-form button:hover { background: #f7d760; transform: translateY(-1px); }
+.footer { text-align: center; padding: 40px 0; color: #556; font-size: 0.82em; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>青岛啤酒节智能营促销系统</h1>
+    <p class="sub">Loop Workshop Agent Team Demo Show — REST API v1</p>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="status-card"><div class="label">API 服务</div><div class="value" id="apiStatus">检测中...</div></div>
+    <div class="status-card"><div class="label">TiDB</div><div class="value" id="dbStatus">检测中...</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>快速创建活动</h2>
+    <div class="quick-form">
+      <input type="text" id="activityName" placeholder="活动名称，如：青岛啤酒节主会场">
+      <button onclick="createActivity()">创建活动</button>
+    </div>
+    <div class="output" id="createOutput"></div>
+  </div>
+
+  <div class="panel">
+    <h2>API 端点</h2>
+    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/ping</span><span class="desc">健康检查</span><button class="try-btn" onclick="tryAPI('GET','/api/v1/ping')">试用</button></div>
+    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities</span><span class="desc">活动列表</span><button class="try-btn" onclick="tryAPI('GET','/api/v1/activities')">试用</button></div>
+    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities/:id</span><span class="desc">活动详情</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/activities</span><span class="desc">创建活动</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions</span><span class="desc">创建促销规则</span></div>
+    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities/:id/promotions</span><span class="desc">活动促销列表</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions/:id/approve</span><span class="desc">审批促销</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions/:id/suspend</span><span class="desc">暂停促销</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/coupons</span><span class="desc">发放优惠券</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/coupons/:code/use</span><span class="desc">核销优惠券</span></div>
+    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/dashboard/:activity_id</span><span class="desc">运营看板数据</span></div>
+    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/simulate</span><span class="desc">业务模拟</span></div>
+    <div class="output" id="apiOutput"></div>
+  </div>
+
+  <div class="footer">
+    beerfest-api v1.0 · Go + Gin + TiDB · Agent Team: leader / RD / QA / DevOps
+  </div>
+</div>
+
+<script>
+const API = '';
+const out = (id) => document.getElementById(id);
+
+async function tryAPI(method, path) {
+  const el = out('apiOutput');
+  el.className = 'output show';
+  el.textContent = '请求中...';
+  try {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    const res = await fetch(API + path, opts);
+    const data = await res.json();
+    el.className = 'output show';
+    el.textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    el.className = 'output show error';
+    el.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function createActivity() {
+  const name = out('activityName').value || '青岛啤酒节测试活动';
+  const now = new Date();
+  const end = new Date(now.getTime() + 30*24*3600*1000);
+  const body = JSON.stringify({
+    name,
+    start_time: now.toISOString(),
+    end_time: end.toISOString()
+  });
+  const el = out('createOutput');
+  el.className = 'output show';
+  el.textContent = '创建中...';
+  try {
+    const res = await fetch(API + '/api/v1/activities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+    const data = await res.json();
+    el.className = 'output show';
+    el.textContent = JSON.stringify(data, null, 2);
+    checkStatus();
+  } catch (e) {
+    el.className = 'output show error';
+    el.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function checkStatus() {
+  try {
+    const res = await fetch(API + '/api/v1/ping');
+    const data = await res.json();
+    out('apiStatus').textContent = '运行中';
+    out('apiStatus').className = 'value ok';
+    const ar = await fetch(API + '/api/v1/activities');
+    out('dbStatus').textContent = '连接正常';
+    out('dbStatus').className = 'value ok';
+  } catch (e) {
+    out('apiStatus').textContent = '未连接';
+    out('apiStatus').className = 'value warn';
+    out('dbStatus').textContent = '未知';
+    out('dbStatus').className = 'value warn';
+  }
+}
+
+checkStatus();
+</script>
+</body>
+</html>
