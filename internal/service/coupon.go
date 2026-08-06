@@ -13,11 +13,15 @@ import (
 type CouponService struct{ db *sql.DB }
 
 func (s *CouponService) Issue(promotionID, userID string) (*model.Coupon, error) {
+	codePrefix := userID
+	if len(userID) > 8 {
+		codePrefix = userID[:8]
+	}
 	c := &model.Coupon{
 		ID:          uuid.New().String(),
 		PromotionID: promotionID,
 		UserID:      userID,
-		Code:        fmt.Sprintf("CP-%s-%d", userID[:8], time.Now().Unix()),
+		Code:        fmt.Sprintf("CP-%s-%d", codePrefix, time.Now().Unix()),
 		Status:      "issued",
 		TraceID:     uuid.New().String(),
 		IssuedAt:    time.Now(),
