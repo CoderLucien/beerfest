@@ -16,6 +16,7 @@ import (
 
 func main() {
 	cfg := config.Load()
+	cfg.RegisterTLS()
 
 	db, err := repository.NewDB(cfg.DatabaseURL())
 	if err != nil {
