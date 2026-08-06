@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/CoderLucien/beerfest-api/internal/service"
@@ -9,6 +11,11 @@ import (
 func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 	api := r.Group("/api/v1")
 	{
+		// Health
+		api.GET("/ping", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		})
+
 		// Dashboard
 		api.GET("/dashboard/:activity_id", Dashboard(s.Dashboard))
 
