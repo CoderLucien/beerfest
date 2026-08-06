@@ -3,147 +3,389 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>啤酒节智能营促销系统</title>
+<title>啤酒节 · 智能营促销系统</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d4f2b 100%); min-height: 100vh; color: #e8e8e8; }
-.container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
-.header { text-align: center; padding: 60px 0 40px; }
-.header h1 { font-size: 2.2em; color: #f5c842; margin-bottom: 10px; text-shadow: 0 2px 12px rgba(245,200,66,0.3); }
-.header .sub { color: #8ec8e8; font-size: 1.1em; }
-.status-bar { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
-.status-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 20px 28px; min-width: 140px; text-align: center; backdrop-filter: blur(8px); }
-.status-card .label { font-size: 0.85em; color: #8ec8e8; margin-bottom: 6px; }
-.status-card .value { font-size: 1.5em; font-weight: 700; }
-.status-card .ok { color: #4ade80; }
-.status-card .warn { color: #f5c842; }
-.panel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; margin-bottom: 24px; backdrop-filter: blur(8px); }
-.panel h2 { color: #f5c842; font-size: 1.2em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.endpoint { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; background: rgba(0,0,0,0.2); transition: background 0.2s; }
-.endpoint:hover { background: rgba(0,0,0,0.35); }
-.method { font-size: 0.75em; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 52px; text-align: center; text-transform: uppercase; }
-.method.get { background: #1a5c2a; color: #4ade80; }
-.method.post { background: #1a3a5c; color: #60a5fa; }
-.endpoint .path { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.9em; flex: 1; color: #d0d0d0; }
-.endpoint .desc { font-size: 0.82em; color: #8899aa; }
-.try-btn { background: rgba(245,200,66,0.15); border: 1px solid rgba(245,200,66,0.3); color: #f5c842; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78em; transition: all 0.2s; white-space: nowrap; }
-.try-btn:hover { background: rgba(245,200,66,0.25); }
-.output { background: #0a1628; border-radius: 10px; padding: 16px; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82em; max-height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(255,255,255,0.08); color: #4ade80; margin-top: 12px; display: none; }
-.output.show { display: block; }
-.output.error { color: #f87171; }
-.quick-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-.quick-form input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 14px; color: #e8e8e8; font-size: 0.9em; outline: none; transition: border 0.2s; flex: 1; min-width: 200px; }
-.quick-form input:focus { border-color: #f5c842; }
-.quick-form button { background: #f5c842; color: #0a1628; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 700; font-size: 0.9em; cursor: pointer; transition: all 0.2s; }
-.quick-form button:hover { background: #f7d760; transform: translateY(-1px); }
-.footer { text-align: center; padding: 40px 0; color: #556; font-size: 0.82em; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8}
+.container{max-width:1280px;margin:0 auto;padding:20px 24px}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;flex-wrap:wrap;gap:12px}
+.header h1{font-size:1.6em;color:#f5c842;text-shadow:0 2px 12px rgba(245,200,66,0.25)}
+.header .sub{color:#7eb8d8;font-size:0.88em;margin-top:4px}
+.health-badge{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font-size:0.85em;font-weight:600}
+.health-badge.healthy{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80}
+.health-badge.degraded{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:#fbbf24}
+.health-dot{width:8px;height:8px;border-radius:50%}
+.health-dot.healthy{background:#4ade80;box-shadow:0 0 6px #4ade80}
+.health-dot.degraded{background:#fbbf24;box-shadow:0 0 6px #fbbf24}
+
+/* Activity selector */
+.selector-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.selector-bar label{color:#8ec8e8;font-size:0.9em;white-space:nowrap}
+.selector-bar select{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 14px;color:#e8e8e8;font-size:0.9em;outline:none;min-width:260px;cursor:pointer}
+.selector-bar select:focus{border-color:#f5c842}
+.selector-bar .btn{padding:8px 20px;border-radius:8px;font-size:0.85em;font-weight:600;cursor:pointer;border:none;transition:all 0.2s}
+.btn-sim{background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.3);color:#f5c842}
+.btn-sim:hover{background:rgba(245,200,66,0.25)}
+.btn-refresh{background:rgba(142,200,232,0.1);border:1px solid rgba(142,200,232,0.25);color:#8ec8e8}
+.btn-refresh:hover{background:rgba(142,200,232,0.2)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,200,66,0.3);border-top-color:#f5c842;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Metrics grid */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.metric-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;backdrop-filter:blur(8px);transition:transform 0.2s}
+.metric-card:hover{transform:translateY(-2px)}
+.metric-card .label{font-size:0.82em;color:#8899aa;margin-bottom:8px}
+.metric-card .value{font-size:1.8em;font-weight:700;color:#f0f0f0}
+.metric-card .value.revenue{color:#4ade80}
+.metric-card .value.users{color:#60a5fa}
+.metric-card .value.rate{color:#f5c842}
+.metric-card .sub{font-size:0.78em;color:#667788;margin-top:4px}
+
+/* Charts */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:20px;margin-bottom:24px}
+.panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;backdrop-filter:blur(8px)}
+.panel h2{color:#f5c842;font-size:1.1em;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.panel h2 .icon{font-size:1.2em}
+.chart-wrap{position:relative;height:280px}
+.chart-wrap canvas{width:100%!important}
+
+/* Simulator output */
+.sim-output{background:#0a1628;border-radius:10px;padding:16px;font-family:"SF Mono","Fira Code",monospace;font-size:0.8em;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;border:1px solid rgba(255,255,255,0.08);color:#4ade80;margin-top:12px;display:none}
+.sim-output.show{display:block}
+.sim-output.error{color:#f87171}
+
+/* Responsive */
+@media(max-width:768px){
+  .charts-grid{grid-template-columns:1fr}
+  .header h1{font-size:1.3em}
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Footer */
+.footer{text-align:center;padding:32px 0;color:#445566;font-size:0.8em}
+.footer span{color:#556677}
+
+/* Toast */
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:10px;font-size:0.88em;font-weight:600;z-index:999;animation:slideIn 0.3s ease;display:none}
+.toast.show{display:block}
+.toast.success{background:#166534;border:1px solid #4ade80;color:#4ade80}
+.toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- Header -->
   <div class="header">
-    <h1>啤酒节智能营促销系统</h1>
-    <p class="sub">Loop Workshop Agent Team Demo Show — REST API v1</p>
-  </div>
-
-  <div class="status-bar" id="statusBar">
-    <div class="status-card"><div class="label">API 服务</div><div class="value" id="apiStatus">检测中...</div></div>
-    <div class="status-card"><div class="label">TiDB</div><div class="value" id="dbStatus">检测中...</div></div>
-  </div>
-
-  <div class="panel">
-    <h2>快速创建活动</h2>
-    <div class="quick-form">
-      <input type="text" id="activityName" placeholder="活动名称，如：啤酒节主会场">
-      <button onclick="createActivity()">创建活动</button>
+    <div>
+      <h1>啤酒节 · 智能营促销系统</h1>
+      <p class="sub">Loop Workshop Agent Team — 运营数据看板</p>
     </div>
-    <div class="output" id="createOutput"></div>
+    <div class="health-badge" id="healthBadge">
+      <span class="health-dot" id="healthDot"></span>
+      <span id="healthText">检测中...</span>
+    </div>
   </div>
 
-  <div class="panel">
-    <h2>API 端点</h2>
-    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/ping</span><span class="desc">健康检查</span><button class="try-btn" onclick="tryAPI('GET','/api/v1/ping')">试用</button></div>
-    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities</span><span class="desc">活动列表</span><button class="try-btn" onclick="tryAPI('GET','/api/v1/activities')">试用</button></div>
-    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities/:id</span><span class="desc">活动详情</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/activities</span><span class="desc">创建活动</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions</span><span class="desc">创建促销规则</span></div>
-    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/activities/:id/promotions</span><span class="desc">活动促销列表</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions/:id/approve</span><span class="desc">审批促销</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/promotions/:id/suspend</span><span class="desc">暂停促销</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/coupons</span><span class="desc">发放优惠券</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/coupons/:code/use</span><span class="desc">核销优惠券</span></div>
-    <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/dashboard/:activity_id</span><span class="desc">运营看板数据</span></div>
-    <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/simulate</span><span class="desc">业务模拟</span></div>
-    <div class="output" id="apiOutput"></div>
+  <!-- Activity selector -->
+  <div class="selector-bar">
+    <label for="activitySelect">当前活动：</label>
+    <select id="activitySelect" onchange="onActivityChange()">
+      <option value="">-- 选择活动 --</option>
+    </select>
+    <button class="btn btn-refresh" onclick="refreshAll()">刷新数据</button>
+    <button class="btn btn-sim" id="simBtn" onclick="runSimulation()">运行模拟</button>
+    <span id="simSpinner" style="display:none"><span class="spinner"></span>模拟中...</span>
+  </div>
+
+  <!-- Metrics cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="label">总营收</div>
+      <div class="value revenue" id="mRevenue">--</div>
+      <div class="sub">活动期间累计</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">活跃用户</div>
+      <div class="value users" id="mUsers">--</div>
+      <div class="sub">领取优惠券用户数</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">券核销率</div>
+      <div class="value rate" id="mRate">--</div>
+      <div class="sub">已使用 / 已发放</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">实验状态</div>
+      <div class="value" style="font-size:1.2em" id="mExp">--</div>
+      <div class="sub">最新 A/B 实验结果</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="panel">
+      <h2><span class="icon"></span>营收 & 订单趋势（模拟数据）</h2>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2><span class="icon"></span>券发放 vs 核销对比</h2>
+      <div class="chart-wrap"><canvas id="couponChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Simulation output -->
+  <div class="panel" id="simPanel" style="display:none">
+    <h2>模拟结果</h2>
+    <div class="sim-output" id="simOutput"></div>
   </div>
 
   <div class="footer">
-    beerfest-api v1.0 · Go + Gin + TiDB · Agent Team: leader / RD / QA / DevOps
+    beerfest-api v1.0 · Go + Gin + TiDB + Redis · Chart.js<br>
+    <span>Agent Team: leader / RD / QA / DevOps / Ops</span>
   </div>
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
 const API = '';
-const out = (id) => document.getElementById(id);
 
-async function tryAPI(method, path) {
-  const el = out('apiOutput');
-  el.className = 'output show';
-  el.textContent = '请求中...';
+let trendChart = null, couponChart = null;
+let simDailyData = [];
+
+// --- Init ---
+async function init() {
+  await Promise.all([checkHealth(), loadActivities()]);
+  setInterval(checkHealth, 30000);
+}
+
+// --- Health ---
+async function checkHealth() {
   try {
-    const opts = { method, headers: { 'Content-Type': 'application/json' } };
-    const res = await fetch(API + path, opts);
+    const res = await fetch(API + '/api/v1/health');
     const data = await res.json();
-    el.className = 'output show';
-    el.textContent = JSON.stringify(data, null, 2);
-  } catch (e) {
-    el.className = 'output show error';
-    el.textContent = 'Error: ' + e.message;
+    const badge = document.getElementById('healthBadge');
+    const dot = document.getElementById('healthDot');
+    const text = document.getElementById('healthText');
+
+    badge.className = 'health-badge ' + (data.status === 'healthy' ? 'healthy' : 'degraded');
+    dot.className = 'health-dot ' + (data.status === 'healthy' ? 'healthy' : 'degraded');
+
+    let label = data.status === 'healthy' ? '系统正常' : '部分降级';
+    if (data.components) {
+      const parts = [];
+      for (const [k,v] of Object.entries(data.components)) {
+        parts.push(k + ': ' + (v.status === 'healthy' ? 'OK' : 'FAIL'));
+      }
+      label += ' · ' + parts.join(' · ');
+    }
+    text.textContent = label;
+  } catch(e) {
+    document.getElementById('healthBadge').className = 'health-badge degraded';
+    document.getElementById('healthDot').className = 'health-dot degraded';
+    document.getElementById('healthText').textContent = 'API 不可达';
   }
 }
 
-async function createActivity() {
-  const name = out('activityName').value || '啤酒节测试活动';
-  const now = new Date();
-  const end = new Date(now.getTime() + 30*24*3600*1000);
-  const body = JSON.stringify({
-    name,
-    start_time: now.toISOString(),
-    end_time: end.toISOString()
+// --- Activities ---
+async function loadActivities() {
+  try {
+    const res = await fetch(API + '/api/v1/activities');
+    const list = await res.json();
+    const sel = document.getElementById('activitySelect');
+    sel.innerHTML = '<option value="">-- 选择活动 --</option>';
+    if (Array.isArray(list)) {
+      list.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.name + ' [' + a.status + ']';
+        sel.appendChild(opt);
+      });
+      if (list.length > 0) {
+        sel.value = list[list.length-1].id;
+        onActivityChange();
+      }
+    }
+  } catch(e) {
+    console.error('load activities:', e);
+  }
+}
+
+// --- Activity change ---
+function onActivityChange() {
+  const id = document.getElementById('activitySelect').value;
+  if (id) loadDashboard(id);
+}
+
+// --- Dashboard ---
+async function loadDashboard(activityId) {
+  try {
+    const res = await fetch(API + '/api/v1/dashboard/' + activityId);
+    const m = await res.json();
+    document.getElementById('mRevenue').textContent = '¥' + (m.total_revenue || 0).toLocaleString('zh-CN', {minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('mUsers').textContent = (m.active_users || 0).toLocaleString();
+    document.getElementById('mRate').textContent = ((m.coupon_used_rate || 0)*100).toFixed(1) + '%';
+    document.getElementById('mExp').textContent = m.experiment_win || '暂无数据';
+  } catch(e) {
+    console.error('dashboard:', e);
+  }
+}
+
+// --- Simulation ---
+async function runSimulation() {
+  const activityId = document.getElementById('activitySelect').value;
+  if (!activityId) { showToast('请先选择活动', 'error'); return; }
+
+  document.getElementById('simSpinner').style.display = 'inline';
+  document.getElementById('simBtn').disabled = true;
+
+  try {
+    const res = await fetch(API + '/api/v1/simulate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({activity_id: activityId, days: 14, seed: Date.now()})
+    });
+    const data = await res.json();
+
+    const panel = document.getElementById('simPanel');
+    panel.style.display = 'block';
+    const out = document.getElementById('simOutput');
+    out.className = 'sim-output show';
+    out.textContent = JSON.stringify(data, null, 2);
+
+    if (data.daily && data.daily.length > 0) {
+      simDailyData = data.daily;
+      renderCharts(data.daily);
+      showToast('模拟完成：' + data.days + '天数据已生成', 'success');
+    }
+
+    loadDashboard(activityId);
+  } catch(e) {
+    const out = document.getElementById('simOutput');
+    out.className = 'sim-output show error';
+    out.textContent = 'Error: ' + e.message;
+    showToast('模拟失败: ' + e.message, 'error');
+  } finally {
+    document.getElementById('simSpinner').style.display = 'none';
+    document.getElementById('simBtn').disabled = false;
+  }
+}
+
+// --- Charts ---
+function renderCharts(daily) {
+  const days = daily.map((_,i) => 'D' + (i+1));
+  const revenues = daily.map(d => d.revenue || 0);
+  const orders = daily.map(d => d.orders_created || 0);
+  const issued = daily.map(d => d.coupons_issued || 0);
+  const used = daily.map(d => d.coupons_used || 0);
+
+  // Trend chart
+  if (trendChart) trendChart.destroy();
+  const tCtx = document.getElementById('trendChart').getContext('2d');
+  trendChart = new Chart(tCtx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [
+        {
+          label: '营收 (¥)',
+          data: revenues,
+          borderColor: '#4ade80',
+          backgroundColor: 'rgba(74,222,128,0.08)',
+          fill: true,
+          tension: 0.3,
+          yAxisID: 'y',
+          pointRadius: 3,
+          pointBackgroundColor: '#4ade80'
+        },
+        {
+          label: '订单数',
+          data: orders,
+          borderColor: '#60a5fa',
+          backgroundColor: 'rgba(96,165,250,0.08)',
+          fill: true,
+          tension: 0.3,
+          yAxisID: 'y1',
+          pointRadius: 3,
+          pointBackgroundColor: '#60a5fa'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {mode:'index',intersect:false},
+      plugins: {legend:{labels:{color:'#8899aa',usePointStyle:true,padding:20}}},
+      scales: {
+        x:{ticks:{color:'#556677'},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{type:'linear',position:'left',title:{display:true,text:'营收 (¥)',color:'#4ade80'},ticks:{color:'#556677',callback:v=>'¥'+v},grid:{color:'rgba(255,255,255,0.05)'}},
+        y1:{type:'linear',position:'right',title:{display:true,text:'订单数',color:'#60a5fa'},ticks:{color:'#556677'},grid:{display:false}}
+      }
+    }
   });
-  const el = out('createOutput');
-  el.className = 'output show';
-  el.textContent = '创建中...';
-  try {
-    const res = await fetch(API + '/api/v1/activities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-    const data = await res.json();
-    el.className = 'output show';
-    el.textContent = JSON.stringify(data, null, 2);
-    checkStatus();
-  } catch (e) {
-    el.className = 'output show error';
-    el.textContent = 'Error: ' + e.message;
-  }
+
+  // Coupon chart
+  if (couponChart) couponChart.destroy();
+  const cCtx = document.getElementById('couponChart').getContext('2d');
+  couponChart = new Chart(cCtx, {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [
+        {
+          label: '券发放',
+          data: issued,
+          backgroundColor: 'rgba(245,200,66,0.5)',
+          borderColor: '#f5c842',
+          borderWidth: 1
+        },
+        {
+          label: '券核销',
+          data: used,
+          backgroundColor: 'rgba(74,222,128,0.5)',
+          borderColor: '#4ade80',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {mode:'index',intersect:false},
+      plugins: {legend:{labels:{color:'#8899aa',usePointStyle:true,padding:20}}},
+      scales: {
+        x:{ticks:{color:'#556677'},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{ticks:{color:'#556677'},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
 }
 
-async function checkStatus() {
-  try {
-    const res = await fetch(API + '/api/v1/ping');
-    const data = await res.json();
-    out('apiStatus').textContent = '运行中';
-    out('apiStatus').className = 'value ok';
-    const ar = await fetch(API + '/api/v1/activities');
-    out('dbStatus').textContent = '连接正常';
-    out('dbStatus').className = 'value ok';
-  } catch (e) {
-    out('apiStatus').textContent = '未连接';
-    out('apiStatus').className = 'value warn';
-    out('dbStatus').textContent = '未知';
-    out('dbStatus').className = 'value warn';
-  }
+// --- Refresh ---
+async function refreshAll() {
+  await Promise.all([checkHealth(), loadActivities()]);
+  const id = document.getElementById('activitySelect').value;
+  if (id) loadDashboard(id);
+  showToast('数据已刷新', 'success');
 }
 
-checkStatus();
+// --- Toast ---
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Go
+init();
 </script>
 </body>
 </html>
