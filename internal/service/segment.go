@@ -54,6 +54,27 @@ func (s *SegmentService) Evaluate(id, userID string) (bool, error) {
 	if err := json.Unmarshal([]byte(seg.Rule), &rule); err != nil {
 		return false, err
 	}
+
+	if rule.MinSpend > 0 {
+		var totalSpend float64
+		s.db.QueryRow(
+			`SELECT COALESCE(SUM(amount),0) FROM orders WHERE user_id=?`, userID,
+		).Scan(&totalSpend)
+		if totalSpend < rule.MinSpend {
+			return false, nil
+		}
+	}
+
+	if rule.MemberDays > 0 {
+		var firstOrder time.Time
+		err := s.db.QueryRow(
+			`SELECT MIN(created_at) FROM orders WHERE user_id=?`, userID,
+		).Scan(&firstOrder)
+		if err != nil || time.Since(firstOrder).Hours()/24 < float64(rule.MemberDays) {
+			return false, nil
+		}
+	}
+
 	return true, nil
 }
 

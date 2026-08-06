@@ -6,7 +6,8 @@ import (
 )
 
 func ReQualify(db *sql.DB, segmentID string) (int, error) {
-	rows, err := db.Query(`SELECT id, rule FROM customer_segments WHERE id=?`, segmentID)
+	segSvc := &SegmentService{db: db}
+	rows, err := db.Query(`SELECT DISTINCT user_id FROM orders`)
 	if err != nil {
 		return 0, err
 	}
@@ -14,13 +15,20 @@ func ReQualify(db *sql.DB, segmentID string) (int, error) {
 
 	count := 0
 	for rows.Next() {
-		var id, rule string
-		if err := rows.Scan(&id, &rule); err != nil {
+		var userID string
+		if err := rows.Scan(&userID); err != nil {
 			continue
 		}
-		count++
+		ok, err := segSvc.Evaluate(segmentID, userID)
+		if err != nil {
+			log.Printf("[re-qualify] evaluate error user=%s: %v", userID, err)
+			continue
+		}
+		if ok {
+			count++
+		}
 	}
-	log.Printf("[re-qualify] segment=%s affected_users=%d", segmentID, count)
+	log.Printf("[re-qualify] segment=%s qualifying_users=%d", segmentID, count)
 	return count, nil
 }
 

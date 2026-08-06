@@ -76,7 +76,8 @@ func Migrate(db *sql.DB) error {
 		status VARCHAR(32) NOT NULL DEFAULT 'draft',
 		result TEXT,
 		trace_id VARCHAR(64),
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			completed_at DATETIME
 	);
 	CREATE TABLE IF NOT EXISTS orders (
 		id VARCHAR(64) PRIMARY KEY,
@@ -84,7 +85,8 @@ func Migrate(db *sql.DB) error {
 		user_id VARCHAR(64) NOT NULL,
 		amount DECIMAL(12,2) NOT NULL DEFAULT 0,
 		trace_id VARCHAR(64),
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			completed_at DATETIME
 	);
 	CREATE TABLE IF NOT EXISTS promotion_segments (
 		promotion_id VARCHAR(64),
