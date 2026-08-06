@@ -34,13 +34,26 @@ func (s *ExperimentService) Create(activityID, name string, variantA, variantB m
 }
 
 func (s *ExperimentService) Start(id string) error {
-	_, err := s.db.Exec(`UPDATE experiments SET status='running' WHERE id=?`, id)
-	return err
+	res, err := s.db.Exec(`UPDATE experiments SET status='running' WHERE id=? AND status='draft'`, id)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }
 
 func (s *ExperimentService) Complete(id, result string) error {
-	_, err := s.db.Exec(
-		`UPDATE experiments SET status='completed', result=? WHERE id=?`, result, id,
+	res, err := s.db.Exec(
+		`UPDATE experiments SET status='completed', result=?, completed_at=? WHERE id=? AND status='running'`,
+		result, time.Now(), id,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }

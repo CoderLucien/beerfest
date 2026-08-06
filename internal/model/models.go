@@ -47,15 +47,16 @@ type CustomerSegment struct {
 }
 
 type Experiment struct {
-	ID         string    `json:"id"`
-	ActivityID string    `json:"activity_id"`
-	Name       string    `json:"name"`
-	VariantA   string    `json:"variant_a"`
-	VariantB   string    `json:"variant_b"`
-	Status     string    `json:"status"`
-	Result     string    `json:"result,omitempty"`
-	TraceID    string    `json:"trace_id"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID          string     `json:"id"`
+	ActivityID  string     `json:"activity_id"`
+	Name        string     `json:"name"`
+	VariantA    string     `json:"variant_a"`
+	VariantB    string     `json:"variant_b"`
+	Status      string     `json:"status"`
+	Result      string     `json:"result,omitempty"`
+	TraceID     string     `json:"trace_id"`
+	CreatedAt   time.Time  `json:"created_at"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
 }
 
 type DashboardMetrics struct {

@@ -33,20 +33,28 @@ type SimulationResult struct {
 func (s *Simulator) RunBusinessDay(activityID string, day int) (*SimulationResult, error) {
 	log.Printf("[sim] day=%d activity=%s", day, activityID)
 
+	promoIDs, err := s.promotionIDsForActivity(activityID)
+	if err != nil {
+		return nil, fmt.Errorf("simulator: %w", err)
+	}
+
 	result := &SimulationResult{}
 	users := 100 + s.rng.Intn(200)
+	var issuedCouponCodes []string
 
 	for i := 0; i < users; i++ {
 		userID := fmt.Sprintf("u%04d", i)
 
-		if s.rng.Float64() < 0.3 {
+		if s.rng.Float64() < 0.3 && len(promoIDs) > 0 {
 			result.CouponsIssued++
-			promoID := uuid.New().String()
+			promoID := promoIDs[s.rng.Intn(len(promoIDs))]
+			code := fmt.Sprintf("CP-%s-%d", userID, day)
+			issuedCouponCodes = append(issuedCouponCodes, code)
 			s.db.Exec(
 				`INSERT INTO coupons (id,promotion_id,user_id,code,status,trace_id,issued_at,expires_at)
 				 VALUES (?,?,?,?,?,?,?,?)`,
 				uuid.New().String(), promoID, userID,
-				fmt.Sprintf("CP-%s-%d", userID, day),
+				code,
 				"issued", uuid.New().String(),
 				time.Now(), time.Now().Add(7*24*time.Hour),
 			)
@@ -64,8 +72,17 @@ func (s *Simulator) RunBusinessDay(activityID string, day int) (*SimulationResul
 			)
 		}
 
-		if s.rng.Float64() < 0.15 {
-			result.CouponsUsed++
+		if s.rng.Float64() < 0.15 && len(issuedCouponCodes) > 0 {
+			code := issuedCouponCodes[s.rng.Intn(len(issuedCouponCodes))]
+			res, err := s.db.Exec(
+				`UPDATE coupons SET status='used' WHERE code=? AND status='issued'`,
+				code,
+			)
+			if err == nil {
+				if n, _ := res.RowsAffected(); n > 0 {
+					result.CouponsUsed++
+				}
+			}
 		}
 	}
 
@@ -78,6 +95,25 @@ func (s *Simulator) RunBusinessDay(activityID string, day int) (*SimulationResul
 	}
 
 	return result, nil
+}
+
+func (s *Simulator) promotionIDsForActivity(activityID string) ([]string, error) {
+	rows, err := s.db.Query(
+		`SELECT id FROM promotions WHERE activity_id=? AND status='active'`, activityID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			continue
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
 }
 
 func (s *Simulator) RunFullScenario(activityID string) ([]*SimulationResult, error) {
