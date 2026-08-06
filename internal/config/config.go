@@ -33,7 +33,7 @@ func Load() *Config {
 
 func (c *Config) DatabaseURL() string {
 	dsn := c.DBUser + ":" + c.DBPass +
-		"@tcp(" + c.DBHost + ":" + c.DBPort + ")/" + c.DBName + "?parseTime=true"
+		"@tcp(" + c.DBHost + ":" + c.DBPort + ")/" + c.DBName + "?parseTime=true&multiStatements=true"
 	if c.DBTLS != "" {
 		dsn += "&tls=" + c.DBTLS
 	}
