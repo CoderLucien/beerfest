@@ -3,67 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>啤酒节 · </title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>国际啤酒节</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif;background:linear-gradient(180deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8;-webkit-tap-highlight-color:transparent}
-.container{max-width:480px;margin:0 auto;padding:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;background:linear-gradient(180deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8;-webkit-tap-highlight-color:transparent}
+.page{max-width:480px;margin:0 auto;padding:16px}
 
 /* Header */
 .header{text-align:center;padding:20px 0 16px}
-.header .logo{font-size:2.4em;margin-bottom:4px}
-.header h1{font-size:1.3em;color:#f5c842;text-shadow:0 2px 12px rgba(245,200,66,0.25);margin-bottom:4px}
-.header .sub{font-size:0.82em;color:#7eb8d8}
+.header .logo{font-size:3em;margin-bottom:2px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.header h1{font-size:1.3em;color:#f5c842;margin-bottom:4px}
+.header .sub{font-size:0.82em;color:#8ec8d8}
+.header .date{font-size:0.72em;color:#667788;margin-top:2px}
 
-/* Activity Selector */
-.act-selector{padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;margin-bottom:16px;font-size:0.85em;color:#8ec8e8;text-align:center}
-.act-selector select{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px;color:#e8e8e8;font-size:0.88em;width:100%;margin-top:6px;outline:none}
-.act-selector select:focus{border-color:#f5c842}
+/* Activity */
+.act-bar{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.act-bar select{flex:1;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#e8e8e8;font-size:0.85em;outline:none}
+.act-bar select:focus{border-color:#f5c842}
+.act-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0}
 
-/* Promotion Cards */
-.section-title{font-size:0.85em;color:#7eb8d8;margin-bottom:10px;padding-left:4px}
-.promo-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
-.promo-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0}
-.promo-icon.discount{background:rgba(74,222,128,0.15);color:#4ade80}
-.promo-icon.coupon{background:rgba(245,200,66,0.15);color:#f5c842}
-.promo-icon.bundle{background:rgba(96,165,250,0.15);color:#60a5fa}
+/* Promotion cards */
+.section-label{font-size:0.82em;color:#8ec8d8;margin:16px 0 10px;font-weight:600}
+.promo-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+.promo-card:hover{border-color:rgba(245,200,66,0.25)}
+.promo-card.claimed{opacity:0.5;border-color:rgba(74,222,128,0.2)}
+.promo-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2em;font-weight:700;flex-shrink:0}
+.promo-icon.gold{background:rgba(245,200,66,0.15);color:#f5c842}
+.promo-icon.green{background:rgba(74,222,128,0.15);color:#4ade80}
+.promo-icon.blue{background:rgba(96,165,250,0.15);color:#60a5fa}
 .promo-info{flex:1;min-width:0}
-.promo-name{font-weight:600;font-size:0.92em;color:#f0f0f0;margin-bottom:2px}
-.promo-type{font-size:0.75em;color:#667788}
-.promo-rule{font-size:0.78em;color:#8ec8e8;margin-top:2px}
+.promo-name{font-weight:600;font-size:0.9em;color:#f0f0f0}
+.promo-desc{font-size:0.75em;color:#8899aa;margin-top:2px}
+.promo-limit{font-size:0.7em;color:#667788;margin-top:2px}
+.btn-claim{padding:8px 16px;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;border:1px solid rgba(245,200,66,0.4);background:rgba(245,200,66,0.12);color:#f5c842;white-space:nowrap;flex-shrink:0;transition:all 0.2s}
+.btn-claim:active{transform:scale(0.95)}
+.btn-claim.got{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.1);color:#4ade80;cursor:default}
 
-/* Action Buttons */
-.actions{display:flex;flex-direction:column;gap:10px;margin:20px 0}
-.btn{width:100%;padding:14px;border-radius:12px;font-size:0.95em;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;text-align:center;letter-spacing:0.5px}
-.btn:active{transform:scale(0.97)}
-.btn-claim{background:linear-gradient(135deg,rgba(245,200,66,0.2),rgba(245,200,66,0.1));border:1.5px solid rgba(245,200,66,0.4);color:#f5c842}
-.btn-claim:hover{background:linear-gradient(135deg,rgba(245,200,66,0.3),rgba(245,200,66,0.15))}
-.btn-order{background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(74,222,128,0.08));border:1.5px solid rgba(74,222,128,0.3);color:#4ade80}
-.btn-order:hover{background:linear-gradient(135deg,rgba(74,222,128,0.25),rgba(74,222,128,0.12))}
-.btn-use{background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(96,165,250,0.08));border:1.5px solid rgba(96,165,250,0.3);color:#60a5fa}
-.btn-use:hover{background:linear-gradient(135deg,rgba(96,165,250,0.25),rgba(96,165,250,0.12))}
-.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
-.btn .spinner{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Checkout section */
+.checkout{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin:20px 0}
+.checkout h3{color:#f5c842;font-size:0.95em;margin-bottom:12px}
+.checkout-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.checkout-row input{flex:1;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9em;outline:none}
+.checkout-row input:focus{border-color:#4ade80}
+.checkout-row input::placeholder{color:#445566}
+.coupon-select{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.coupon-chip{padding:6px 14px;border-radius:20px;font-size:0.78em;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.2);color:#8899aa;transition:all 0.2s}
+.coupon-chip.selected{border-color:#f5c842;background:rgba(245,200,66,0.12);color:#f5c842}
+.coupon-chip:active{transform:scale(0.95)}
 
-/* Coupon Display */
-.coupon-display{background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(245,200,66,0.02));border:2px dashed rgba(245,200,66,0.3);border-radius:16px;padding:20px;text-align:center;margin:12px 0;display:none}
-.coupon-display.show{display:block}
-.coupon-code{font-family:"SF Mono","Fira Code",monospace;font-size:1.3em;font-weight:700;color:#f5c842;letter-spacing:2px;word-break:break-all;margin:8px 0}
-.coupon-label{font-size:0.78em;color:#8899aa}
+/* Calculation preview */
+.calc-preview{display:none;background:rgba(0,0,0,0.25);border-radius:10px;padding:14px;margin-bottom:12px;font-size:0.82em}
+.calc-preview.show{display:block}
+.calc-line{display:flex;justify-content:space-between;padding:4px 0;color:#8899aa}
+.calc-line.discount{color:#4ade80}
+.calc-line.total{color:#f5c842;font-weight:700;font-size:1.1em;border-top:1px solid rgba(255,255,255,0.08);margin-top:4px;padding-top:8px}
 
-/* Result Panel */
-.result-panel{background:#0a1628;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-top:12px;display:none;max-height:260px;overflow-y:auto}
-.result-panel.show{display:block}
-.result-panel .http{font-size:0.75em;color:#667788;margin-bottom:6px;font-family:"SF Mono","Fira Code",monospace}
-.result-panel .json{font-family:"SF Mono","Fira Code",monospace;font-size:0.75em;color:#4ade80;white-space:pre-wrap;word-break:break-all}
-.result-panel.error .json{color:#f87171}
+/* Pay button */
+.btn-pay{width:100%;padding:14px;border-radius:12px;font-size:1em;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628;transition:all 0.2s}
+.btn-pay:active{transform:scale(0.97)}
+.btn-pay:disabled{opacity:0.35;cursor:not-allowed}
 
-/* Order Form */
-.order-form{display:flex;gap:8px;margin-bottom:10px;display:none}
-.order-form.show{display:flex}
-.order-form input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9em;outline:none}
-.order-form input:focus{border-color:#4ade80}
+/* Receipt */
+.receipt{display:none;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:14px;padding:20px;margin:16px 0;text-align:center}
+.receipt.show{display:block}
+.receipt h3{color:#4ade80;font-size:1.1em;margin-bottom:14px}
+.receipt-table{width:100%;font-size:0.85em}
+.receipt-table td{padding:6px 8px;color:#8899aa}
+.receipt-table td:last-child{text-align:right;color:#e8e8e8}
+.receipt-table tr.total td{color:#f5c842;font-weight:700;font-size:1.1em;border-top:1px dashed rgba(255,255,255,0.1);padding-top:10px}
+.receipt .order-id{font-family:"SF Mono","Fira Code",monospace;font-size:0.72em;color:#556677;margin-top:12px}
+
+/* Lucky Wheel */
+.wheel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
+.wheel-overlay.show{display:flex}
+.wheel-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#8899aa;font-size:1.2em;cursor:pointer}
+.wheel-title{color:#f5c842;font-size:1.1em;margin-bottom:20px;font-weight:700}
+.wheel-container{position:relative;width:280px;height:280px}
+.wheel-canvas{width:100%;height:100%}
+.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:24px solid #f5c842;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));z-index:2}
+.btn-spin{margin-top:20px;padding:12px 40px;border-radius:24px;font-size:1em;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628}
+.btn-spin:disabled{opacity:0.4;cursor:not-allowed}
+.spin-remain{color:#667788;font-size:0.78em;margin-top:8px}
+
+/* Game entry button */
+.game-entry{text-align:center;margin:16px 0}
+.btn-game{padding:10px 28px;border-radius:24px;font-size:0.88em;font-weight:700;cursor:pointer;border:1px dashed rgba(245,200,66,0.4);background:rgba(245,200,66,0.06);color:#f5c842;transition:all 0.2s}
+.btn-game:active{transform:scale(0.95)}
 
 /* Toast */
 .toast{position:fixed;top:16px;left:16px;right:16px;padding:12px 18px;border-radius:12px;font-size:0.88em;font-weight:600;z-index:999;text-align:center;display:none;animation:slideDown 0.3s ease}
@@ -72,118 +101,93 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto
 .toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
 @keyframes slideDown{from{transform:translateY(-40px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* Status Badge */
-.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.75em;font-weight:600}
-.status-badge.online{background:rgba(74,222,128,0.12);color:#4ade80}
-.status-badge.offline{background:rgba(248,113,113,0.12);color:#f87171}
-.status-dot{width:6px;height:6px;border-radius:50%}
-.status-dot.online{background:#4ade80}
-.status-dot.offline{background:#f87171}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.footer{text-align:center;padding:24px 0;color:#445566;font-size:0.75em}
+.footer{text-align:center;padding:20px 0;color:#445566;font-size:0.72em}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="page">
 
-  <!-- Header -->
   <div class="header">
     <div class="logo">🍺</div>
     <h1>国际啤酒节</h1>
-    <div class="sub"> · 智能营促销系统</div>
-    <div style="margin-top:8px">
-      <span class="status-badge" id="statusBadge">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">检测中...</span>
-      </span>
-    </div>
+    <div class="sub">扫码领券 · 畅享美酒</div>
+    <div class="date">2026.08.06 — 08.20 · 主会场</div>
   </div>
 
-  <!-- Activity Selector -->
-  <div class="act-selector">
-    当前活动
+  <div class="act-bar">
+    <div class="act-dot"></div>
     <select id="activitySelect" onchange="loadPromos()">
-      <option value="">-- 选择活动 --</option>
+      <option value="">选择会场...</option>
     </select>
   </div>
 
-  <!-- Promotions -->
-  <div id="promoSection" style="display:none">
-    <div class="section-title">可领取优惠</div>
-    <div id="promoList"></div>
+  <div class="section-label">限时优惠</div>
+  <div id="promoList"><div style="color:#556677;font-size:0.82em;text-align:center;padding:20px">请先选择会场</div></div>
+
+  <div class="game-entry">
+    <button class="btn-game" onclick="openWheel()">🎰 幸运大转盘 · 抽券</button>
+    <div style="font-size:0.7em;color:#667788;margin-top:4px" id="spinRemainText">今日剩余 3 次</div>
   </div>
 
-  <!-- Coupon Display -->
-  <div class="coupon-display" id="couponDisplay">
-    <div class="coupon-label">我的优惠券</div>
-    <div class="coupon-code" id="couponCode">--</div>
-    <div style="font-size:0.75em;color:#667788;margin-top:4px" id="couponStatus">待使用</div>
-  </div>
-
-  <!-- Actions -->
-  <div class="actions">
-    <button class="btn btn-claim" id="btnClaim" onclick="claimCoupon()" disabled>
-      领取欢迎券
-    </button>
-    <button class="btn btn-order" id="btnOrder" onclick="showOrderForm()" disabled>
-      下单消费
-    </button>
-    <div class="order-form" id="orderForm">
-      <input type="number" id="orderAmount" value="128" min="1" max="9999" placeholder="消费金额 ¥">
-      <button class="btn btn-order" style="width:auto;padding:10px 18px;font-size:0.82em;white-space:nowrap" onclick="placeOrder()">确认下单</button>
+  <div class="checkout" id="checkoutSection">
+    <h3>🧾 去结算</h3>
+    <div class="coupon-select" id="couponChips">
+      <span style="color:#556677;font-size:0.78em">请先领取优惠券</span>
     </div>
-    <button class="btn btn-use" id="btnUse" onclick="useCoupon()" disabled>
-      核销优惠券
-    </button>
+    <div class="checkout-row">
+      <input type="number" id="orderAmount" value="128" min="1" placeholder="消费金额 ¥">
+    </div>
+    <div class="calc-preview" id="calcPreview">
+      <div class="calc-line"><span>原价</span><span id="calcOrig">¥0.00</span></div>
+      <div class="calc-line discount"><span>优惠券抵扣</span><span id="calcDiscount">-¥0.00</span></div>
+      <div class="calc-line total"><span>实付</span><span id="calcFinal">¥0.00</span></div>
+    </div>
+    <button class="btn-pay" id="btnPay" onclick="doPay()" disabled>确认支付</button>
   </div>
 
-  <!-- Result Panel -->
-  <div class="result-panel" id="resultPanel">
-    <div class="http" id="resultHttp"></div>
-    <div class="json" id="resultJson"></div>
-  </div>
+  <div class="receipt" id="receipt"></div>
 
-  <div class="footer">
-    beerfest-api v1.0 · Demo 演示
-  </div>
+  <div class="footer">国际啤酒节 · 智能营促销</div>
 </div>
+
+<!-- Lucky Wheel Overlay -->
+<div class="wheel-overlay" id="wheelOverlay">
+  <button class="wheel-close" onclick="closeWheel()">✕</button>
+  <div class="wheel-title">🎰 幸运大转盘</div>
+  <div class="wheel-container">
+    <div class="wheel-pointer"></div>
+    <canvas class="wheel-canvas" id="wheelCanvas" width="280" height="280"></canvas>
+  </div>
+  <button class="btn-spin" id="btnSpin" onclick="spinWheel()">开始抽奖</button>
+  <div class="spin-remain" id="spinRemain"></div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 var API = '';
+var myCoupons = {};     // {promoId: {code, name, promoData}}
+var selectedCoupon = null;
+var wheelSpinning = false;
+var spinRemaining = 3;
 
-var myCouponCode = null;
-var myPromoId = null;
+var wheelPrizes = [
+  {label: '满100减30', color: '#f5c842'},
+  {label: '全场8折',   color: '#4ade80'},
+  {label: '啤酒套餐',  color: '#60a5fa'},
+  {label: '谢谢参与',  color: '#667788'},
+  {label: '满100减30', color: '#f5c842'},
+  {label: '再来一次',  color: '#8ec8d8'},
+  {label: '全场8折',   color: '#4ade80'},
+  {label: '啤酒套餐',  color: '#60a5fa'}
+];
 
-// Init
+// --- Init ---
 async function init() {
-  await checkAPI();
   await loadActivities();
-}
-
-async function checkAPI() {
-  try {
-    var res = await fetch(API + '/api/v1/ping');
-    var data = await res.json();
-    var ok = data === 'ok' || (data && data.status === 'ok');
-    setStatus(ok);
-  } catch(e) {
-    setStatus(false);
-  }
-}
-
-function setStatus(ok) {
-  var badge = document.getElementById('statusBadge');
-  var dot = document.getElementById('statusDot');
-  var txt = document.getElementById('statusText');
-  if (ok) {
-    badge.className = 'status-badge online';
-    dot.className = 'status-dot online';
-    txt.textContent = '系统在线';
-  } else {
-    badge.className = 'status-badge offline';
-    dot.className = 'status-dot offline';
-    txt.textContent = '系统离线';
-  }
 }
 
 async function loadActivities() {
@@ -191,7 +195,7 @@ async function loadActivities() {
     var res = await fetch(API + '/api/v1/activities');
     var list = await res.json();
     var sel = document.getElementById('activitySelect');
-    sel.innerHTML = '<option value="">-- 选择活动 --</option>';
+    sel.innerHTML = '<option value="">选择会场...</option>';
     if (Array.isArray(list)) {
       list.forEach(function(a) {
         var opt = document.createElement('option');
@@ -205,17 +209,13 @@ async function loadActivities() {
       }
     }
   } catch(e) {
-    showToast('加载活动失败: ' + e.message, 'error');
+    showToast('加载失败: ' + e.message, 'error');
   }
 }
 
 async function loadPromos() {
   var aid = document.getElementById('activitySelect').value;
   if (!aid) return;
-
-  document.getElementById('btnClaim').disabled = true;
-  document.getElementById('btnOrder').disabled = true;
-  document.getElementById('promoSection').style.display = 'none';
 
   try {
     var res = await fetch(API + '/api/v1/activities/' + aid + '/promotions');
@@ -224,166 +224,369 @@ async function loadPromos() {
     list.innerHTML = '';
 
     if (!Array.isArray(promos) || promos.length === 0) {
-      list.innerHTML = '<div style="color:#667788;font-size:0.85em;padding:12px;text-align:center">暂无促销活动</div>';
-      document.getElementById('promoSection').style.display = 'block';
+      list.innerHTML = '<div style="color:#556677;font-size:0.82em;text-align:center;padding:20px">暂无优惠活动</div>';
       return;
     }
 
-    var approved = promos.filter(function(p) { return p.status === 'approved' || p.status === 'active'; });
-    if (approved.length === 0) {
-      list.innerHTML = '<div style="color:#667788;font-size:0.85em;padding:12px;text-align:center">促销审核中</div>';
-      document.getElementById('promoSection').style.display = 'block';
-      return;
-    }
+    promos.forEach(function(p) {
+      if (p.status !== 'approved' && p.status !== 'active') return;
 
-    myPromoId = approved[0].id;
+      var iconCls, icon, name, desc, limit;
 
-    approved.forEach(function(p) {
-      var iconCls = 'discount';
-      var icon = '%';
-      var ruleText = '';
       try {
         var rule = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
-        if (p.type === 'discount') { iconCls = 'discount'; icon = '%'; ruleText = (rule.rate*100).toFixed(0) + '折'; }
-        else if (p.type === 'coupon') { iconCls = 'coupon'; icon = '￥'; ruleText = '满' + rule.threshold + '减' + rule.discount; }
-        else if (p.type === 'bundle') { iconCls = 'bundle'; icon = '#'; ruleText = (rule.items||[]).join('+') + ' ¥' + rule.price; }
+        if (p.type === 'discount') {
+          iconCls = 'green'; icon = (rule.rate*100).toFixed(0) + '折';
+          name = p.name; desc = '全场' + (rule.rate*100).toFixed(0) + '折优惠'; limit = '不限门槛';
+        } else if (p.type === 'coupon') {
+          iconCls = 'gold'; icon = '¥' + rule.discount;
+          name = p.name; desc = '满' + rule.threshold + '减' + rule.discount; limit = '满¥' + rule.threshold + '可用';
+        } else if (p.type === 'bundle') {
+          iconCls = 'blue'; icon = '套餐';
+          name = p.name; desc = (rule.items||[]).join('+'); limit = '特价 ¥' + rule.price;
+        }
       } catch(e) {}
 
+      var claimed = !!myCoupons[p.id];
       var card = document.createElement('div');
-      card.className = 'promo-card';
-      card.innerHTML = '<div class="promo-icon ' + iconCls + '">' + icon + '</div>' +
+      card.className = 'promo-card' + (claimed ? ' claimed' : '');
+      card.id = 'promo-' + p.id;
+      card.innerHTML =
+        '<div class="promo-icon ' + iconCls + '">' + icon + '</div>' +
         '<div class="promo-info">' +
-        '<div class="promo-name">' + escHtml(p.name) + '</div>' +
-        '<div class="promo-type">' + escHtml(p.type) + '</div>' +
-        '<div class="promo-rule">' + escHtml(ruleText) + '</div>' +
-        '</div>';
+        '<div class="promo-name">' + escHtml(name || p.name) + '</div>' +
+        '<div class="promo-desc">' + escHtml(desc || '') + '</div>' +
+        '<div class="promo-limit">' + escHtml(limit || '') + '</div>' +
+        '</div>' +
+        '<button class="btn-claim' + (claimed ? ' got' : '') + '" id="btn-claim-' + p.id + '" onclick="claimOne(\'' + p.id + '\')">' +
+        (claimed ? '已领取 ✓' : '立即领取') +
+        '</button>';
       list.appendChild(card);
     });
 
-    document.getElementById('promoSection').style.display = 'block';
-    document.getElementById('btnClaim').disabled = false;
-    document.getElementById('btnOrder').disabled = false;
-    showToast('已加载 ' + approved.length + ' 个促销', 'success');
+    updateCouponChips();
   } catch(e) {
-    showToast('加载促销失败: ' + e.message, 'error');
-    document.getElementById('btnClaim').disabled = false;
-    document.getElementById('btnOrder').disabled = false;
-    document.getElementById('promoSection').style.display = 'block';
+    showToast('加载优惠失败', 'error');
   }
 }
 
-async function claimCoupon() {
-  var aid = document.getElementById('activitySelect').value;
-  if (!aid || !myPromoId) { showToast('请先选择活动', 'error'); return; }
+async function claimOne(promoId) {
+  if (myCoupons[promoId]) { showToast('已领取过此券', 'error'); return; }
 
-  var btn = document.getElementById('btnClaim');
+  var btn = document.getElementById('btn-claim-' + promoId);
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>领取中...';
+  btn.textContent = '领取中...';
 
   try {
     var res = await fetch(API + '/api/v1/coupons', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({promotion_id: myPromoId, user_id: 'customer_' + Date.now()})
+      body: JSON.stringify({promotion_id: promoId, user_id: 'guest_' + Date.now()})
     });
     var data = await res.json();
-    showResult(res.status, data);
 
     if (data.code) {
-      myCouponCode = data.code;
-      document.getElementById('couponCode').textContent = data.code;
-      document.getElementById('couponStatus').textContent = data.status === 'issued' ? '待使用' : data.status;
-      document.getElementById('couponDisplay').classList.add('show');
-      document.getElementById('btnUse').disabled = false;
-      showToast('优惠券领取成功！', 'success');
+      // Find promo data
+      var promoCard = document.getElementById('promo-' + promoId);
+      var promoName = promoCard ? promoCard.querySelector('.promo-name').textContent : '优惠券';
+
+      myCoupons[promoId] = {code: data.code, name: promoName};
+      btn.textContent = '已领取 ✓';
+      btn.className = 'btn-claim got';
+      btn.disabled = false;
+      document.getElementById('promo-' + promoId).classList.add('claimed');
+
+      updateCouponChips();
+      showToast('领取成功！', 'success');
     }
   } catch(e) {
-    showToast('领取失败: ' + e.message, 'error');
-  } finally {
+    btn.textContent = '立即领取';
     btn.disabled = false;
-    btn.innerHTML = '领取欢迎券';
+    showToast('领取失败: ' + e.message, 'error');
   }
 }
 
-function showOrderForm() {
-  var form = document.getElementById('orderForm');
-  form.classList.toggle('show');
-  if (form.classList.contains('show')) {
-    document.getElementById('orderAmount').focus();
+function updateCouponChips() {
+  var container = document.getElementById('couponChips');
+  var ids = Object.keys(myCoupons);
+  if (ids.length === 0) {
+    container.innerHTML = '<span style="color:#556677;font-size:0.78em">请先领取优惠券</span>';
+  } else {
+    var html = '';
+    ids.forEach(function(id) {
+      var c = myCoupons[id];
+      var sel = selectedCoupon === id;
+      html += '<span class="coupon-chip' + (sel ? ' selected' : '') + '" onclick="selectCoupon(\'' + id + '\')">' +
+        escHtml(c.name) + '</span>';
+    });
+    container.innerHTML = html;
   }
+  updateCalc();
 }
 
-async function placeOrder() {
-  var aid = document.getElementById('activitySelect').value;
-  var amount = parseInt(document.getElementById('orderAmount').value) || 128;
-  if (!aid) { showToast('请先选择活动', 'error'); return; }
+function selectCoupon(id) {
+  selectedCoupon = (selectedCoupon === id) ? null : id;
+  updateCouponChips();
+}
 
-  var btn = document.getElementById('btnOrder');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>下单中...';
-  document.getElementById('orderForm').classList.remove('show');
+function updateCalc() {
+  var amount = parseFloat(document.getElementById('orderAmount').value) || 0;
+  var preview = document.getElementById('calcPreview');
+  var btnPay = document.getElementById('btnPay');
+
+  if (!selectedCoupon || amount <= 0) {
+    preview.classList.remove('show');
+    btnPay.disabled = true;
+    return;
+  }
+
+  preview.classList.add('show');
+  btnPay.disabled = false;
+
+  // Find discount amount from rule
+  var promoCard = document.getElementById('promo-' + selectedCoupon);
+  var discount = 0;
+  var discountLabel = '';
+
+  // We need the original promo data - fetch from server
+  // For now use stored info
+  try {
+    // Re-fetch to get rule
+    var aid = document.getElementById('activitySelect').value;
+    fetch(API + '/api/v1/activities/' + aid + '/promotions').then(function(res) {
+      return res.json();
+    }).then(function(promos) {
+      if (Array.isArray(promos)) {
+        var p = promos.find(function(x) { return x.id === selectedCoupon; });
+        if (p) {
+          var rule = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
+          var disc = 0;
+          var label = '';
+          if (p.type === 'discount') {
+            disc = amount * (1 - rule.rate);
+            label = '全场' + (rule.rate*100).toFixed(0) + '折';
+          } else if (p.type === 'coupon') {
+            disc = amount >= rule.threshold ? rule.discount : 0;
+            label = '满' + rule.threshold + '减' + rule.discount;
+          } else if (p.type === 'bundle') {
+            disc = Math.max(0, amount - rule.price);
+            label = '套餐价 ¥' + rule.price;
+          }
+          var final = Math.max(0, amount - disc);
+          document.getElementById('calcOrig').textContent = '¥' + amount.toFixed(2);
+          document.getElementById('calcDiscount').textContent = '-¥' + disc.toFixed(2);
+          document.getElementById('calcFinal').textContent = '¥' + final.toFixed(2);
+        }
+      }
+    });
+  } catch(e) {}
+}
+
+// Recalc on amount change
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('orderAmount').addEventListener('input', updateCalc);
+});
+
+async function doPay() {
+  if (!selectedCoupon) { showToast('请选择一张优惠券', 'error'); return; }
+
+  var amount = parseFloat(document.getElementById('orderAmount').value) || 0;
+  if (amount <= 0) { showToast('请输入消费金额', 'error'); return; }
+
+  var btnPay = document.getElementById('btnPay');
+  btnPay.disabled = true;
+  btnPay.innerHTML = '<span class="spinner"></span>支付中...';
 
   try {
-    // Use simulate with 1 day to create orders
-    var res = await fetch(API + '/api/v1/simulate', {
+    var coupon = myCoupons[selectedCoupon];
+
+    // Simulate order
+    var aid = document.getElementById('activitySelect').value;
+    var simRes = await fetch(API + '/api/v1/simulate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({activity_id: aid, days: 1, seed: Date.now()})
     });
-    var data = await res.json();
-    showResult(res.status, data.summary || data);
-    showToast('下单成功！订单已生成', 'success');
-  } catch(e) {
-    showToast('下单失败: ' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '下单消费';
-  }
-}
 
-async function useCoupon() {
-  if (!myCouponCode) { showToast('请先领取优惠券', 'error'); return; }
+    // Use coupon
+    var useRes = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(coupon.code) + '/use', {method:'POST'});
+    var useData = await useRes.json();
 
-  var btn = document.getElementById('btnUse');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>核销中...';
-
-  try {
-    var res = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(myCouponCode) + '/use', {method:'POST'});
-    var data = await res.json();
-    showResult(res.status, data);
-
-    if (data.status === 'used') {
-      document.getElementById('couponStatus').textContent = '已使用';
-      document.getElementById('couponDisplay').style.opacity = '0.5';
-      document.getElementById('btnUse').disabled = true;
-      showToast('核销成功！感谢光临 🍺', 'success');
+    // Calculate discount
+    var promosRes = await fetch(API + '/api/v1/activities/' + aid + '/promotions');
+    var promos = await promosRes.json();
+    var promo = (Array.isArray(promos) ? promos.find(function(x) { return x.id === selectedCoupon; }) : null);
+    var rule = promo ? (typeof promo.rule === 'string' ? JSON.parse(promo.rule) : promo.rule) : null;
+    var discount = 0;
+    var discountLabel = coupon.name;
+    if (rule) {
+      if (promo.type === 'discount') discount = amount * (1 - rule.rate);
+      else if (promo.type === 'coupon') discount = amount >= rule.threshold ? rule.discount : 0;
+      else if (promo.type === 'bundle') discount = Math.max(0, amount - rule.price);
     }
+    var finalAmount = Math.max(0, amount - discount);
+    var orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
+
+    // Show receipt
+    var receipt = document.getElementById('receipt');
+    receipt.innerHTML =
+      '<h3>✅ 支付成功</h3>' +
+      '<table class="receipt-table">' +
+      '<tr><td>原价</td><td>¥' + amount.toFixed(2) + '</td></tr>' +
+      '<tr><td>优惠券</td><td style="color:#4ade80">-' + escHtml(discountLabel) + ' -¥' + discount.toFixed(2) + '</td></tr>' +
+      '<tr class="total"><td>实付</td><td>¥' + finalAmount.toFixed(2) + '</td></tr>' +
+      '</table>' +
+      '<div class="order-id">订单号: ' + orderId + '</div>';
+    receipt.classList.add('show');
+    receipt.scrollIntoView({behavior:'smooth'});
+
+    // Clean up used coupon
+    delete myCoupons[selectedCoupon];
+    selectedCoupon = null;
+    updateCouponChips();
+    loadPromos();
+    showToast('支付成功！欢迎再次光临 🍺', 'success');
   } catch(e) {
-    showToast('核销失败: ' + e.message, 'error');
-    btn.disabled = false;
+    showToast('支付失败: ' + e.message, 'error');
   } finally {
-    btn.innerHTML = '核销优惠券';
+    btnPay.disabled = false;
+    btnPay.textContent = '确认支付';
   }
 }
 
-function showResult(status, data) {
-  var panel = document.getElementById('resultPanel');
-  document.getElementById('resultHttp').textContent = 'HTTP ' + status + '  ' + new Date().toLocaleTimeString();
-  document.getElementById('resultJson').textContent = JSON.stringify(data, null, 2);
-  panel.className = 'result-panel show' + (status >= 400 ? ' error' : '');
+// --- Lucky Wheel ---
+function drawWheel() {
+  var canvas = document.getElementById('wheelCanvas');
+  var ctx = canvas.getContext('2d');
+  var cx = 140, cy = 140, r = 130;
+  var n = wheelPrizes.length;
+  var angle = 2 * Math.PI / n;
+
+  wheelPrizes.forEach(function(prize, i) {
+    var start = i * angle - Math.PI/2;
+    var end = start + angle;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.fillStyle = prize.color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Label
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + angle/2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#0a1628';
+    ctx.font = 'bold 12px -apple-system, sans-serif';
+    ctx.fillText(prize.label, r - 12, 4);
+    ctx.restore();
+  });
+
+  // Center
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, 2*Math.PI);
+  ctx.fillStyle = '#f5c842';
+  ctx.fill();
+  ctx.fillStyle = '#0a1628';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('抽奖', cx, cy);
+}
+
+function openWheel() {
+  document.getElementById('wheelOverlay').classList.add('show');
+  document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
+  drawWheel();
+}
+
+function closeWheel() {
+  document.getElementById('wheelOverlay').classList.remove('show');
+}
+
+async function spinWheel() {
+  if (wheelSpinning || spinRemaining <= 0) return;
+  wheelSpinning = true;
+  spinRemaining--;
+
+  var btn = document.getElementById('btnSpin');
+  btn.disabled = true;
+  document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
+  document.getElementById('spinRemainText').textContent = '今日剩余 ' + spinRemaining + ' 次';
+
+  // Random target (0-7), favor first 3 promotions
+  var target = Math.floor(Math.random() * wheelPrizes.length);
+  var spins = 5 + Math.floor(Math.random() * 3); // 5-7 full rotations
+  var totalDeg = spins * 360 + target * (360/wheelPrizes.length) + Math.random() * (360/wheelPrizes.length);
+
+  var canvas = document.getElementById('wheelCanvas');
+  var duration = 3000;
+  var startTime = Date.now();
+
+  function anim() {
+    var elapsed = Date.now() - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var deg = eased * totalDeg;
+    canvas.style.transform = 'rotate(' + deg + 'deg)';
+    if (progress < 1) {
+      requestAnimationFrame(anim);
+    } else {
+      wheelSpinning = false;
+      btn.disabled = false;
+      var prizeIdx = target;
+      var prize = wheelPrizes[prizeIdx];
+      if (prize.label === '谢谢参与') {
+        showToast('谢谢参与！明天再来吧', 'error');
+      } else if (prize.label === '再来一次') {
+        spinRemaining++;
+        document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
+        document.getElementById('spinRemainText').textContent = '今日剩余 ' + spinRemaining + ' 次';
+        showToast('再来一次！', 'success');
+      } else {
+        // Auto-claim matching promotion
+        var aid = document.getElementById('activitySelect').value;
+        if (aid) {
+          fetch(API + '/api/v1/activities/' + aid + '/promotions').then(function(r) { return r.json(); }).then(function(promos) {
+            if (Array.isArray(promos)) {
+              var match = promos.find(function(p) {
+                var t = '';
+                try { var rule = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
+                  if (p.type === 'discount') t = '全场' + (rule.rate*100).toFixed(0) + '折';
+                  else if (p.type === 'coupon') t = '满' + rule.threshold + '减' + rule.discount;
+                  else if (p.type === 'bundle') t = '啤酒套餐';
+                } catch(e) {}
+                return t === prize.label;
+              });
+              if (match && !myCoupons[match.id]) {
+                claimOne(match.id);
+                showToast('🎉 恭喜获得「' + prize.label + '」！已自动领取', 'success');
+              } else {
+                showToast('🎉 恭喜获得「' + prize.label + '」！', 'success');
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+  requestAnimationFrame(anim);
 }
 
 function showToast(msg, type) {
-  var t = document.createElement('div');
-  t.className = 'toast show ' + type;
+  var t = document.getElementById('toast');
   t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function() { t.remove(); }, 2500);
+  t.className = 'toast show ' + type;
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 init();
