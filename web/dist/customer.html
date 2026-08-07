@@ -158,8 +158,6 @@ var myPromoId = null;
 async function init() {
   await checkAPI();
   await loadActivities();
-  var sel = document.getElementById('activitySelect');
-  if (sel.value) loadPromos();
 }
 
 async function checkAPI() {
@@ -203,7 +201,7 @@ async function loadActivities() {
       });
       if (list.length > 0) {
         sel.value = list[list.length-1].id;
-        loadPromos();
+        await loadPromos();
       }
     }
   } catch(e) {
@@ -267,7 +265,10 @@ async function loadPromos() {
     document.getElementById('btnOrder').disabled = false;
     showToast('已加载 ' + approved.length + ' 个促销', 'success');
   } catch(e) {
-    showToast('加载促销失败', 'error');
+    showToast('加载促销失败: ' + e.message, 'error');
+    document.getElementById('btnClaim').disabled = false;
+    document.getElementById('btnOrder').disabled = false;
+    document.getElementById('promoSection').style.display = 'block';
   }
 }
 
