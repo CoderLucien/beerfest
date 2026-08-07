@@ -33,6 +33,8 @@ type Coupon struct {
 	Code        string    `json:"code"`
 	Status      string    `json:"status"` // issued, used, expired
 	TraceID     string    `json:"trace_id"`
+	IP          string    `json:"ip,omitempty"`
+	UserAgent   string    `json:"user_agent,omitempty"`
 	IssuedAt    time.Time `json:"issued_at"`
 	ExpiresAt   time.Time `json:"expires_at"`
 }
@@ -54,6 +56,25 @@ type Experiment struct {
 	VariantB    string     `json:"variant_b"`
 	Status      string     `json:"status"`
 	Result      string     `json:"result,omitempty"`
+	TraceID     string     `json:"trace_id"`
+	CreatedAt   time.Time  `json:"created_at"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
+}
+
+type User struct {
+	ID           string    `json:"id"`
+	Phone        string    `json:"phone"`
+	Username     string    `json:"username,omitempty"`
+	PasswordHash string    `json:"-"`
+	Role         string    `json:"role"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type Order struct {
+	ID          string     `json:"id"`
+	ActivityID  string     `json:"activity_id"`
+	UserID      string     `json:"user_id"`
+	Amount      float64    `json:"amount"`
 	TraceID     string     `json:"trace_id"`
 	CreatedAt   time.Time  `json:"created_at"`
 	CompletedAt *time.Time `json:"completed_at,omitempty"`

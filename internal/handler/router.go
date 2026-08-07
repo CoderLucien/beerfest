@@ -5,49 +5,76 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/CoderLucien/beerfest-api/internal/middleware"
 	"github.com/CoderLucien/beerfest-api/internal/service"
 )
 
 func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 	api := r.Group("/api/v1")
 	{
-		// Health
+		// Health (public)
 		api.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 		})
 		api.GET("/health", Health(s.Health))
 
-		// Dashboard
-		api.GET("/dashboard/:activity_id", Dashboard(s.Dashboard))
+		// Auth (public)
+		api.POST("/auth/send-code", SendCode(s.Auth))
+		api.POST("/auth/login", Login(s.Auth))
+		api.POST("/auth/demo-login", DemoLogin(s.Auth))
 
-		// Activities
-		api.POST("/activities", CreateActivity(s.Activity))
+		// Admin auth (public)
+		api.POST("/admin/login", AdminLogin(s.Auth))
+
+		// Activities (read: public)
 		api.GET("/activities", ListActivities(s.Activity))
 		api.GET("/activities/:id", GetActivity(s.Activity))
-		api.PUT("/activities/:id/status", UpdateActivityStatus(s.Activity))
 
-		// Promotions
-		api.POST("/promotions", CreatePromotion(s.Promotion))
+		// Promotions (read: public)
 		api.GET("/promotions/:id", GetPromotion(s.Promotion))
 		api.GET("/activities/:id/promotions", ListPromotionsByActivity(s.Promotion))
-		api.POST("/promotions/:id/approve", ApprovePromotion(s.Promotion))
-		api.POST("/promotions/:id/suspend", SuspendPromotion(s.Promotion))
 
-		// Coupons
-		api.POST("/coupons", IssueCoupon(s.Coupon))
-		api.POST("/coupons/:code/use", UseCoupon(s.Coupon))
-		api.GET("/coupons/user/:user_id", ListUserCoupons(s.Coupon))
+		// Coupons (customer auth)
+		auth := api.Group("")
+		auth.Use(middleware.AuthRequired())
+		{
+			auth.POST("/coupons", IssueCoupon(s.Coupon))
+			auth.POST("/coupons/:code/use", UseCoupon(s.Coupon))
+			auth.GET("/coupons/mine", ListMyCoupons(s.Coupon))
+			auth.POST("/orders", CreateOrder(s.Order))
+			auth.GET("/orders/mine", ListMyOrders(s.Order))
+		}
 
-		// Experiments
-		api.POST("/experiments", CreateExperiment(s.Experiment))
-		api.POST("/experiments/:id/start", StartExperiment(s.Experiment))
-		api.POST("/experiments/:id/complete", CompleteExperiment(s.Experiment))
+		// Admin-only operations
+		admin := api.Group("")
+		admin.Use(middleware.AdminRequired())
+		{
+			// Dashboard
+			admin.GET("/dashboard/:activity_id", Dashboard(s.Dashboard))
 
-		// Customer Segments (V2)
-		api.POST("/segments", CreateSegment(s.Segment))
-		api.PUT("/segments/:id/rule", UpdateSegmentRule(s.Segment))
+			// Activities (write)
+			admin.POST("/activities", CreateActivity(s.Activity))
+			admin.PUT("/activities/:id/status", UpdateActivityStatus(s.Activity))
 
-		// Simulator (M4)
-		api.POST("/simulate", RunSimulation(s.DB))
+			// Promotions (write)
+			admin.POST("/promotions", CreatePromotion(s.Promotion))
+			admin.POST("/promotions/:id/approve", ApprovePromotion(s.Promotion))
+			admin.POST("/promotions/:id/suspend", SuspendPromotion(s.Promotion))
+
+			// Experiments
+			admin.POST("/experiments", CreateExperiment(s.Experiment))
+			admin.POST("/experiments/:id/start", StartExperiment(s.Experiment))
+			admin.POST("/experiments/:id/complete", CompleteExperiment(s.Experiment))
+
+			// Customer Segments
+			admin.POST("/segments", CreateSegment(s.Segment))
+			admin.PUT("/segments/:id/rule", UpdateSegmentRule(s.Segment))
+
+			// Simulator
+			admin.POST("/simulate", RunSimulation(s.DB))
+
+			// Ops Chat (T4)
+			admin.POST("/ops/chat", OpsChat(s.OpsChat))
+		}
 	}
 }

@@ -12,7 +12,7 @@ import (
 
 type CouponService struct{ db *sql.DB }
 
-func (s *CouponService) Issue(promotionID, userID string) (*model.Coupon, error) {
+func (s *CouponService) Issue(promotionID, userID, ip, userAgent string) (*model.Coupon, error) {
 	codePrefix := userID
 	if len(userID) > 8 {
 		codePrefix = userID[:8]
@@ -21,16 +21,18 @@ func (s *CouponService) Issue(promotionID, userID string) (*model.Coupon, error)
 		ID:          uuid.New().String(),
 		PromotionID: promotionID,
 		UserID:      userID,
-		Code:        fmt.Sprintf("CP-%s-%d", codePrefix, time.Now().Unix()),
+		Code:        fmt.Sprintf("CP-%s-%d-%s", codePrefix, time.Now().Unix(), uuid.New().String()[:4]),
 		Status:      "issued",
 		TraceID:     uuid.New().String(),
+		IP:          ip,
+		UserAgent:   userAgent,
 		IssuedAt:    time.Now(),
 		ExpiresAt:   time.Now().Add(7 * 24 * time.Hour),
 	}
 	_, err := s.db.Exec(
-		`INSERT INTO coupons (id,promotion_id,user_id,code,status,trace_id,issued_at,expires_at)
-		 VALUES (?,?,?,?,?,?,?,?)`,
-		c.ID, c.PromotionID, c.UserID, c.Code, c.Status, c.TraceID, c.IssuedAt, c.ExpiresAt,
+		`INSERT INTO coupons (id,promotion_id,user_id,code,status,trace_id,ip,user_agent,issued_at,expires_at)
+		 VALUES (?,?,?,?,?,?,?,?,?,?)`,
+		c.ID, c.PromotionID, c.UserID, c.Code, c.Status, c.TraceID, c.IP, c.UserAgent, c.IssuedAt, c.ExpiresAt,
 	)
 	return c, err
 }
@@ -38,9 +40,9 @@ func (s *CouponService) Issue(promotionID, userID string) (*model.Coupon, error)
 func (s *CouponService) GetByCode(code string) (*model.Coupon, error) {
 	c := &model.Coupon{}
 	err := s.db.QueryRow(
-		`SELECT id,promotion_id,user_id,code,status,trace_id,issued_at,expires_at
+		`SELECT id,promotion_id,user_id,code,status,trace_id,COALESCE(ip,''),COALESCE(user_agent,''),issued_at,expires_at
 		 FROM coupons WHERE code=?`, code,
-	).Scan(&c.ID, &c.PromotionID, &c.UserID, &c.Code, &c.Status, &c.TraceID, &c.IssuedAt, &c.ExpiresAt)
+	).Scan(&c.ID, &c.PromotionID, &c.UserID, &c.Code, &c.Status, &c.TraceID, &c.IP, &c.UserAgent, &c.IssuedAt, &c.ExpiresAt)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +75,7 @@ func (s *CouponService) Use(code string) error {
 
 func (s *CouponService) ListByUser(userID string) ([]model.Coupon, error) {
 	rows, err := s.db.Query(
-		`SELECT id,promotion_id,user_id,code,status,trace_id,issued_at,expires_at
+		`SELECT id,promotion_id,user_id,code,status,trace_id,COALESCE(ip,''),COALESCE(user_agent,''),issued_at,expires_at
 		 FROM coupons WHERE user_id=? ORDER BY issued_at DESC`, userID,
 	)
 	if err != nil {
@@ -84,7 +86,7 @@ func (s *CouponService) ListByUser(userID string) ([]model.Coupon, error) {
 	for rows.Next() {
 		var c model.Coupon
 		if err := rows.Scan(&c.ID, &c.PromotionID, &c.UserID, &c.Code, &c.Status,
-			&c.TraceID, &c.IssuedAt, &c.ExpiresAt); err != nil {
+			&c.TraceID, &c.IP, &c.UserAgent, &c.IssuedAt, &c.ExpiresAt); err != nil {
 			return nil, err
 		}
 		list = append(list, c)

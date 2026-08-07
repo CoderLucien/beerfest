@@ -121,10 +121,17 @@ echo "  POST /experiments → $EXP_ID"
 START=$(curl -s -X POST "$API/api/v1/experiments/$EXP_ID/start")
 echo "  POST /start → $(echo $START | grep -o '"status":"[^"]*"')"
 
-RESULT=$(curl -s -X POST "$API/api/v1/experiments/$EXP_ID/complete" -H "Content-Type: application/json" \
+RESULT=$(curl -s -w "\n%{http_code}" -X POST "$API/api/v1/experiments/$EXP_ID/complete" -H "Content-Type: application/json" \
   -d '{"result":"variant_a_win"}')
-echo "  POST /complete → result=variant_a_win"
-echo -e "  $OK A/B 实验完成（折扣方案胜出）"
+HTTP_CODE=$(echo "$RESULT" | tail -1)
+BODY=$(echo "$RESULT" | sed '$d')
+COMPLETE_STATUS=$(echo "$BODY" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+echo "  POST /complete → HTTP $HTTP_CODE status=$COMPLETE_STATUS"
+if [[ "$HTTP_CODE" == "200" && "$COMPLETE_STATUS" == "completed" ]]; then
+  echo -e "  $OK A/B 实验完成（折扣方案胜出）"
+else
+  echo -e "  $ERR 实验完成失败 (HTTP $HTTP_CODE): $BODY"
+fi
 
 # ── 9. 运行模拟器 (M4) ──
 echo ""

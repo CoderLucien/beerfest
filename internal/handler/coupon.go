@@ -10,7 +10,6 @@ import (
 
 type issueCouponReq struct {
 	PromotionID string `json:"promotion_id" binding:"required"`
-	UserID      string `json:"user_id" binding:"required"`
 }
 
 func IssueCoupon(s *service.CouponService) gin.HandlerFunc {
@@ -20,7 +19,8 @@ func IssueCoupon(s *service.CouponService) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		cp, err := s.Issue(req.PromotionID, req.UserID)
+		userID, _ := c.Get("user_id")
+		cp, err := s.Issue(req.PromotionID, userID.(string), c.ClientIP(), c.GetHeader("User-Agent"))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -39,9 +39,10 @@ func UseCoupon(s *service.CouponService) gin.HandlerFunc {
 	}
 }
 
-func ListUserCoupons(s *service.CouponService) gin.HandlerFunc {
+func ListMyCoupons(s *service.CouponService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		list, err := s.ListByUser(c.Param("user_id"))
+		userID, _ := c.Get("user_id")
+		list, err := s.ListByUser(userID.(string))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
