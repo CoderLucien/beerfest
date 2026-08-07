@@ -21,6 +21,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .health-dot.healthy{background:#4ade80;box-shadow:0 0 6px #4ade80}
 .health-dot.degraded{background:#fbbf24;box-shadow:0 0 6px #fbbf24}
 
+/* Tabs */
+.tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid rgba(255,255,255,0.08)}
+.tab-btn{padding:10px 28px;font-size:0.95em;font-weight:600;cursor:pointer;border:none;background:transparent;color:#667788;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s}
+.tab-btn:hover{color:#8ec8e8}
+.tab-btn.active{color:#f5c842;border-bottom-color:#f5c842}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
 /* Activity selector */
 .selector-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .selector-bar label{color:#8ec8e8;font-size:0.9em;white-space:nowrap}
@@ -31,6 +39,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .btn-sim:hover{background:rgba(245,200,66,0.25)}
 .btn-refresh{background:rgba(142,200,232,0.1);border:1px solid rgba(142,200,232,0.25);color:#8ec8e8}
 .btn-refresh:hover{background:rgba(142,200,232,0.2)}
+.btn-sim:disabled{opacity:0.4;cursor:not-allowed}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,200,66,0.3);border-top-color:#f5c842;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -58,11 +67,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .sim-output.show{display:block}
 .sim-output.error{color:#f87171}
 
+/* Customer Journey Timeline */
+.journey-intro{color:#8ec8e8;font-size:0.9em;margin-bottom:24px;line-height:1.6}
+.journey-intro .highlight{color:#f5c842;font-weight:600}
+.timeline{position:relative;padding-left:40px}
+.timeline::before{content:'';position:absolute;left:15px;top:4px;bottom:4px;width:2px;background:rgba(245,200,66,0.2)}
+.timeline-step{position:relative;margin-bottom:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;transition:all 0.2s}
+.timeline-step:hover{border-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.05)}
+.timeline-step.played{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.05)}
+.timeline-dot{position:absolute;left:-31px;top:20px;width:14px;height:14px;border-radius:50%;background:rgba(245,200,66,0.3);border:2px solid rgba(245,200,66,0.5);z-index:1;transition:all 0.3s}
+.timeline-step.played .timeline-dot{background:#4ade80;border-color:#4ade80;box-shadow:0 0 8px rgba(74,222,128,0.4)}
+.timeline-step.running .timeline-dot{background:#f5c842;border-color:#f5c842;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 4px rgba(245,200,66,0.4)}50%{box-shadow:0 0 16px rgba(245,200,66,0.8)}}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.step-num{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,0.15);color:#f5c842;font-size:0.78em;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.timeline-step.played .step-num{background:rgba(74,222,128,0.2);color:#4ade80}
+.step-title{font-weight:600;font-size:0.95em;color:#e8e8e8}
+.step-desc{color:#667788;font-size:0.82em;margin-bottom:10px;padding-left:36px}
+.step-actions{padding-left:36px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-run{padding:6px 16px;border-radius:6px;font-size:0.8em;font-weight:600;cursor:pointer;border:1px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.1);color:#f5c842;transition:all 0.2s}
+.btn-run:hover{background:rgba(245,200,66,0.2)}
+.btn-run:disabled{opacity:0.4;cursor:not-allowed}
+.step-result{display:none;margin-top:10px;padding-left:36px}
+.step-result.show{display:block}
+.step-http{font-size:0.75em;color:#667788;display:inline-block;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:4px;font-family:"SF Mono","Fira Code",monospace}
+.step-json{padding:10px;margin-top:6px;background:#0a1628;border-radius:8px;font-family:"SF Mono","Fira Code",monospace;font-size:0.75em;color:#4ade80;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;border:1px solid rgba(255,255,255,0.06)}
+.step-json.error{color:#f87171}
+.journey-summary{text-align:center;padding:24px;margin-top:20px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.15);border-radius:14px;display:none}
+.journey-summary.show{display:block}
+.journey-summary h3{color:#4ade80;font-size:1.1em;margin-bottom:8px}
+
 /* Responsive */
 @media(max-width:768px){
   .charts-grid{grid-template-columns:1fr}
   .header h1{font-size:1.3em}
   .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .timeline{padding-left:30px}
+  .timeline-dot{left:-24px}
 }
 
 /* Footer */
@@ -92,58 +133,194 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
     </div>
   </div>
 
-  <!-- Activity selector -->
-  <div class="selector-bar">
-    <label for="activitySelect">当前活动：</label>
-    <select id="activitySelect" onchange="onActivityChange()">
-      <option value="">-- 选择活动 --</option>
-    </select>
-    <button class="btn btn-refresh" onclick="refreshAll()">刷新数据</button>
-    <input type="number" id="simDays" value="7" min="1" max="30" style="width:56px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px;color:#e8e8e8;font-size:0.85em;text-align:center" title="模拟天数">
-    <button class="btn btn-sim" id="simBtn" onclick="runSimulation()">运行模拟</button>
-    <span id="simSpinner" style="display:none"><span class="spinner"></span>模拟中...</span>
+  <!-- Tab navigation -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dashboard')">运营看板</button>
+    <button class="tab-btn" onclick="switchTab('journey')">客户旅程</button>
   </div>
 
-  <!-- Metrics cards -->
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="label">总营收</div>
-      <div class="value revenue" id="mRevenue">--</div>
-      <div class="sub">活动期间累计</div>
+  <!-- ==================== Dashboard Tab ==================== -->
+  <div class="tab-content active" id="tab-dashboard">
+
+    <!-- Activity selector -->
+    <div class="selector-bar">
+      <label for="activitySelect">当前活动：</label>
+      <select id="activitySelect" onchange="onActivityChange()">
+        <option value="">-- 选择活动 --</option>
+      </select>
+      <button class="btn btn-refresh" onclick="refreshAll()">刷新数据</button>
+      <input type="number" id="simDays" value="7" min="1" max="30" style="width:60px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 8px;color:#e8e8e8;font-size:0.9em;text-align:center" title="模拟天数">
+      <button class="btn btn-sim" id="simBtn" onclick="runSimulation()">运行模拟</button>
+      <span id="simSpinner" style="display:none"><span class="spinner"></span>模拟中...</span>
     </div>
-    <div class="metric-card">
-      <div class="label">活跃用户</div>
-      <div class="value users" id="mUsers">--</div>
-      <div class="sub">领取优惠券用户数</div>
+
+    <!-- Metrics cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="label">总营收</div>
+        <div class="value revenue" id="mRevenue">--</div>
+        <div class="sub">活动期间累计</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">活跃用户</div>
+        <div class="value users" id="mUsers">--</div>
+        <div class="sub">领取优惠券用户数</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">券核销率</div>
+        <div class="value rate" id="mRate">--</div>
+        <div class="sub">已使用 / 已发放</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">实验状态</div>
+        <div class="value" style="font-size:1.2em" id="mExp">--</div>
+        <div class="sub">最新 A/B 实验结果</div>
+      </div>
     </div>
-    <div class="metric-card">
-      <div class="label">券核销率</div>
-      <div class="value rate" id="mRate">--</div>
-      <div class="sub">已使用 / 已发放</div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="panel">
+        <h2><span class="icon"></span>营收 & 订单趋势（模拟数据）</h2>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h2><span class="icon"></span>券发放 vs 核销对比</h2>
+        <div class="chart-wrap"><canvas id="couponChart"></canvas></div>
+      </div>
     </div>
-    <div class="metric-card">
-      <div class="label">实验状态</div>
-      <div class="value" style="font-size:1.2em" id="mExp">--</div>
-      <div class="sub">最新 A/B 实验结果</div>
+
+    <!-- Simulation output -->
+    <div class="panel" id="simPanel" style="display:none">
+      <h2>模拟结果</h2>
+      <div class="sim-output" id="simOutput"></div>
     </div>
   </div>
 
-  <!-- Charts -->
-  <div class="charts-grid">
-    <div class="panel">
-      <h2><span class="icon"></span>营收 & 订单趋势（模拟数据）</h2>
-      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+  <!-- ==================== Customer Journey Tab ==================== -->
+  <div class="tab-content" id="tab-journey">
+    <div class="journey-intro">
+      跟随用户 <span class="highlight">Alice</span> 体验啤酒节智能营促销系统的完整旅程。
+      从入场扫码到离场推送，每一步都有 <span class="highlight">trace_id</span> 全链路追踪。
+      点击每个步骤的「运行」按钮，观察系统如何实时响应。
     </div>
-    <div class="panel">
-      <h2><span class="icon"></span>券发放 vs 核销对比</h2>
-      <div class="chart-wrap"><canvas id="couponChart"></canvas></div>
-    </div>
-  </div>
 
-  <!-- Simulation output -->
-  <div class="panel" id="simPanel" style="display:none">
-    <h2>模拟结果</h2>
-    <div class="sim-output" id="simOutput"></div>
+    <div class="timeline" id="timeline">
+      <!-- Step 1: Arrival -->
+      <div class="timeline-step" id="step-1">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <span class="step-title">抵达 · 扫码入场</span>
+        </div>
+        <div class="step-desc">Alice 到达啤酒节入口，扫描二维码进入会场。系统自动发放欢迎优惠券。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(1)">运行</button>
+          <span class="step-http">POST /api/v1/coupons</span>
+        </div>
+        <div class="step-result" id="result-1"></div>
+      </div>
+
+      <!-- Step 2: Browse -->
+      <div class="timeline-step" id="step-2">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <span class="step-title">浏览 · 查看促销</span>
+        </div>
+        <div class="step-desc">Alice 浏览活动促销信息——全场8折、满100减30、啤酒+烧烤套餐。系统展示已审批的促销列表。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(2)">运行</button>
+          <span class="step-http">GET /api/v1/activities/:id/promotions</span>
+        </div>
+        <div class="step-result" id="result-2"></div>
+      </div>
+
+      <!-- Step 3: Order -->
+      <div class="timeline-step" id="step-3">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">3</span>
+          <span class="step-title">下单 · 购买啤酒</span>
+        </div>
+        <div class="step-desc">Alice 下单购买啤酒 + 烧烤套餐，消费 ¥128。订单写入系统，营收实时更新，trace_id 可追踪。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(3)">运行</button>
+          <span class="step-http">POST /api/v1/orders (via simulate 1day)</span>
+        </div>
+        <div class="step-result" id="result-3"></div>
+      </div>
+
+      <!-- Step 4: Redeem -->
+      <div class="timeline-step" id="step-4">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">4</span>
+          <span class="step-title">用券 · 核销优惠券</span>
+        </div>
+        <div class="step-desc">Alice 使用入场时发放的优惠券抵用。券状态 issued → used，原子 UPDATE 防重复核销。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(4)">运行</button>
+          <span class="step-http">POST /api/v1/coupons/:code/use</span>
+        </div>
+        <div class="step-result" id="result-4"></div>
+      </div>
+
+      <!-- Step 5: Segment -->
+      <div class="timeline-step" id="step-5">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">5</span>
+          <span class="step-title">分群 · 智能识别</span>
+        </div>
+        <div class="step-desc">系统根据 Alice 的消费行为自动分群——判定为「高频高消费用户」，触发精准营销策略。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(5)">运行</button>
+          <span class="step-http">POST /api/v1/segments</span>
+        </div>
+        <div class="step-result" id="result-5"></div>
+      </div>
+
+      <!-- Step 6: Experiment -->
+      <div class="timeline-step" id="step-6">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">6</span>
+          <span class="step-title">实验 · A/B 决策</span>
+        </div>
+        <div class="step-desc">Alice 被分入 A/B 实验的「折扣组」——系统对比折扣 vs 满减策略效果，数据驱动选择最优方案。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(6)">运行</button>
+          <span class="step-http">POST /api/v1/experiments</span>
+        </div>
+        <div class="step-result" id="result-6"></div>
+      </div>
+
+      <!-- Step 7: Departure -->
+      <div class="timeline-step" id="step-7">
+        <div class="timeline-dot"></div>
+        <div class="step-header">
+          <span class="step-num">7</span>
+          <span class="step-title">离场 · 数据闭环</span>
+        </div>
+        <div class="step-desc">Alice 离开啤酒节。运营看板汇总完整数据：营收、活跃用户、核销率、实验结论。系统生成离场推送券。</div>
+        <div class="step-actions">
+          <button class="btn-run" onclick="journeyStep(7)">运行</button>
+          <span class="step-http">GET /api/v1/dashboard/:id</span>
+        </div>
+        <div class="step-result" id="result-7"></div>
+      </div>
+    </div>
+
+    <!-- Journey summary -->
+    <div class="journey-summary" id="journeySummary">
+      <h3>Alice 的旅程完成</h3>
+      <p style="color:#8899aa;font-size:0.9em">
+        从扫码入场到离场推送，7 个触点完整覆盖。<br>
+        每一步都有 trace_id 可追踪，数据实时同步到运营看板。<br>
+        切回「运营看板」标签页查看完整数据。
+      </p>
+    </div>
   </div>
 
   <div class="footer">
@@ -156,10 +333,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 <div class="toast" id="toast"></div>
 
 <script>
-const API = '';
+var API = '';
 
-let trendChart = null, couponChart = null;
-let simDailyData = [];
+var trendChart = null;
+var couponChart = null;
+var simDailyData = [];
+var journeyData = {};
 
 // --- Init ---
 async function init() {
@@ -167,22 +346,35 @@ async function init() {
   setInterval(checkHealth, 30000);
 }
 
+// --- Tabs ---
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  document.querySelector('.tab-btn[onclick*="' + name + '"]').classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'dashboard') {
+    var id = document.getElementById('activitySelect').value;
+    if (id) loadDashboard(id);
+  }
+}
+
 // --- Health ---
 async function checkHealth() {
   try {
-    const res = await fetch(API + '/api/v1/health');
-    const data = await res.json();
-    const badge = document.getElementById('healthBadge');
-    const dot = document.getElementById('healthDot');
-    const text = document.getElementById('healthText');
+    var res = await fetch(API + '/api/v1/health');
+    var data = await res.json();
+    var badge = document.getElementById('healthBadge');
+    var dot = document.getElementById('healthDot');
+    var text = document.getElementById('healthText');
 
     badge.className = 'health-badge ' + (data.status === 'healthy' ? 'healthy' : 'degraded');
     dot.className = 'health-dot ' + (data.status === 'healthy' ? 'healthy' : 'degraded');
 
-    let label = data.status === 'healthy' ? '系统正常' : '部分降级';
+    var label = data.status === 'healthy' ? '系统正常' : '部分降级';
     if (data.components) {
-      const parts = [];
-      for (const [k,v] of Object.entries(data.components)) {
+      var parts = [];
+      for (var _i = 0, _a = Object.entries(data.components); _i < _a.length; _i++) {
+        var _b = _a[_i], k = _b[0], v = _b[1];
         parts.push(k + ': ' + (v.status === 'healthy' ? 'OK' : 'FAIL'));
       }
       label += ' · ' + parts.join(' · ');
@@ -198,13 +390,13 @@ async function checkHealth() {
 // --- Activities ---
 async function loadActivities() {
   try {
-    const res = await fetch(API + '/api/v1/activities');
-    const list = await res.json();
-    const sel = document.getElementById('activitySelect');
+    var res = await fetch(API + '/api/v1/activities');
+    var list = await res.json();
+    var sel = document.getElementById('activitySelect');
     sel.innerHTML = '<option value="">-- 选择活动 --</option>';
     if (Array.isArray(list)) {
-      list.forEach(a => {
-        const opt = document.createElement('option');
+      list.forEach(function(a) {
+        var opt = document.createElement('option');
         opt.value = a.id;
         opt.textContent = a.name + ' [' + a.status + ']';
         sel.appendChild(opt);
@@ -221,15 +413,15 @@ async function loadActivities() {
 
 // --- Activity change ---
 function onActivityChange() {
-  const id = document.getElementById('activitySelect').value;
+  var id = document.getElementById('activitySelect').value;
   if (id) loadDashboard(id);
 }
 
 // --- Dashboard ---
 async function loadDashboard(activityId) {
   try {
-    const res = await fetch(API + '/api/v1/dashboard/' + activityId);
-    const m = await res.json();
+    var res = await fetch(API + '/api/v1/dashboard/' + activityId);
+    var m = await res.json();
     document.getElementById('mRevenue').textContent = '¥' + (m.total_revenue || 0).toLocaleString('zh-CN', {minimumFractionDigits:2,maximumFractionDigits:2});
     document.getElementById('mUsers').textContent = (m.active_users || 0).toLocaleString();
     document.getElementById('mRate').textContent = ((m.coupon_used_rate || 0)*100).toFixed(1) + '%';
@@ -241,24 +433,27 @@ async function loadDashboard(activityId) {
 
 // --- Simulation ---
 async function runSimulation() {
-  const activityId = document.getElementById('activitySelect').value;
+  var activityId = document.getElementById('activitySelect').value;
   if (!activityId) { showToast('请先选择活动', 'error'); return; }
+
+  var days = parseInt(document.getElementById('simDays').value) || 7;
+  if (days < 1) days = 1;
+  if (days > 30) days = 30;
 
   document.getElementById('simSpinner').style.display = 'inline';
   document.getElementById('simBtn').disabled = true;
 
   try {
-    const days = parseInt(document.getElementById('simDays').value) || 7;
-    const res = await fetch(API + '/api/v1/simulate', {
+    var res = await fetch(API + '/api/v1/simulate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({activity_id: activityId, days, seed: Date.now()})
+      body: JSON.stringify({activity_id: activityId, days: days, seed: Date.now()})
     });
-    const data = await res.json();
+    var data = await res.json();
 
-    const panel = document.getElementById('simPanel');
+    var panel = document.getElementById('simPanel');
     panel.style.display = 'block';
-    const out = document.getElementById('simOutput');
+    var out = document.getElementById('simOutput');
     out.className = 'sim-output show';
     out.textContent = JSON.stringify(data, null, 2);
 
@@ -270,9 +465,9 @@ async function runSimulation() {
 
     loadDashboard(activityId);
   } catch(e) {
-    const out = document.getElementById('simOutput');
-    out.className = 'sim-output show error';
-    out.textContent = 'Error: ' + e.message;
+    var out2 = document.getElementById('simOutput');
+    out2.className = 'sim-output show error';
+    out2.textContent = 'Error: ' + e.message;
     showToast('模拟失败: ' + e.message, 'error');
   } finally {
     document.getElementById('simSpinner').style.display = 'none';
@@ -282,15 +477,15 @@ async function runSimulation() {
 
 // --- Charts ---
 function renderCharts(daily) {
-  const days = daily.map((_,i) => 'D' + (i+1));
-  const revenues = daily.map(d => d.revenue || 0);
-  const orders = daily.map(d => d.orders_created || 0);
-  const issued = daily.map(d => d.coupons_issued || 0);
-  const used = daily.map(d => d.coupons_used || 0);
+  var days = daily.map(function(_, i) { return 'D' + (i+1); });
+  var revenues = daily.map(function(d) { return d.revenue || 0; });
+  var orders = daily.map(function(d) { return d.orders_created || 0; });
+  var issued = daily.map(function(d) { return d.coupons_issued || 0; });
+  var used = daily.map(function(d) { return d.coupons_used || 0; });
 
   // Trend chart
   if (trendChart) trendChart.destroy();
-  const tCtx = document.getElementById('trendChart').getContext('2d');
+  var tCtx = document.getElementById('trendChart').getContext('2d');
   trendChart = new Chart(tCtx, {
     type: 'line',
     data: {
@@ -327,7 +522,7 @@ function renderCharts(daily) {
       plugins: {legend:{labels:{color:'#8899aa',usePointStyle:true,padding:20}}},
       scales: {
         x:{ticks:{color:'#556677'},grid:{color:'rgba(255,255,255,0.05)'}},
-        y:{type:'linear',position:'left',title:{display:true,text:'营收 (¥)',color:'#4ade80'},ticks:{color:'#556677',callback:v=>'¥'+v},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{type:'linear',position:'left',title:{display:true,text:'营收 (¥)',color:'#4ade80'},ticks:{color:'#556677',callback:function(v){return '¥'+v;}},grid:{color:'rgba(255,255,255,0.05)'}},
         y1:{type:'linear',position:'right',title:{display:true,text:'订单数',color:'#60a5fa'},ticks:{color:'#556677'},grid:{display:false}}
       }
     }
@@ -335,7 +530,7 @@ function renderCharts(daily) {
 
   // Coupon chart
   if (couponChart) couponChart.destroy();
-  const cCtx = document.getElementById('couponChart').getContext('2d');
+  var cCtx = document.getElementById('couponChart').getContext('2d');
   couponChart = new Chart(cCtx, {
     type: 'bar',
     data: {
@@ -373,17 +568,180 @@ function renderCharts(daily) {
 // --- Refresh ---
 async function refreshAll() {
   await Promise.all([checkHealth(), loadActivities()]);
-  const id = document.getElementById('activitySelect').value;
+  var id = document.getElementById('activitySelect').value;
   if (id) loadDashboard(id);
   showToast('数据已刷新', 'success');
 }
 
+// --- Customer Journey Steps ---
+async function journeyStep(n) {
+  var stepEl = document.getElementById('step-' + n);
+  var resultEl = document.getElementById('result-' + n);
+  var activityId = document.getElementById('activitySelect').value;
+  if (!activityId) { showToast('请先在运营看板中选择活动', 'error'); return; }
+
+  stepEl.classList.add('running');
+  resultEl.className = 'step-result show';
+  resultEl.innerHTML = '<span class="spinner"></span> 执行中...';
+
+  try {
+    switch (n) {
+      case 1: await doStep1(activityId, resultEl, stepEl); break;
+      case 2: await doStep2(activityId, resultEl, stepEl); break;
+      case 3: await doStep3(activityId, resultEl, stepEl); break;
+      case 4: await doStep4(resultEl, stepEl); break;
+      case 5: await doStep5(activityId, resultEl, stepEl); break;
+      case 6: await doStep6(activityId, resultEl, stepEl); break;
+      case 7: await doStep7(activityId, resultEl, stepEl); break;
+    }
+  } catch(e) {
+    resultEl.innerHTML = '<div class="step-json error">Error: ' + e.message + '</div>';
+  } finally {
+    stepEl.classList.remove('running');
+    stepEl.classList.add('played');
+    checkJourneyComplete();
+  }
+}
+
+async function doStep1(activityId, resultEl, stepEl) {
+  var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+  var promos = await promosRes.json();
+  var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
+  if (!promoId) throw new Error('请先在运营看板中创建并审批促销');
+
+  var res = await fetch(API + '/api/v1/coupons', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({promotion_id: promoId, user_id: 'alice_demo'})
+  });
+  var data = await res.json();
+  journeyData.couponCode = data.code;
+  journeyData.promoId = promoId;
+  resultEl.innerHTML = '<span class="step-http">POST /api/v1/coupons → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+}
+
+async function doStep2(activityId, resultEl, stepEl) {
+  var res = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+  var data = await res.json();
+  resultEl.innerHTML = '<span class="step-http">GET /api/v1/activities/' + activityId + '/promotions → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+}
+
+async function doStep3(activityId, resultEl, stepEl) {
+  var res = await fetch(API + '/api/v1/simulate', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
+  });
+  var data = await res.json();
+  resultEl.innerHTML = '<span class="step-http">POST /api/v1/simulate (1天) → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data.summary || data, null, 2)) + '</div>';
+}
+
+async function doStep4(resultEl, stepEl) {
+  var code = journeyData.couponCode;
+  if (!code) {
+    var codeInput = '<input id="tmpCode" placeholder="输入券码" style="background:#0a1628;border:1px solid rgba(255,255,255,0.15);color:#e8e8e8;padding:4px 8px;border-radius:4px;font-size:0.8em;margin-right:8px;width:240px">' +
+      '<button class="btn-run" onclick="useCouponInput()">核销此券</button>';
+    resultEl.innerHTML = '<div style="color:#fbbf24">请先运行步骤 1 获取券码，或手动输入：</div>' + codeInput;
+    return;
+  }
+  await doUseCoupon(code, resultEl);
+}
+
+async function doUseCoupon(code, resultEl) {
+  var res = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(code) + '/use', {method:'POST'});
+  var data = await res.json();
+  resultEl.innerHTML = '<span class="step-http">POST /api/v1/coupons/' + escHtml(code) + '/use → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+}
+
+function useCouponInput() {
+  var code = document.getElementById('tmpCode').value;
+  if (!code) { showToast('请输入券码', 'error'); return; }
+  journeyData.couponCode = code;
+  var resultEl = document.getElementById('result-4');
+  doUseCoupon(code, resultEl).then(function() {
+    document.getElementById('step-4').classList.add('played');
+    checkJourneyComplete();
+  }).catch(function(e) {
+    resultEl.innerHTML = '<div class="step-json error">Error: ' + e.message + '</div>';
+  });
+}
+
+async function doStep5(activityId, resultEl, stepEl) {
+  var res = await fetch(API + '/api/v1/segments', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name: '高频高消费用户', rule: {min_spend: 100, member_days: 7}})
+  });
+  var data = await res.json();
+  resultEl.innerHTML = '<span class="step-http">POST /api/v1/segments → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+}
+
+async function doStep6(activityId, resultEl, stepEl) {
+  var res = await fetch(API + '/api/v1/experiments', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      activity_id: activityId,
+      name: '折扣vs满减效果对比',
+      variant_a: {type:'discount',rate:0.8},
+      variant_b: {type:'coupon',threshold:100,discount:30}
+    })
+  });
+  var data = await res.json();
+  var expId = data.id;
+
+  if (expId) {
+    await fetch(API + '/api/v1/experiments/' + expId + '/start', {method:'POST'});
+    var completeRes = await fetch(API + '/api/v1/experiments/' + expId + '/complete', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({result:'variant_a_win'})
+    });
+    var completeData = await completeRes.json();
+    resultEl.innerHTML = '<span class="step-http">POST /api/v1/experiments → ' + res.status + ' (created) → start → complete (' + completeRes.status + ')</span>' +
+      '<div class="step-json">' + escHtml(JSON.stringify(completeData, null, 2)) + '</div>';
+  } else {
+    resultEl.innerHTML = '<span class="step-http">POST /api/v1/experiments → ' + res.status + '</span>' +
+      '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+  }
+}
+
+async function doStep7(activityId, resultEl, stepEl) {
+  var res = await fetch(API + '/api/v1/dashboard/' + activityId);
+  var data = await res.json();
+  resultEl.innerHTML = '<span class="step-http">GET /api/v1/dashboard/' + activityId + ' → ' + res.status + '</span>' +
+    '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
+}
+
+function checkJourneyComplete() {
+  var allPlayed = true;
+  for (var i = 1; i <= 7; i++) {
+    if (!document.getElementById('step-' + i).classList.contains('played')) {
+      allPlayed = false;
+      break;
+    }
+  }
+  if (allPlayed) {
+    document.getElementById('journeySummary').classList.add('show');
+    showToast('Alice 的旅程全部完成！切回运营看板查看数据', 'success');
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 // --- Toast ---
 function showToast(msg, type) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show ' + type;
-  setTimeout(() => t.classList.remove('show'), 2500);
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 
 // Go
