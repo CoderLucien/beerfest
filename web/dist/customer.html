@@ -3,149 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>啤酒节 · 智能营促销</title>
+<title>啤酒节 · </title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:linear-gradient(180deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8}
-.page{max-width:480px;margin:0 auto;padding:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif;background:linear-gradient(180deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8;-webkit-tap-highlight-color:transparent}
+.container{max-width:480px;margin:0 auto;padding:16px}
 
 /* Header */
-.header{text-align:center;padding:24px 0 20px}
+.header{text-align:center;padding:20px 0 16px}
 .header .logo{font-size:2.4em;margin-bottom:4px}
-.header h1{font-size:1.3em;color:#f5c842;text-shadow:0 2px 12px rgba(245,200,66,0.2)}
-.header .sub{color:#7eb8d8;font-size:0.82em;margin-top:4px}
+.header h1{font-size:1.3em;color:#f5c842;text-shadow:0 2px 12px rgba(245,200,66,0.25);margin-bottom:4px}
+.header .sub{font-size:0.82em;color:#7eb8d8}
 
-/* Activity selector */
-.section{margin-bottom:20px}
-.section-label{color:#8ec8e8;font-size:0.82em;margin-bottom:8px;font-weight:600}
-.activity-select{width:100%;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#e8e8e8;font-size:0.95em;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f5c842' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
-.activity-select:focus{border-color:#f5c842}
+/* Activity Selector */
+.act-selector{padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;margin-bottom:16px;font-size:0.85em;color:#8ec8e8;text-align:center}
+.act-selector select{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px;color:#e8e8e8;font-size:0.88em;width:100%;margin-top:6px;outline:none}
+.act-selector select:focus{border-color:#f5c842}
 
-/* Promo cards */
-.promo-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;margin-bottom:10px;backdrop-filter:blur(8px)}
-.promo-card .promo-name{color:#f5c842;font-weight:700;font-size:1em;margin-bottom:4px}
-.promo-card .promo-desc{color:#8899aa;font-size:0.82em;line-height:1.5}
-.promo-card .promo-meta{display:flex;gap:16px;margin-top:8px;font-size:0.78em;color:#667788}
-.promo-empty{text-align:center;padding:40px 20px;color:#556677;font-size:0.9em}
+/* Promotion Cards */
+.section-title{font-size:0.85em;color:#7eb8d8;margin-bottom:10px;padding-left:4px}
+.promo-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+.promo-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0}
+.promo-icon.discount{background:rgba(74,222,128,0.15);color:#4ade80}
+.promo-icon.coupon{background:rgba(245,200,66,0.15);color:#f5c842}
+.promo-icon.bundle{background:rgba(96,165,250,0.15);color:#60a5fa}
+.promo-info{flex:1;min-width:0}
+.promo-name{font-weight:600;font-size:0.92em;color:#f0f0f0;margin-bottom:2px}
+.promo-type{font-size:0.75em;color:#667788}
+.promo-rule{font-size:0.78em;color:#8ec8e8;margin-top:2px}
 
-/* Action buttons */
-.actions{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
-.btn{width:100%;padding:14px;border-radius:12px;font-size:1em;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
+/* Action Buttons */
+.actions{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.btn{width:100%;padding:14px;border-radius:12px;font-size:0.95em;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;text-align:center;letter-spacing:0.5px}
 .btn:active{transform:scale(0.97)}
-.btn-primary{background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628}
-.btn-primary:active{background:linear-gradient(135deg,#d4a832,#b89228)}
-.btn-secondary{background:rgba(142,200,232,0.12);border:1px solid rgba(142,200,232,0.25);color:#8ec8e8}
-.btn-secondary:active{background:rgba(142,200,232,0.2)}
-.btn-danger{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.25);color:#f87171}
-.btn-danger:active{background:rgba(248,113,113,0.2)}
-.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-claim{background:linear-gradient(135deg,rgba(245,200,66,0.2),rgba(245,200,66,0.1));border:1.5px solid rgba(245,200,66,0.4);color:#f5c842}
+.btn-claim:hover{background:linear-gradient(135deg,rgba(245,200,66,0.3),rgba(245,200,66,0.15))}
+.btn-order{background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(74,222,128,0.08));border:1.5px solid rgba(74,222,128,0.3);color:#4ade80}
+.btn-order:hover{background:linear-gradient(135deg,rgba(74,222,128,0.25),rgba(74,222,128,0.12))}
+.btn-use{background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(96,165,250,0.08));border:1.5px solid rgba(96,165,250,0.3);color:#60a5fa}
+.btn-use:hover{background:linear-gradient(135deg,rgba(96,165,250,0.25),rgba(96,165,250,0.12))}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+.btn .spinner{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* Order input */
-.order-row{display:flex;gap:10px;align-items:center}
-.order-input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#e8e8e8;font-size:0.95em;outline:none}
-.order-input:focus{border-color:#f5c842}
-.order-input::placeholder{color:#445566}
+/* Coupon Display */
+.coupon-display{background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(245,200,66,0.02));border:2px dashed rgba(245,200,66,0.3);border-radius:16px;padding:20px;text-align:center;margin:12px 0;display:none}
+.coupon-display.show{display:block}
+.coupon-code{font-family:"SF Mono","Fira Code",monospace;font-size:1.3em;font-weight:700;color:#f5c842;letter-spacing:2px;word-break:break-all;margin:8px 0}
+.coupon-label{font-size:0.78em;color:#8899aa}
 
-/* Coupon code display */
-.coupon-card{background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:16px;margin-bottom:12px;text-align:center}
-.coupon-card .coupon-code{font-family:"SF Mono","Fira Code",monospace;font-size:1.3em;color:#f5c842;font-weight:700;letter-spacing:2px;word-break:break-all}
-.coupon-card .coupon-hint{color:#667788;font-size:0.78em;margin-top:4px}
+/* Result Panel */
+.result-panel{background:#0a1628;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-top:12px;display:none;max-height:260px;overflow-y:auto}
+.result-panel.show{display:block}
+.result-panel .http{font-size:0.75em;color:#667788;margin-bottom:6px;font-family:"SF Mono","Fira Code",monospace}
+.result-panel .json{font-family:"SF Mono","Fira Code",monospace;font-size:0.75em;color:#4ade80;white-space:pre-wrap;word-break:break-all}
+.result-panel.error .json{color:#f87171}
 
-/* Response panel */
-.response-panel{background:#0a0f18;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden}
-.response-panel .resp-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.2);font-size:0.78em;color:#667788}
-.response-panel .resp-body{padding:12px 16px;font-family:"SF Mono","Fira Code",monospace;font-size:0.75em;color:#4ade80;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.5}
-.response-panel .resp-body.error{color:#f87171}
-.response-panel .resp-body.loading{color:#f5c842}
+/* Order Form */
+.order-form{display:flex;gap:8px;margin-bottom:10px;display:none}
+.order-form.show{display:flex}
+.order-form input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9em;outline:none}
+.order-form input:focus{border-color:#4ade80}
 
 /* Toast */
-.toast{position:fixed;top:16px;left:16px;right:16px;padding:12px 16px;border-radius:10px;font-size:0.88em;font-weight:600;z-index:999;animation:slideDown 0.3s ease;display:none;text-align:center}
+.toast{position:fixed;top:16px;left:16px;right:16px;padding:12px 18px;border-radius:12px;font-size:0.88em;font-weight:600;z-index:999;text-align:center;display:none;animation:slideDown 0.3s ease}
 .toast.show{display:block}
 .toast.success{background:#166534;border:1px solid #4ade80;color:#4ade80}
 .toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
-@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slideDown{from{transform:translateY(-40px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* Spinner */
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(245,200,66,0.3);border-top-color:#f5c842;border-radius:50%;animation:spin 0.6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Status Badge */
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.75em;font-weight:600}
+.status-badge.online{background:rgba(74,222,128,0.12);color:#4ade80}
+.status-badge.offline{background:rgba(248,113,113,0.12);color:#f87171}
+.status-dot{width:6px;height:6px;border-radius:50%}
+.status-dot.online{background:#4ade80}
+.status-dot.offline{background:#f87171}
 
-/* Footer */
 .footer{text-align:center;padding:24px 0;color:#445566;font-size:0.75em}
-.footer span{color:#556677}
 </style>
 </head>
 <body>
-<div class="page">
+<div class="container">
 
   <!-- Header -->
   <div class="header">
-    <div class="logo"></div>
-    <h1>啤酒节</h1>
-    <p class="sub"> · 智能营促销系统</p>
+    <div class="logo">🍺</div>
+    <h1>国际啤酒节</h1>
+    <div class="sub"> · 智能营促销系统</div>
+    <div style="margin-top:8px">
+      <span class="status-badge" id="statusBadge">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">检测中...</span>
+      </span>
+    </div>
   </div>
 
-  <!-- Activity selector -->
-  <div class="section">
-    <div class="section-label">选择活动</div>
-    <select class="activity-select" id="activitySelect" onchange="onActivityChange()">
+  <!-- Activity Selector -->
+  <div class="act-selector">
+    当前活动
+    <select id="activitySelect" onchange="loadPromos()">
       <option value="">-- 选择活动 --</option>
     </select>
   </div>
 
   <!-- Promotions -->
-  <div class="section">
-    <div class="section-label">当前促销</div>
-    <div id="promoList"><div class="promo-empty">请先选择活动</div></div>
+  <div id="promoSection" style="display:none">
+    <div class="section-title">可领取优惠</div>
+    <div id="promoList"></div>
   </div>
 
-  <!-- Coupon display -->
-  <div id="couponDisplay"></div>
+  <!-- Coupon Display -->
+  <div class="coupon-display" id="couponDisplay">
+    <div class="coupon-label">我的优惠券</div>
+    <div class="coupon-code" id="couponCode">--</div>
+    <div style="font-size:0.75em;color:#667788;margin-top:4px" id="couponStatus">待使用</div>
+  </div>
 
   <!-- Actions -->
   <div class="actions">
-    <button class="btn btn-primary" id="btnClaim" onclick="claimCoupon()" disabled>
-      <span>🎫</span> 领取欢迎券
+    <button class="btn btn-claim" id="btnClaim" onclick="claimCoupon()" disabled>
+      领取欢迎券
     </button>
-
-    <div class="order-row">
-      <input type="number" class="order-input" id="orderAmount" placeholder="消费金额 (¥)" value="128" min="1" step="0.01">
-      <button class="btn btn-secondary" id="btnOrder" onclick="placeOrder()" disabled style="width:auto;flex-shrink:0">
-        下单
-      </button>
+    <button class="btn btn-order" id="btnOrder" onclick="showOrderForm()" disabled>
+      下单消费
+    </button>
+    <div class="order-form" id="orderForm">
+      <input type="number" id="orderAmount" value="128" min="1" max="9999" placeholder="消费金额 ¥">
+      <button class="btn btn-order" style="width:auto;padding:10px 18px;font-size:0.82em;white-space:nowrap" onclick="placeOrder()">确认下单</button>
     </div>
-
-    <button class="btn btn-danger" id="btnUse" onclick="useCoupon()" disabled>
+    <button class="btn btn-use" id="btnUse" onclick="useCoupon()" disabled>
       核销优惠券
     </button>
   </div>
 
-  <!-- Response panel -->
-  <div class="response-panel">
-    <div class="resp-header">
-      <span>API 响应</span>
-      <span id="respStatus"></span>
-    </div>
-    <div class="resp-body" id="respBody">等待操作...</div>
+  <!-- Result Panel -->
+  <div class="result-panel" id="resultPanel">
+    <div class="http" id="resultHttp"></div>
+    <div class="json" id="resultJson"></div>
   </div>
 
   <div class="footer">
-    beerfest-api v1.0 · Go + Gin + TiDB + Redis<br>
-    <span>Agent Team: leader / RD / QA / dveops / Ops</span>
+    beerfest-api v1.0 · Demo 演示
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 var API = '';
-var currentCouponCode = null;
 
-// --- Init ---
+var myCouponCode = null;
+var myPromoId = null;
+
+// Init
 async function init() {
+  await checkAPI();
   await loadActivities();
+  var sel = document.getElementById('activitySelect');
+  if (sel.value) loadPromos();
 }
 
-// --- Activities ---
+async function checkAPI() {
+  try {
+    var res = await fetch(API + '/api/v1/ping');
+    var data = await res.json();
+    var ok = data === 'ok' || (data && data.status === 'ok');
+    setStatus(ok);
+  } catch(e) {
+    setStatus(false);
+  }
+}
+
+function setStatus(ok) {
+  var badge = document.getElementById('statusBadge');
+  var dot = document.getElementById('statusDot');
+  var txt = document.getElementById('statusText');
+  if (ok) {
+    badge.className = 'status-badge online';
+    dot.className = 'status-dot online';
+    txt.textContent = '系统在线';
+  } else {
+    badge.className = 'status-badge offline';
+    dot.className = 'status-dot offline';
+    txt.textContent = '系统离线';
+  }
+}
+
 async function loadActivities() {
   try {
     var res = await fetch(API + '/api/v1/activities');
@@ -156,181 +198,191 @@ async function loadActivities() {
       list.forEach(function(a) {
         var opt = document.createElement('option');
         opt.value = a.id;
-        opt.textContent = a.name + ' [' + a.status + ']';
+        opt.textContent = a.name;
         sel.appendChild(opt);
       });
       if (list.length > 0) {
         sel.value = list[list.length-1].id;
-        onActivityChange();
+        loadPromos();
       }
     }
   } catch(e) {
-    showResp('加载活动失败: ' + e.message, 'error');
+    showToast('加载活动失败: ' + e.message, 'error');
   }
 }
 
-// --- Activity change ---
-function onActivityChange() {
-  var id = document.getElementById('activitySelect').value;
-  if (id) {
-    loadPromotions(id);
+async function loadPromos() {
+  var aid = document.getElementById('activitySelect').value;
+  if (!aid) return;
+
+  document.getElementById('btnClaim').disabled = true;
+  document.getElementById('btnOrder').disabled = true;
+  document.getElementById('promoSection').style.display = 'none';
+
+  try {
+    var res = await fetch(API + '/api/v1/activities/' + aid + '/promotions');
+    var promos = await res.json();
+    var list = document.getElementById('promoList');
+    list.innerHTML = '';
+
+    if (!Array.isArray(promos) || promos.length === 0) {
+      list.innerHTML = '<div style="color:#667788;font-size:0.85em;padding:12px;text-align:center">暂无促销活动</div>';
+      document.getElementById('promoSection').style.display = 'block';
+      return;
+    }
+
+    var approved = promos.filter(function(p) { return p.status === 'approved' || p.status === 'active'; });
+    if (approved.length === 0) {
+      list.innerHTML = '<div style="color:#667788;font-size:0.85em;padding:12px;text-align:center">促销审核中</div>';
+      document.getElementById('promoSection').style.display = 'block';
+      return;
+    }
+
+    myPromoId = approved[0].id;
+
+    approved.forEach(function(p) {
+      var iconCls = 'discount';
+      var icon = '%';
+      var ruleText = '';
+      try {
+        var rule = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
+        if (p.type === 'discount') { iconCls = 'discount'; icon = '%'; ruleText = (rule.rate*100).toFixed(0) + '折'; }
+        else if (p.type === 'coupon') { iconCls = 'coupon'; icon = '￥'; ruleText = '满' + rule.threshold + '减' + rule.discount; }
+        else if (p.type === 'bundle') { iconCls = 'bundle'; icon = '#'; ruleText = (rule.items||[]).join('+') + ' ¥' + rule.price; }
+      } catch(e) {}
+
+      var card = document.createElement('div');
+      card.className = 'promo-card';
+      card.innerHTML = '<div class="promo-icon ' + iconCls + '">' + icon + '</div>' +
+        '<div class="promo-info">' +
+        '<div class="promo-name">' + escHtml(p.name) + '</div>' +
+        '<div class="promo-type">' + escHtml(p.type) + '</div>' +
+        '<div class="promo-rule">' + escHtml(ruleText) + '</div>' +
+        '</div>';
+      list.appendChild(card);
+    });
+
+    document.getElementById('promoSection').style.display = 'block';
     document.getElementById('btnClaim').disabled = false;
     document.getElementById('btnOrder').disabled = false;
-  } else {
-    document.getElementById('promoList').innerHTML = '<div class="promo-empty">请先选择活动</div>';
-    document.getElementById('btnClaim').disabled = true;
-    document.getElementById('btnOrder').disabled = true;
-  }
-}
-
-// --- Promotions ---
-async function loadPromotions(activityId) {
-  try {
-    var res = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
-    var list = await res.json();
-    var html = '';
-    if (Array.isArray(list) && list.length > 0) {
-      list.forEach(function(p) {
-        html += '<div class="promo-card">' +
-          '<div class="promo-name">' + escHtml(p.name || '未命名促销') + '</div>' +
-          '<div class="promo-desc">' + escHtml(p.description || p.type || '') + '</div>' +
-          '<div class="promo-meta"><span>状态: ' + escHtml(p.status || 'N/A') + '</span></div>' +
-          '</div>';
-      });
-    } else {
-      html = '<div class="promo-empty">暂无促销活动</div>';
-    }
-    document.getElementById('promoList').innerHTML = html;
+    showToast('已加载 ' + approved.length + ' 个促销', 'success');
   } catch(e) {
-    document.getElementById('promoList').innerHTML = '<div class="promo-empty">加载促销失败</div>';
+    showToast('加载促销失败', 'error');
   }
 }
 
-// --- Claim coupon ---
 async function claimCoupon() {
-  var activityId = document.getElementById('activitySelect').value;
-  if (!activityId) { showToast('请先选择活动', 'error'); return; }
+  var aid = document.getElementById('activitySelect').value;
+  if (!aid || !myPromoId) { showToast('请先选择活动', 'error'); return; }
 
-  setLoading('btnClaim', true);
-  document.getElementById('respBody').className = 'resp-body loading';
-  document.getElementById('respBody').textContent = '请求中...';
+  var btn = document.getElementById('btnClaim');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>领取中...';
 
   try {
-    // Get first available promotion
-    var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
-    var promos = await promosRes.json();
-    var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
-    if (!promoId) throw new Error('当前活动无可用促销');
-
     var res = await fetch(API + '/api/v1/coupons', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({promotion_id: promoId, user_id: 'customer_' + Date.now()})
+      body: JSON.stringify({promotion_id: myPromoId, user_id: 'customer_' + Date.now()})
     });
     var data = await res.json();
-    currentCouponCode = data.code;
+    showResult(res.status, data);
 
-    // Show coupon card
-    document.getElementById('couponDisplay').innerHTML =
-      '<div class="coupon-card">' +
-      '<div class="coupon-code">' + escHtml(data.code || 'N/A') + '</div>' +
-      '<div class="coupon-hint">券码已就绪，下单后可使用</div>' +
-      '</div>';
-
-    document.getElementById('btnUse').disabled = false;
-    showResp(JSON.stringify(data, null, 2), 'success');
-    showToast('领取成功！券码: ' + (data.code || 'N/A'), 'success');
+    if (data.code) {
+      myCouponCode = data.code;
+      document.getElementById('couponCode').textContent = data.code;
+      document.getElementById('couponStatus').textContent = data.status === 'issued' ? '待使用' : data.status;
+      document.getElementById('couponDisplay').classList.add('show');
+      document.getElementById('btnUse').disabled = false;
+      showToast('优惠券领取成功！', 'success');
+    }
   } catch(e) {
-    showResp('领取失败: ' + e.message, 'error');
     showToast('领取失败: ' + e.message, 'error');
   } finally {
-    setLoading('btnClaim', false);
+    btn.disabled = false;
+    btn.innerHTML = '领取欢迎券';
   }
 }
 
-// --- Place order ---
+function showOrderForm() {
+  var form = document.getElementById('orderForm');
+  form.classList.toggle('show');
+  if (form.classList.contains('show')) {
+    document.getElementById('orderAmount').focus();
+  }
+}
+
 async function placeOrder() {
-  var activityId = document.getElementById('activitySelect').value;
-  if (!activityId) { showToast('请先选择活动', 'error'); return; }
+  var aid = document.getElementById('activitySelect').value;
+  var amount = parseInt(document.getElementById('orderAmount').value) || 128;
+  if (!aid) { showToast('请先选择活动', 'error'); return; }
 
-  var amount = parseFloat(document.getElementById('orderAmount').value) || 128;
-  if (amount <= 0) { showToast('请输入有效金额', 'error'); return; }
-
-  setLoading('btnOrder', true);
-  document.getElementById('respBody').className = 'resp-body loading';
-  document.getElementById('respBody').textContent = '请求中...';
+  var btn = document.getElementById('btnOrder');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>下单中...';
+  document.getElementById('orderForm').classList.remove('show');
 
   try {
+    // Use simulate with 1 day to create orders
     var res = await fetch(API + '/api/v1/simulate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
+      body: JSON.stringify({activity_id: aid, days: 1, seed: Date.now()})
     });
     var data = await res.json();
-    showResp(JSON.stringify(data, null, 2), 'success');
-    showToast('下单成功！消费 ¥' + amount.toFixed(2), 'success');
-    // Refresh promotions
-    loadPromotions(activityId);
+    showResult(res.status, data.summary || data);
+    showToast('下单成功！订单已生成', 'success');
   } catch(e) {
-    showResp('下单失败: ' + e.message, 'error');
     showToast('下单失败: ' + e.message, 'error');
   } finally {
-    setLoading('btnOrder', false);
+    btn.disabled = false;
+    btn.innerHTML = '下单消费';
   }
 }
 
-// --- Use coupon ---
 async function useCoupon() {
-  if (!currentCouponCode) { showToast('请先领取优惠券', 'error'); return; }
+  if (!myCouponCode) { showToast('请先领取优惠券', 'error'); return; }
 
-  setLoading('btnUse', true);
-  document.getElementById('respBody').className = 'resp-body loading';
-  document.getElementById('respBody').textContent = '请求中...';
+  var btn = document.getElementById('btnUse');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>核销中...';
 
   try {
-    var res = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(currentCouponCode) + '/use', {method:'POST'});
+    var res = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(myCouponCode) + '/use', {method:'POST'});
     var data = await res.json();
-    showResp(JSON.stringify(data, null, 2), 'success');
-    showToast('核销成功！', 'success');
-    document.getElementById('btnUse').disabled = true;
-    document.getElementById('couponDisplay').innerHTML = '';
-    currentCouponCode = null;
+    showResult(res.status, data);
+
+    if (data.status === 'used') {
+      document.getElementById('couponStatus').textContent = '已使用';
+      document.getElementById('couponDisplay').style.opacity = '0.5';
+      document.getElementById('btnUse').disabled = true;
+      showToast('核销成功！感谢光临 🍺', 'success');
+    }
   } catch(e) {
-    showResp('核销失败: ' + e.message, 'error');
     showToast('核销失败: ' + e.message, 'error');
+    btn.disabled = false;
   } finally {
-    setLoading('btnUse', false);
+    btn.innerHTML = '核销优惠券';
   }
 }
 
-// --- Helpers ---
-function showResp(text, cls) {
-  document.getElementById('respBody').className = 'resp-body ' + (cls || '');
-  document.getElementById('respBody').textContent = text;
-  document.getElementById('respStatus').textContent = cls === 'error' ? 'ERROR' : 'OK';
-  document.getElementById('respStatus').style.color = cls === 'error' ? '#f87171' : '#4ade80';
-}
-
-function setLoading(btnId, loading) {
-  var btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  if (loading) {
-    btn.setAttribute('data-orig-text', btn.textContent);
-    btn.innerHTML = '<span class="spinner"></span> 处理中...';
-  } else {
-    btn.innerHTML = btn.getAttribute('data-orig-text') || btn.textContent;
-  }
+function showResult(status, data) {
+  var panel = document.getElementById('resultPanel');
+  document.getElementById('resultHttp').textContent = 'HTTP ' + status + '  ' + new Date().toLocaleTimeString();
+  document.getElementById('resultJson').textContent = JSON.stringify(data, null, 2);
+  panel.className = 'result-panel show' + (status >= 400 ? ' error' : '');
 }
 
 function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
+  var t = document.createElement('div');
   t.className = 'toast show ' + type;
-  setTimeout(function() { t.classList.remove('show'); }, 3000);
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2500);
 }
 
 function escHtml(s) {
-  return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 init();

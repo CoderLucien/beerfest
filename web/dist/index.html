@@ -97,6 +97,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .journey-summary.show{display:block}
 .journey-summary h3{color:#4ade80;font-size:1.1em;margin-bottom:8px}
 
+/* Terminal */
+.term-container{background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;font-family:"SF Mono","Fira Code","Cascadia Code",monospace}
+.term-banner{padding:8px 16px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75em;color:#556677;display:flex;justify-content:space-between;align-items:center}
+.term-banner .dots{display:flex;gap:6px}
+.term-banner .dot{width:10px;height:10px;border-radius:50%}
+.term-banner .dot.r{background:#ff5f57}
+.term-banner .dot.y{background:#febc2e}
+.term-banner .dot.g{background:#28c840}
+.term-output{padding:12px 16px;min-height:420px;max-height:520px;overflow-y:auto;font-size:0.82em;line-height:1.6;color:#8ec8e8}
+.term-output .prompt{color:#4ade80}
+.term-output .cmd{color:#f0f0f0}
+.term-output .http-ok{color:#4ade80}
+.term-output .http-err{color:#f87171}
+.term-output .json-out{color:#a5d6ff;white-space:pre-wrap;word-break:break-all}
+.term-output .info{color:#667788}
+.term-output .warn{color:#fbbf24}
+.term-output .error{color:#f87171}
+.term-input-line{display:flex;align-items:center;padding:8px 16px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.3)}
+.term-input-line .prompt{color:#4ade80;font-weight:700;font-size:0.85em;white-space:nowrap}
+.term-input-line input{flex:1;background:transparent;border:none;color:#f0f0f0;font-family:inherit;font-size:0.85em;outline:none;caret-color:#4ade80;padding:6px 0;margin-left:8px}
+.term-input-line .cursor{display:inline-block;width:8px;height:15px;background:#4ade80;animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
 /* Responsive */
 @media(max-width:768px){
   .charts-grid{grid-template-columns:1fr}
@@ -116,26 +139,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .toast.success{background:#166534;border:1px solid #4ade80;color:#4ade80}
 .toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* Terminal */
-.terminal-intro{color:#8ec8e8;font-size:0.88em;margin-bottom:16px}
-.terminal-intro code{background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:4px;color:#f5c842;font-size:0.9em}
-.terminal-container{background:#0a0f18;border:1px solid rgba(245,200,66,0.15);border-radius:12px;overflow:hidden}
-.terminal-output{padding:16px 20px;min-height:340px;max-height:420px;overflow-y:auto;font-family:"SF Mono","Fira Code","Cascadia Code",monospace;font-size:0.82em;line-height:1.65;color:#c8d8e8}
-.term-line{margin-bottom:2px;white-space:pre-wrap;word-break:break-all}
-.term-welcome{color:#4ade80}
-.term-cmd{color:#f5c842}
-.term-out{color:#8899aa}
-.term-json{color:#4ade80}
-.term-error{color:#f87171}
-.term-info{color:#60a5fa}
-.term-typewriter{display:inline}
-.term-cursor{display:inline-block;width:8px;height:14px;background:#f5c842;animation:blink 0.8s infinite;vertical-align:middle;margin-left:2px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.terminal-input-line{display:flex;align-items:center;padding:10px 16px;background:rgba(0,0,0,0.3);border-top:1px solid rgba(255,255,255,0.06)}
-.term-prompt{color:#4ade80;font-weight:700;font-family:"SF Mono","Fira Code",monospace;font-size:0.85em;margin-right:10px}
-.terminal-input{flex:1;background:transparent;border:none;outline:none;color:#e8e8e8;font-family:"SF Mono","Fira Code",monospace;font-size:0.85em;caret-color:#f5c842}
-.terminal-input::placeholder{color:#445566}
 </style>
 </head>
 <body>
@@ -346,24 +349,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 
   <!-- ==================== Terminal Tab ==================== -->
   <div class="tab-content" id="tab-terminal">
-    <div class="terminal-intro">
-      <span class="highlight">beerfest-terminal</span> — 输入 <code>help</code> 查看可用命令，<code>journey</code> 自动执行 Alice 完整旅程
-    </div>
-    <div class="terminal-container" id="terminalContainer">
-      <div class="terminal-output" id="terminalOutput">
-        <div class="term-line term-welcome">
-┌──────────────────────────────────────────────────────────────┐
-│        啤酒节 · 智能营促销系统  Terminal v1.0            │
-│        Agent Team: leader / RD / QA / dveops / Ops           │
-│                                                              │
-│  输入 help 查看命令   输入 journey 自动执行客户旅程           │
-│  ↑↓ 浏览历史命令                                             │
-└──────────────────────────────────────────────────────────────┘
-        </div>
+    <div class="term-container">
+      <div class="term-banner">
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+        <span>beerfest-api v1.0 · Go+Gin+TiDB+Redis · 啤酒节智能营促销系统</span>
+        <span style="width:52px"></span>
       </div>
-      <div class="terminal-input-line">
-        <span class="term-prompt">$</span>
-        <input type="text" class="terminal-input" id="terminalInput" autofocus placeholder="输入命令..." autocomplete="off">
+      <div class="term-output" id="termOutput">
+        <div class="banner-text">beerfest-api v1.0 · Go + Gin + TiDB + Redis</div>
+        <div class="banner-text">啤酒节智能营促销系统 — 终端模式</div>
+        <div>&nbsp;</div>
+        <div class="info">输入 <span class="cmd">journey</span> 自动执行 Alice 客户旅程，或输入 <span class="cmd">help</span> 查看可用命令。</div>
+        <div>&nbsp;</div>
+      </div>
+      <div class="term-input-line" onclick="document.getElementById('termInput').focus()">
+        <span class="prompt">guest@beerfest:~$</span>
+        <input type="text" id="termInput" autofocus spellcheck="false" autocomplete="off">
       </div>
     </div>
   </div>
@@ -387,6 +388,7 @@ var journeyData = {};
 
 // --- Init ---
 async function init() {
+  initTerminal();
   await Promise.all([checkHealth(), loadActivities()]);
   setInterval(checkHealth, 30000);
 }
@@ -400,6 +402,9 @@ function switchTab(name) {
   if (name === 'dashboard') {
     var id = document.getElementById('activitySelect').value;
     if (id) loadDashboard(id);
+  }
+  if (name === 'terminal') {
+    setTimeout(function() { document.getElementById('termInput').focus(); }, 100);
   }
 }
 
@@ -784,19 +789,19 @@ function escHtml(s) {
 // --- Terminal ---
 var termHistory = [];
 var termHistoryIdx = -1;
-var termRunning = false;
+var termBusy = false;
 
-function setupTerminal() {
-  var inp = document.getElementById('terminalInput');
+function initTerminal() {
+  var inp = document.getElementById('termInput');
   inp.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       var cmd = inp.value.trim();
       if (cmd) {
         termHistory.push(cmd);
         termHistoryIdx = termHistory.length;
+        inp.value = '';
+        termExec(cmd);
       }
-      inp.value = '';
-      if (cmd) runTermCmd(cmd);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (termHistoryIdx > 0) {
@@ -814,278 +819,225 @@ function setupTerminal() {
       }
     }
   });
-  document.getElementById('terminalContainer').addEventListener('click', function() {
-    inp.focus();
-  });
 }
 
 function termPrint(text, cls) {
-  var out = document.getElementById('terminalOutput');
-  var line = document.createElement('div');
-  line.className = 'term-line ' + (cls || '');
-  line.textContent = text;
-  out.appendChild(line);
+  var out = document.getElementById('termOutput');
+  var div = document.createElement('div');
+  if (cls) div.className = cls;
+  div.innerHTML = text;
+  out.appendChild(div);
   out.scrollTop = out.scrollHeight;
 }
 
-function termPrintHTML(html) {
-  var out = document.getElementById('terminalOutput');
-  var line = document.createElement('div');
-  line.className = 'term-line';
-  line.innerHTML = html;
-  out.appendChild(line);
+function termPrintRaw(el) {
+  var out = document.getElementById('termOutput');
+  out.appendChild(el);
   out.scrollTop = out.scrollHeight;
 }
 
-async function runTermCmd(cmd) {
-  if (termRunning) { termPrint(' 请等待当前命令完成...', 'term-error'); return; }
-
-  termPrint('$ ' + cmd, 'term-cmd');
+function termExec(cmd) {
+  if (termBusy) { termPrint('Busy — wait for current command to finish.', 'warn'); return; }
   var parts = cmd.split(/\s+/);
-  var action = parts[0].toLowerCase();
+  var main = parts[0].toLowerCase();
+  var arg = parts[1];
 
-  switch (action) {
-    case 'help':
-      termPrint('');
-      termPrint('可用命令：', 'term-info');
-      termPrint('  journey          自动执行 Alice 完整客户旅程 (7步)', '');
-      termPrint('  step <1-7>       单步执行旅程', '');
-      termPrint('  curl <method> <path> [body]  手动 API 调用', '');
-      termPrint('  ping             检测 API 连通性', '');
-      termPrint('  whoami           当前系统信息', '');
-      termPrint('  date             显示当前时间', '');
-      termPrint('  clear            清屏', '');
-      termPrint('  help             显示此帮助', '');
-      termPrint('');
-      break;
+  termPrint('<span class="prompt">guest@beerfest:~$</span> <span class="cmd">' + escHtml(cmd) + '</span>');
 
-    case 'clear':
-      document.getElementById('terminalOutput').innerHTML = '';
-      break;
-
-    case 'ping':
-      try {
-        var res = await fetch(API + '/api/v1/health');
-        var data = await res.json();
-        termPrint('PONG — API ' + API + '/api/v1/health — ' + data.status + ' (' + res.status + ')', 'term-json');
-      } catch(e) {
-        termPrint('API 不可达: ' + e.message, 'term-error');
-      }
-      break;
-
-    case 'whoami':
-      termPrint('beerfest-terminal v1.0', 'term-info');
-      termPrint('Agent Team: leader-cc-air3 / beerfest-rd-cc-air3 / beerfest-qa-cc-air3 / dveops-cc-ubuntu / beerfest-ops-cc-air3', '');
-      termPrint('Backend: Go + Gin + TiDB + Redis', '');
-      break;
-
-    case 'date':
-      termPrint(new Date().toISOString(), '');
-      break;
-
-    case 'step':
-      var stepN = parseInt(parts[1]);
-      if (!stepN || stepN < 1 || stepN > 7) {
-        termPrint('用法: step <1-7>', 'term-error');
-        break;
-      }
-      termRunning = true;
-      try {
-        await runTermStep(stepN);
-      } finally {
-        termRunning = false;
-      }
-      break;
-
-    case 'journey':
-      termRunning = true;
-      try {
-        await runTermJourney();
-      } finally {
-        termRunning = false;
-      }
-      break;
-
-    case 'curl':
-      var method = (parts[1] || 'GET').toUpperCase();
-      var path = parts[2] || '';
-      var bodyStr = parts.slice(3).join(' ');
-      var body = null;
-      if (bodyStr) {
-        try { body = JSON.parse(bodyStr); } catch(e) {}
-      }
-      try {
-        var opts = {method: method, headers: {'Content-Type':'application/json'}};
-        if (body) opts.body = JSON.stringify(body);
-        var res = await fetch(API + path, opts);
-        var data = await res.json();
-        termPrint(method + ' ' + path + ' → ' + res.status, 'term-info');
-        termPrint(JSON.stringify(data, null, 2), 'term-json');
-      } catch(e) {
-        termPrint('Error: ' + e.message, 'term-error');
-      }
-      break;
-
-    default:
-      termPrint('未知命令: ' + action + '，输入 help 查看可用命令', 'term-error');
-  }
+  if (main === 'help') { showHelp(); }
+  else if (main === 'journey') { runJourney(); }
+  else if (main === 'step' && arg) { termStep(parseInt(arg)); }
+  else if (main === 'clear') { document.getElementById('termOutput').innerHTML = ''; }
+  else if (main === 'whoami') { termPrint('Alice (alice_demo) — 啤酒节游客', 'info'); }
+  else if (main === 'date') { termPrint(new Date().toString(), 'info'); }
+  else if (main === 'ping') { pingAPI(); }
+  else if (main === 'curl') { execCurl(cmd); }
+  else { termPrint('Unknown: ' + escHtml(cmd) + ' — type <span class="cmd">help</span>', 'error'); }
 }
 
-async function runTermStep(n) {
-  var activityId = document.getElementById('activitySelect').value;
-  if (!activityId) { termPrint('请先在运营看板中选择活动', 'term-error'); return; }
+function showHelp() {
+  termPrint('AVAILABLE COMMANDS', 'info');
+  termPrint('  <span class="cmd">journey</span>     — 自动执行 Alice 客户旅程 (7 步全流程)', '');
+  termPrint('  <span class="cmd">step 1-7</span>   — 执行单个旅程步骤', '');
+  termPrint('  <span class="cmd">curl ...</span>    — 手动调用 API (curl -X POST /api/v1/...)', '');
+  termPrint('  <span class="cmd">ping</span>        — 检查 API 连通性', '');
+  termPrint('  <span class="cmd">clear</span>       — 清屏', '');
+  termPrint('  <span class="cmd">whoami</span>      — 当前用户身份', '');
+  termPrint('  <span class="cmd">help</span>        — 显示此帮助', '');
+}
 
-  termPrint('▶ Step ' + n + ' 执行中...', 'term-info');
+function pingAPI() {
+  fetch(API + '/api/v1/ping').then(function(r) { return r.json(); }).then(function(d) {
+    termPrint(JSON.stringify(d), 'json-out');
+  }).catch(function(e) { termPrint('Error: ' + e.message, 'error'); });
+}
 
-  try {
-    switch (n) {
-      case 1:
-        var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
-        var promos = await promosRes.json();
-        var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
-        if (!promoId) throw new Error('未找到促销');
-        var r1 = await fetch(API + '/api/v1/coupons', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({promotion_id: promoId, user_id: 'alice_terminal'})
-        });
-        var d1 = await r1.json();
-        journeyData.couponCode = d1.code;
-        termPrint('POST /api/v1/coupons → ' + r1.status + ' 券码: ' + (d1.code || 'N/A'), 'term-json');
-        break;
-      case 2:
-        var r2 = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
-        var d2 = await r2.json();
-        termPrint('GET /api/v1/activities/' + activityId + '/promotions → ' + r2.status + ' ' + (Array.isArray(d2) ? d2.length + '条促销' : ''), 'term-json');
-        break;
-      case 3:
-        var r3 = await fetch(API + '/api/v1/simulate', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
-        });
-        var d3 = await r3.json();
-        termPrint('POST /api/v1/simulate (1天) → ' + r3.status + ' 营收:¥' + ((d3.summary||d3).total_revenue||0), 'term-json');
-        break;
-      case 4:
-        if (!journeyData.couponCode) { termPrint('请先执行 step 1 获取券码', 'term-error'); return; }
-        var r4 = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(journeyData.couponCode) + '/use', {method:'POST'});
-        var d4 = await r4.json();
-        termPrint('POST /api/v1/coupons/' + journeyData.couponCode + '/use → ' + r4.status + ' ' + JSON.stringify(d4), 'term-json');
-        break;
-      case 5:
-        var r5 = await fetch(API + '/api/v1/segments', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({name: '高频高消费用户', rule: {min_spend: 100, member_days: 7}})
-        });
-        var d5 = await r5.json();
-        termPrint('POST /api/v1/segments → ' + r5.status + ' id=' + (d5.id||'N/A'), 'term-json');
-        break;
-      case 6:
-        var r6 = await fetch(API + '/api/v1/experiments', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({activity_id: activityId, name: '折扣vs满减对比', variant_a: {type:'discount',rate:0.8}, variant_b: {type:'coupon',threshold:100,discount:30}})
-        });
-        var d6 = await r6.json();
-        if (d6.id) {
-          await fetch(API + '/api/v1/experiments/' + d6.id + '/start', {method:'POST'});
-          var r6c = await fetch(API + '/api/v1/experiments/' + d6.id + '/complete', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({result:'variant_a_win'})});
-          var d6c = await r6c.json();
-          termPrint('POST /api/v1/experiments → start → complete → ' + r6c.status + ' ' + JSON.stringify(d6c), 'term-json');
-        } else {
-          termPrint('POST /api/v1/experiments → ' + r6.status + ' ' + JSON.stringify(d6), 'term-json');
-        }
-        break;
-      case 7:
-        var r7 = await fetch(API + '/api/v1/dashboard/' + activityId);
-        var d7 = await r7.json();
-        termPrint('GET /api/v1/dashboard/' + activityId + ' → ' + r7.status, 'term-info');
-        termPrint('营收:¥' + (d7.total_revenue||0).toLocaleString() + ' | 用户:' + (d7.active_users||0) + ' | 核销率:' + ((d7.coupon_used_rate||0)*100).toFixed(1) + '% | 实验:' + (d7.experiment_win||'N/A'), 'term-json');
-        break;
+function execCurl(cmd) {
+  var m = cmd.match(/curl\s+-X\s+(\w+)\s+(.+)/i);
+  if (!m) { termPrint('Usage: curl -X METHOD /api/v1/path [body]', 'warn'); return; }
+  var method = m[1].toUpperCase();
+  var rest = m[2].trim();
+  var url = API + rest.split(/\s+/)[0];
+  var bodyIdx = rest.indexOf('{');
+  var body = null;
+  if (bodyIdx > -1) {
+    try { body = JSON.parse(rest.substring(bodyIdx)); } catch(e) {}
+  }
+  var opts = {method: method, headers: {'Content-Type':'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  fetch(url, opts).then(function(r) {
+    return r.json().then(function(d) { return {status: r.status, data: d}; });
+  }).then(function(r) {
+    termPrint('HTTP ' + r.status, r.status === 200 ? 'http-ok' : 'http-err');
+    termPrint(JSON.stringify(r.data, null, 2), 'json-out');
+  }).catch(function(e) { termPrint('Error: ' + e.message, 'error'); });
+}
+
+// Typewriter
+function typewriter(text, speed, callback) {
+  var out = document.getElementById('termOutput');
+  var el = document.createElement('div');
+  out.appendChild(el);
+  out.scrollTop = out.scrollHeight;
+  var i = 0;
+  function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      out.scrollTop = out.scrollHeight;
+      i++;
+      setTimeout(type, speed);
+    } else {
+      if (callback) callback(el, out);
     }
-  } catch(e) {
-    termPrint('Step ' + n + ' 失败: ' + e.message, 'term-error');
   }
+  type();
 }
 
-async function runTermJourney() {
-  termPrint('');
-  termPrint('═══════════════════════════════════════════', 'term-info');
-  termPrint('  开始执行 Alice 完整客户旅程 (7 步)', 'term-info');
-  termPrint('═══════════════════════════════════════════', 'term-info');
-
+function runJourney() {
+  var aid = document.getElementById('activitySelect').value;
+  if (!aid) { termPrint('请先在运营看板选择活动，或手动创建 → curl -X POST ' + API + '/api/v1/activities {...}', 'warn'); return; }
+  termBusy = true;
+  termPrint('=== Alice 客户旅程 · 啤酒节 ===', 'info');
   var steps = [
-    {n:1, name:'抵达·扫码入场'},
-    {n:2, name:'浏览·查看促销'},
-    {n:3, name:'下单·购买啤酒'},
-    {n:4, name:'用券·核销优惠券'},
-    {n:5, name:'分群·智能识别'},
-    {n:6, name:'实验·A/B决策'},
-    {n:7, name:'离场·数据闭环'}
+    {n:1, name:'抵达·扫码入场', fn:termStep1},
+    {n:2, name:'浏览·查看促销', fn:termStep2},
+    {n:3, name:'下单·购买啤酒', fn:termStep3},
+    {n:4, name:'用券·核销优惠券', fn:termStep4},
+    {n:5, name:'分群·智能识别', fn:termStep5},
+    {n:6, name:'实验·A/B决策', fn:termStep6},
+    {n:7, name:'离场·数据闭环', fn:termStep7}
   ];
-
-  for (var i = 0; i < steps.length; i++) {
-    var s = steps[i];
-    var title = '[' + s.n + '/7] ' + s.name;
-    // Typewriter effect
-    var chars = title.split('');
-    for (var j = 0; j < chars.length; j++) {
-      termPrint(chars.slice(0, j+1).join('') + (j < chars.length-1 ? '_' : ''), 'term-cmd');
-      var out = document.getElementById('terminalOutput');
-      if (out.lastChild && j < chars.length-1) {
-        out.removeChild(out.lastChild);
-      }
-      await sleep(25 + Math.random() * 15);
+  var idx = 0;
+  function next() {
+    if (idx >= steps.length) {
+      termPrint('', '');
+      termPrint('=== Alice 旅程完成！切回「运营看板」查看汇总数据 ===', 'info');
+      termBusy = false;
+      return;
     }
-    var out2 = document.getElementById('terminalOutput');
-    for (var k = 0; k < chars.length - 1; k++) {
-      if (out2.lastChild && out2.lastChild.classList.contains('term-cmd')) {
-        out2.removeChild(out2.lastChild);
-      }
-    }
-    termPrint(title, 'term-cmd');
-
-    await runTermStep(s.n);
-    await sleep(300);
+    var s = steps[idx];
+    termPrint('--- Step ' + s.n + ': ' + s.name + ' ---', 'info');
+    var cmd = getStepCmd(s.n, aid);
+    typewriter('$ ' + cmd, 18, function() {
+      s.fn(aid, function() { idx++; setTimeout(next, 600); });
+    });
   }
-
-  termPrint('');
-  termPrint('═══════════════════════════════════════════', 'term-info');
-  termPrint('   Alice 旅程完成！7/7 步全部执行完毕', 'term-json');
-  termPrint('═══════════════════════════════════════════', 'term-info');
-  termPrint('');
-  termPrint('切回「运营看板」标签页查看最新数据。', 'term-info');
-
-  for (var i = 1; i <= 7; i++) {
-    var stepEl = document.getElementById('step-' + i);
-    if (stepEl) stepEl.classList.add('played');
-  }
-  checkJourneyComplete();
+  next();
 }
 
-function sleep(ms) {
-  return new Promise(function(resolve) { setTimeout(resolve, ms); });
+function getStepCmd(n, aid) {
+  switch(n) {
+    case 1: return 'curl -X POST ' + API + '/api/v1/coupons -d \'{"promotion_id":"<auto>","user_id":"alice_demo"}\'';
+    case 2: return 'curl ' + API + '/api/v1/activities/' + aid + '/promotions';
+    case 3: return 'curl -X POST ' + API + '/api/v1/simulate -d \'{"activity_id":"' + aid + '","days":1}\'';
+    case 4: return 'curl -X POST ' + API + '/api/v1/coupons/<code>/use';
+    case 5: return 'curl -X POST ' + API + '/api/v1/segments -d \'{"name":"高频高消费用户","rule":{"min_spend":100,"member_days":7}}\'';
+    case 6: return 'curl -X POST ' + API + '/api/v1/experiments ... → start → complete';
+    case 7: return 'curl ' + API + '/api/v1/dashboard/' + aid;
+    default: return '';
+  }
 }
 
-var termInitialized = false;
-var origSwitchTab = switchTab;
-switchTab = function(name) {
-  origSwitchTab(name);
-  if (name === 'terminal' && !termInitialized) {
-    setupTerminal();
-    termInitialized = true;
-    setTimeout(function() {
-      document.getElementById('terminalInput').focus();
-    }, 100);
+function termStep(n) {
+  var aid = document.getElementById('activitySelect').value;
+  if (!aid) { termPrint('请先选择活动', 'warn'); return; }
+  var fns = {1:termStep1,2:termStep2,3:termStep3,4:termStep4,5:termStep5,6:termStep6,7:termStep7};
+  if (fns[n]) {
+    termBusy = true;
+    fns[n](aid, function() { termBusy = false; });
+  } else {
+    termPrint('Step must be 1-7', 'warn');
   }
-  if (name === 'terminal') {
-    setTimeout(function() {
-      document.getElementById('terminalInput').focus();
-    }, 100);
-  }
-};
+}
+
+function apiCall(method, url, body, cb) {
+  var opts = {method: method, headers: {'Content-Type':'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  fetch(url, opts).then(function(r) {
+    return r.json().then(function(d) { return {status: r.status, data: d}; });
+  }).then(function(r) {
+    termPrint('HTTP ' + r.status, r.status >= 200 && r.status < 300 ? 'http-ok' : 'http-err');
+    termPrint(JSON.stringify(r.data, null, 2), 'json-out');
+    if (cb) cb(r);
+  }).catch(function(e) {
+    termPrint('Error: ' + e.message, 'error');
+    if (cb) cb(null);
+  });
+}
+
+function termStep1(aid, cb) {
+  fetch(API + '/api/v1/activities/' + aid + '/promotions').then(function(r) { return r.json(); }).then(function(promos) {
+    var pid = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
+    if (!pid) { termPrint('No approved promo found. Run demo-test.sh first.', 'warn'); if(cb)cb(); return; }
+    apiCall('POST', API + '/api/v1/coupons', {promotion_id: pid, user_id: 'alice_demo'}, function(r) {
+      if (r && r.data && r.data.code) journeyData.couponCode = r.data.code;
+      if (cb) cb();
+    });
+  }).catch(function(e) { termPrint('Error: ' + e.message, 'error'); if(cb)cb(); });
+}
+
+function termStep2(aid, cb) {
+  apiCall('GET', API + '/api/v1/activities/' + aid + '/promotions', null, cb);
+}
+
+function termStep3(aid, cb) {
+  termPrint('模拟 1 天业务运行 (约 10s)...', 'info');
+  apiCall('POST', API + '/api/v1/simulate', {activity_id: aid, days: 1, seed: Date.now()}, cb);
+}
+
+function termStep4(aid, cb) {
+  var code = journeyData.couponCode;
+  if (!code) { termPrint('No coupon code. Run step 1 first.', 'warn'); if(cb)cb(); return; }
+  apiCall('POST', API + '/api/v1/coupons/' + encodeURIComponent(code) + '/use', null, cb);
+}
+
+function termStep5(aid, cb) {
+  apiCall('POST', API + '/api/v1/segments', {name: '高频高消费用户', rule: {min_spend: 100, member_days: 7}}, cb);
+}
+
+function termStep6(aid, cb) {
+  apiCall('POST', API + '/api/v1/experiments', {
+    activity_id: aid, name: '折扣vs满减效果对比',
+    variant_a: {type:'discount',rate:0.8}, variant_b: {type:'coupon',threshold:100,discount:30}
+  }, function(r) {
+    if (r && r.data && r.data.id) {
+      var eid = r.data.id;
+      fetch(API + '/api/v1/experiments/' + eid + '/start', {method:'POST'}).then(function() {
+        return fetch(API + '/api/v1/experiments/' + eid + '/complete', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({result:'variant_a_win'})
+        });
+      }).then(function(cr) { return cr.json(); }).then(function(cd) {
+        termPrint('Experiment result: ' + JSON.stringify(cd), 'json-out');
+        if(cb)cb();
+      }).catch(function(e) { termPrint('Error: ' + e.message, 'error'); if(cb)cb(); });
+    } else { if(cb)cb(); }
+  });
+}
+
+function termStep7(aid, cb) {
+  apiCall('GET', API + '/api/v1/dashboard/' + aid, cb);
+}
 
 // --- Toast ---
 function showToast(msg, type) {
