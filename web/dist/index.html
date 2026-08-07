@@ -248,10 +248,10 @@ async function runSimulation() {
   document.getElementById('simBtn').disabled = true;
 
   try {
+    const days = parseInt(document.getElementById('simDays').value) || 7;
     const res = await fetch(API + '/api/v1/simulate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      const days = parseInt(document.getElementById('simDays').value) || 7;
       body: JSON.stringify({activity_id: activityId, days, seed: Date.now()})
     });
     const data = await res.json();
