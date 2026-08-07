@@ -127,13 +127,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .preset-btn:hover{background:rgba(96,165,250,0.18);border-color:rgba(96,165,250,0.4);color:#b8d8f8}
 .preset-btn:active{transform:scale(0.96)}
 .chat-input-line{display:flex;gap:10px;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.2)}
-.chat-input-line input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#e8e8e8;font-size:0.88em;outline:none}
+.chat-input-line input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#e8e8e8;font-size:16px;outline:none}
 .chat-input-line input:focus{border-color:#60a5fa}
 .chat-send-btn{background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;padding:10px 20px;border-radius:10px;font-size:0.85em;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .chat-send-btn:hover{background:rgba(96,165,250,0.25)}
 .chat-send-btn:active{transform:scale(0.96)}
 .chat-send-btn:disabled{opacity:0.4;cursor:not-allowed}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Dashboard two-column layout */
+.dashboard-layout{display:flex;gap:20px;align-items:flex-start}
+.dashboard-main{flex:1.6;min-width:0}
+.dashboard-chat{flex:1;min-width:360px;max-width:480px}
+.dashboard-chat .chat-container{height:calc(100vh - 200px);position:sticky;top:20px}
+@media(max-width:900px){
+  .dashboard-layout{flex-direction:column}
+  .dashboard-chat{min-width:0;max-width:none;width:100%}
+  .dashboard-chat .chat-container{height:500px;position:static}
+}
 
 /* Responsive */
 @media(max-width:768px){
@@ -197,12 +208,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('dashboard')">运营看板</button>
     <button class="tab-btn" onclick="switchTab('journey')">客户旅程</button>
-    <button class="tab-btn" onclick="switchTab('assistant')">AI 助手</button>
   </div>
   </div>
 
   <!-- ==================== Dashboard Tab ==================== -->
   <div class="tab-content active" id="tab-dashboard">
+    <div class="dashboard-layout">
+      <div class="dashboard-main">
 
     <!-- Activity selector -->
     <div class="selector-bar">
@@ -257,6 +269,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
       <h2>模拟结果</h2>
       <div class="sim-output" id="simOutput"></div>
     </div>
+      </div><!-- /dashboard-main -->
+      <div class="dashboard-chat">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">
+              <div class="chat-avatar">🤖</div>
+              <div class="chat-bubble">
+                <div class="chat-text">你好！我是啤酒节运营助手，基于实时数据帮你盯数据、找异常、出方案。</div>
+                <div class="chat-text" style="margin-top:6px">直接输入问题，我会拉取最新运营数据进行分析。比如「今天营收怎么样」「核销率为什么低」「推荐优化策略」。</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-presets" id="chatPresets">
+            <span style="color:#667788;font-size:0.82em">我是啤酒节运营助手，帮你盯数据、找异常、出方案。随意提问 👇</span>
+          </div>
+          <div class="chat-input-line">
+            <input type="text" id="chatInput" placeholder="输入运营问题，比如「今天核销率怎么样」..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send-btn" onclick="sendChat()">发送</button>
+          </div>
+        </div>
+      </div><!-- /dashboard-chat -->
+    </div><!-- /dashboard-layout -->
   </div>
 
   <!-- ==================== Customer Journey Tab ==================== -->
@@ -385,32 +419,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
     </div>
   </div>
 
-  <!-- ==================== AI Assistant Tab ==================== -->
-  <div class="tab-content" id="tab-assistant">
-    <div class="chat-container">
-      <!-- Chat Messages -->
-      <div class="chat-messages" id="chatMessages">
-        <div class="chat-msg bot">
-          <div class="chat-avatar">🤖</div>
-          <div class="chat-bubble">
-            <div class="chat-text">你好！我是啤酒节运营助手，基于实时数据帮你盯数据、找异常、出方案。</div>
-            <div class="chat-text" style="margin-top:6px">直接输入问题，我会拉取最新运营数据进行分析。比如「今天营收怎么样」「核销率为什么低」「推荐优化策略」。</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Preset Prompts -->
-      <div class="chat-presets" id="chatPresets">
-        <span style="color:#667788;font-size:0.82em">我是啤酒节运营助手，帮你盯数据、找异常、出方案。随意提问 👇</span>
-      </div>
-
-      <!-- Input -->
-      <div class="chat-input-line">
-        <input type="text" id="chatInput" placeholder="输入运营问题，比如「今天核销率怎么样」..." onkeydown="if(event.key==='Enter')sendChat()">
-        <button class="chat-send-btn" onclick="sendChat()">发送</button>
-      </div>
-    </div>
-  </div>
 
   <div class="footer">
     beerfest-api v1.0 · Go + Gin + TiDB + Redis · Chart.js<br>
@@ -551,9 +559,6 @@ function switchTab(name) {
   if (name === 'dashboard') {
     var id = document.getElementById('activitySelect').value;
     if (id) loadDashboard(id);
-  }
-  if (name === 'assistant') {
-    setTimeout(function() { document.getElementById('chatInput').focus(); }, 100);
   }
 }
 
