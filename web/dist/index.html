@@ -99,6 +99,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
       <option value="">-- 选择活动 --</option>
     </select>
     <button class="btn btn-refresh" onclick="refreshAll()">刷新数据</button>
+    <input type="number" id="simDays" value="7" min="1" max="30" style="width:56px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px;color:#e8e8e8;font-size:0.85em;text-align:center" title="模拟天数">
     <button class="btn btn-sim" id="simBtn" onclick="runSimulation()">运行模拟</button>
     <span id="simSpinner" style="display:none"><span class="spinner"></span>模拟中...</span>
   </div>
@@ -250,7 +251,8 @@ async function runSimulation() {
     const res = await fetch(API + '/api/v1/simulate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({activity_id: activityId, days: 14, seed: Date.now()})
+      const days = parseInt(document.getElementById('simDays').value) || 7;
+      body: JSON.stringify({activity_id: activityId, days, seed: Date.now()})
     });
     const data = await res.json();
 
