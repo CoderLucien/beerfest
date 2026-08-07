@@ -53,10 +53,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 .checkout-row input{flex:1;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9em;outline:none}
 .checkout-row input:focus{border-color:#4ade80}
 .checkout-row input::placeholder{color:#445566}
-.coupon-select{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.coupon-chip{padding:6px 14px;border-radius:20px;font-size:0.78em;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.2);color:#8899aa;transition:all 0.2s}
-.coupon-chip.selected{border-color:#f5c842;background:rgba(245,200,66,0.12);color:#f5c842}
-.coupon-chip:active{transform:scale(0.95)}
+.coupon-select{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.coupon-chip{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:#8899aa;transition:all 0.2s}
+.coupon-chip:hover{border-color:rgba(255,255,255,0.25)}
+.coupon-chip.selected{border-color:#f5c842;background:rgba(245,200,66,0.1);color:#f0d878}
+.coupon-chip:active{transform:scale(0.98)}
+.coupon-chip .chip-badge{flex-shrink:0;font-size:0.78em;font-weight:700;padding:3px 10px;border-radius:10px;min-width:56px;text-align:center}
+.coupon-chip .chip-badge.coupon-type{background:rgba(245,200,66,0.15);color:#f5c842}
+.coupon-chip .chip-badge.discount-type{background:rgba(74,222,128,0.15);color:#4ade80}
+.coupon-chip .chip-badge.bundle-type{background:rgba(96,165,250,0.15);color:#60a5fa}
+.coupon-chip .chip-body{flex:1;min-width:0}
+.coupon-chip .chip-rule{font-size:0.88em;font-weight:600;color:#e8e8e8}
+.coupon-chip .chip-limit{font-size:0.72em;color:#667788;margin-top:2px}
+.coupon-chip .chip-save{flex-shrink:0;font-size:0.78em;font-weight:700;color:#4ade80;display:none}
+.coupon-chip .chip-save.show{display:block}
 
 /* Calculation preview */
 .calc-preview{display:none;background:rgba(0,0,0,0.25);border-radius:10px;padding:14px;margin-bottom:12px;font-size:0.82em}
@@ -209,7 +219,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
       <span style="color:#556677;font-size:0.78em">请先领取优惠券</span>
     </div>
     <div class="checkout-row">
-      <input type="number" id="orderAmount" value="128" min="1" placeholder="消费金额 ¥">
+      <input type="number" id="orderAmount" value="128" min="1" placeholder="消费金额 ¥" oninput="updateCalc()">
     </div>
     <div class="calc-preview" id="calcPreview">
       <div class="calc-line"><span>原价</span><span id="calcOrig">¥0.00</span></div>
@@ -486,6 +496,7 @@ async function loadPromos() {
       return;
     }
 
+    window.promoMetas = {};
     promos.forEach(function(p) {
       if (p.status !== 'approved' && p.status !== 'active') return;
 
@@ -504,6 +515,7 @@ async function loadPromos() {
           name = p.name; desc = (rule.items||[]).join('+'); limit = '特价 ¥' + rule.price;
         }
       } catch(e) {}
+      window.promoMetas[p.id] = {type: p.type, desc: desc, limit: limit, name: name || p.name, rule: typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule};
 
       var claimed = !!myCoupons[p.id];
       var card = document.createElement('div');
@@ -553,8 +565,11 @@ async function claimOne(promoId) {
     if (data.code) {
       var promoCard = document.getElementById('promo-' + promoId);
       var promoName = promoCard ? promoCard.querySelector('.promo-name').textContent : '优惠券';
+      var promoDesc = promoCard ? promoCard.querySelector('.promo-desc').textContent : '';
+      var promoLimit = promoCard ? promoCard.querySelector('.promo-limit').textContent : '';
+      var promoType = window.promoMetas && window.promoMetas[promoId] ? window.promoMetas[promoId].type : 'coupon';
 
-      myCoupons[promoId] = {code: data.code, name: promoName, status: 'issued'};
+      myCoupons[promoId] = {code: data.code, name: promoName, desc: promoDesc, limit: promoLimit, type: promoType, status: 'issued'};
       renderHistory();
       btn.textContent = '已领取 ✓';
       btn.className = 'btn-claim got';
@@ -582,12 +597,50 @@ function updateCouponChips() {
     ids.forEach(function(id) {
       var c = myCoupons[id];
       var sel = selectedCoupon === id;
-      html += '<span class="coupon-chip' + (sel ? ' selected' : '') + '" onclick="selectCoupon(\'' + id + '\')">' +
-        escHtml(c.name) + '</span>';
+      var badgeCls = c.type === 'discount' ? 'discount-type' : (c.type === 'bundle' ? 'bundle-type' : 'coupon-type');
+      var badgeText = c.type === 'discount' ? '折扣' : (c.type === 'bundle' ? '套餐' : '满减');
+      var ruleText = c.desc || c.name;
+      var limitText = c.limit || '';
+      html += '<div class="coupon-chip' + (sel ? ' selected' : '') + '" onclick="selectCoupon(\'' + id + '\')">' +
+        '<span class="chip-badge ' + badgeCls + '">' + escHtml(badgeText) + '</span>' +
+        '<span class="chip-body">' +
+        '<div class="chip-rule">' + escHtml(ruleText) + '</div>' +
+        (limitText ? '<div class="chip-limit">' + escHtml(limitText) + '</div>' : '') +
+        '</span>' +
+        '<span class="chip-save" id="chip-save-' + id + '">可省 ¥0</span>' +
+        '</div>';
     });
     container.innerHTML = html;
+    updateChipSavings();
   }
   updateCalc();
+}
+
+function updateChipSavings() {
+  var amount = parseFloat(document.getElementById('orderAmount').value) || 0;
+  var ids = Object.keys(myCoupons);
+  ids.forEach(function(id) {
+    var el = document.getElementById('chip-save-' + id);
+    if (!el) return;
+    el.classList.remove('show');
+    if (amount <= 0) return;
+    var meta = window.promoMetas && window.promoMetas[id];
+    if (!meta || !meta.rule) return;
+    try {
+      var disc = 0;
+      if (meta.type === 'discount') {
+        disc = amount * (1 - meta.rule.rate);
+      } else if (meta.type === 'coupon') {
+        disc = amount >= meta.rule.threshold ? meta.rule.discount : 0;
+      } else if (meta.type === 'bundle') {
+        disc = Math.max(0, amount - meta.rule.price);
+      }
+      if (disc > 0) {
+        el.textContent = '可省 ¥' + disc.toFixed(0);
+        el.classList.add('show');
+      }
+    } catch(e) {}
+  });
 }
 
 function selectCoupon(id) {
@@ -604,12 +657,14 @@ function updateCalc() {
     preview.classList.remove('show');
     btnPay.disabled = true;
     btnPay.textContent = '请先领券并选择优惠券';
+    updateChipSavings();
     return;
   }
 
   preview.classList.add('show');
   btnPay.disabled = false;
   btnPay.textContent = '确认支付';
+  updateChipSavings();
 
   try {
     var aid = document.getElementById('activitySelect').value;
