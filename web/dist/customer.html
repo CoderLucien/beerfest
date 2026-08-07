@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>啤酒节 · 智能营促销</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:linear-gradient(180deg,#0a1628 0%,#132a42 50%,#0d3b1e 100%);min-height:100vh;color:#e8e8e8}
+.page{max-width:480px;margin:0 auto;padding:16px}
+
+/* Header */
+.header{text-align:center;padding:24px 0 20px}
+.header .logo{font-size:2.4em;margin-bottom:4px}
+.header h1{font-size:1.3em;color:#f5c842;text-shadow:0 2px 12px rgba(245,200,66,0.2)}
+.header .sub{color:#7eb8d8;font-size:0.82em;margin-top:4px}
+
+/* Activity selector */
+.section{margin-bottom:20px}
+.section-label{color:#8ec8e8;font-size:0.82em;margin-bottom:8px;font-weight:600}
+.activity-select{width:100%;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#e8e8e8;font-size:0.95em;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f5c842' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.activity-select:focus{border-color:#f5c842}
+
+/* Promo cards */
+.promo-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;margin-bottom:10px;backdrop-filter:blur(8px)}
+.promo-card .promo-name{color:#f5c842;font-weight:700;font-size:1em;margin-bottom:4px}
+.promo-card .promo-desc{color:#8899aa;font-size:0.82em;line-height:1.5}
+.promo-card .promo-meta{display:flex;gap:16px;margin-top:8px;font-size:0.78em;color:#667788}
+.promo-empty{text-align:center;padding:40px 20px;color:#556677;font-size:0.9em}
+
+/* Action buttons */
+.actions{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.btn{width:100%;padding:14px;border-radius:12px;font-size:1em;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628}
+.btn-primary:active{background:linear-gradient(135deg,#d4a832,#b89228)}
+.btn-secondary{background:rgba(142,200,232,0.12);border:1px solid rgba(142,200,232,0.25);color:#8ec8e8}
+.btn-secondary:active{background:rgba(142,200,232,0.2)}
+.btn-danger{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.25);color:#f87171}
+.btn-danger:active{background:rgba(248,113,113,0.2)}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Order input */
+.order-row{display:flex;gap:10px;align-items:center}
+.order-input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#e8e8e8;font-size:0.95em;outline:none}
+.order-input:focus{border-color:#f5c842}
+.order-input::placeholder{color:#445566}
+
+/* Coupon code display */
+.coupon-card{background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:16px;margin-bottom:12px;text-align:center}
+.coupon-card .coupon-code{font-family:"SF Mono","Fira Code",monospace;font-size:1.3em;color:#f5c842;font-weight:700;letter-spacing:2px;word-break:break-all}
+.coupon-card .coupon-hint{color:#667788;font-size:0.78em;margin-top:4px}
+
+/* Response panel */
+.response-panel{background:#0a0f18;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden}
+.response-panel .resp-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.2);font-size:0.78em;color:#667788}
+.response-panel .resp-body{padding:12px 16px;font-family:"SF Mono","Fira Code",monospace;font-size:0.75em;color:#4ade80;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.5}
+.response-panel .resp-body.error{color:#f87171}
+.response-panel .resp-body.loading{color:#f5c842}
+
+/* Toast */
+.toast{position:fixed;top:16px;left:16px;right:16px;padding:12px 16px;border-radius:10px;font-size:0.88em;font-weight:600;z-index:999;animation:slideDown 0.3s ease;display:none;text-align:center}
+.toast.show{display:block}
+.toast.success{background:#166534;border:1px solid #4ade80;color:#4ade80}
+.toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Spinner */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(245,200,66,0.3);border-top-color:#f5c842;border-radius:50%;animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Footer */
+.footer{text-align:center;padding:24px 0;color:#445566;font-size:0.75em}
+.footer span{color:#556677}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo"></div>
+    <h1>啤酒节</h1>
+    <p class="sub"> · 智能营促销系统</p>
+  </div>
+
+  <!-- Activity selector -->
+  <div class="section">
+    <div class="section-label">选择活动</div>
+    <select class="activity-select" id="activitySelect" onchange="onActivityChange()">
+      <option value="">-- 选择活动 --</option>
+    </select>
+  </div>
+
+  <!-- Promotions -->
+  <div class="section">
+    <div class="section-label">当前促销</div>
+    <div id="promoList"><div class="promo-empty">请先选择活动</div></div>
+  </div>
+
+  <!-- Coupon display -->
+  <div id="couponDisplay"></div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" id="btnClaim" onclick="claimCoupon()" disabled>
+      <span>🎫</span> 领取欢迎券
+    </button>
+
+    <div class="order-row">
+      <input type="number" class="order-input" id="orderAmount" placeholder="消费金额 (¥)" value="128" min="1" step="0.01">
+      <button class="btn btn-secondary" id="btnOrder" onclick="placeOrder()" disabled style="width:auto;flex-shrink:0">
+        下单
+      </button>
+    </div>
+
+    <button class="btn btn-danger" id="btnUse" onclick="useCoupon()" disabled>
+      核销优惠券
+    </button>
+  </div>
+
+  <!-- Response panel -->
+  <div class="response-panel">
+    <div class="resp-header">
+      <span>API 响应</span>
+      <span id="respStatus"></span>
+    </div>
+    <div class="resp-body" id="respBody">等待操作...</div>
+  </div>
+
+  <div class="footer">
+    beerfest-api v1.0 · Go + Gin + TiDB + Redis<br>
+    <span>Agent Team: leader / RD / QA / dveops / Ops</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = '';
+var currentCouponCode = null;
+
+// --- Init ---
+async function init() {
+  await loadActivities();
+}
+
+// --- Activities ---
+async function loadActivities() {
+  try {
+    var res = await fetch(API + '/api/v1/activities');
+    var list = await res.json();
+    var sel = document.getElementById('activitySelect');
+    sel.innerHTML = '<option value="">-- 选择活动 --</option>';
+    if (Array.isArray(list)) {
+      list.forEach(function(a) {
+        var opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.name + ' [' + a.status + ']';
+        sel.appendChild(opt);
+      });
+      if (list.length > 0) {
+        sel.value = list[list.length-1].id;
+        onActivityChange();
+      }
+    }
+  } catch(e) {
+    showResp('加载活动失败: ' + e.message, 'error');
+  }
+}
+
+// --- Activity change ---
+function onActivityChange() {
+  var id = document.getElementById('activitySelect').value;
+  if (id) {
+    loadPromotions(id);
+    document.getElementById('btnClaim').disabled = false;
+    document.getElementById('btnOrder').disabled = false;
+  } else {
+    document.getElementById('promoList').innerHTML = '<div class="promo-empty">请先选择活动</div>';
+    document.getElementById('btnClaim').disabled = true;
+    document.getElementById('btnOrder').disabled = true;
+  }
+}
+
+// --- Promotions ---
+async function loadPromotions(activityId) {
+  try {
+    var res = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+    var list = await res.json();
+    var html = '';
+    if (Array.isArray(list) && list.length > 0) {
+      list.forEach(function(p) {
+        html += '<div class="promo-card">' +
+          '<div class="promo-name">' + escHtml(p.name || '未命名促销') + '</div>' +
+          '<div class="promo-desc">' + escHtml(p.description || p.type || '') + '</div>' +
+          '<div class="promo-meta"><span>状态: ' + escHtml(p.status || 'N/A') + '</span></div>' +
+          '</div>';
+      });
+    } else {
+      html = '<div class="promo-empty">暂无促销活动</div>';
+    }
+    document.getElementById('promoList').innerHTML = html;
+  } catch(e) {
+    document.getElementById('promoList').innerHTML = '<div class="promo-empty">加载促销失败</div>';
+  }
+}
+
+// --- Claim coupon ---
+async function claimCoupon() {
+  var activityId = document.getElementById('activitySelect').value;
+  if (!activityId) { showToast('请先选择活动', 'error'); return; }
+
+  setLoading('btnClaim', true);
+  document.getElementById('respBody').className = 'resp-body loading';
+  document.getElementById('respBody').textContent = '请求中...';
+
+  try {
+    // Get first available promotion
+    var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+    var promos = await promosRes.json();
+    var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
+    if (!promoId) throw new Error('当前活动无可用促销');
+
+    var res = await fetch(API + '/api/v1/coupons', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({promotion_id: promoId, user_id: 'customer_' + Date.now()})
+    });
+    var data = await res.json();
+    currentCouponCode = data.code;
+
+    // Show coupon card
+    document.getElementById('couponDisplay').innerHTML =
+      '<div class="coupon-card">' +
+      '<div class="coupon-code">' + escHtml(data.code || 'N/A') + '</div>' +
+      '<div class="coupon-hint">券码已就绪，下单后可使用</div>' +
+      '</div>';
+
+    document.getElementById('btnUse').disabled = false;
+    showResp(JSON.stringify(data, null, 2), 'success');
+    showToast('领取成功！券码: ' + (data.code || 'N/A'), 'success');
+  } catch(e) {
+    showResp('领取失败: ' + e.message, 'error');
+    showToast('领取失败: ' + e.message, 'error');
+  } finally {
+    setLoading('btnClaim', false);
+  }
+}
+
+// --- Place order ---
+async function placeOrder() {
+  var activityId = document.getElementById('activitySelect').value;
+  if (!activityId) { showToast('请先选择活动', 'error'); return; }
+
+  var amount = parseFloat(document.getElementById('orderAmount').value) || 128;
+  if (amount <= 0) { showToast('请输入有效金额', 'error'); return; }
+
+  setLoading('btnOrder', true);
+  document.getElementById('respBody').className = 'resp-body loading';
+  document.getElementById('respBody').textContent = '请求中...';
+
+  try {
+    var res = await fetch(API + '/api/v1/simulate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
+    });
+    var data = await res.json();
+    showResp(JSON.stringify(data, null, 2), 'success');
+    showToast('下单成功！消费 ¥' + amount.toFixed(2), 'success');
+    // Refresh promotions
+    loadPromotions(activityId);
+  } catch(e) {
+    showResp('下单失败: ' + e.message, 'error');
+    showToast('下单失败: ' + e.message, 'error');
+  } finally {
+    setLoading('btnOrder', false);
+  }
+}
+
+// --- Use coupon ---
+async function useCoupon() {
+  if (!currentCouponCode) { showToast('请先领取优惠券', 'error'); return; }
+
+  setLoading('btnUse', true);
+  document.getElementById('respBody').className = 'resp-body loading';
+  document.getElementById('respBody').textContent = '请求中...';
+
+  try {
+    var res = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(currentCouponCode) + '/use', {method:'POST'});
+    var data = await res.json();
+    showResp(JSON.stringify(data, null, 2), 'success');
+    showToast('核销成功！', 'success');
+    document.getElementById('btnUse').disabled = true;
+    document.getElementById('couponDisplay').innerHTML = '';
+    currentCouponCode = null;
+  } catch(e) {
+    showResp('核销失败: ' + e.message, 'error');
+    showToast('核销失败: ' + e.message, 'error');
+  } finally {
+    setLoading('btnUse', false);
+  }
+}
+
+// --- Helpers ---
+function showResp(text, cls) {
+  document.getElementById('respBody').className = 'resp-body ' + (cls || '');
+  document.getElementById('respBody').textContent = text;
+  document.getElementById('respStatus').textContent = cls === 'error' ? 'ERROR' : 'OK';
+  document.getElementById('respStatus').style.color = cls === 'error' ? '#f87171' : '#4ade80';
+}
+
+function setLoading(btnId, loading) {
+  var btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  if (loading) {
+    btn.setAttribute('data-orig-text', btn.textContent);
+    btn.innerHTML = '<span class="spinner"></span> 处理中...';
+  } else {
+    btn.innerHTML = btn.getAttribute('data-orig-text') || btn.textContent;
+  }
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+function escHtml(s) {
+  return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>

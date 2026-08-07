@@ -116,6 +116,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .toast.success{background:#166534;border:1px solid #4ade80;color:#4ade80}
 .toast.error{background:#7f1d1d;border:1px solid #f87171;color:#f87171}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* Terminal */
+.terminal-intro{color:#8ec8e8;font-size:0.88em;margin-bottom:16px}
+.terminal-intro code{background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:4px;color:#f5c842;font-size:0.9em}
+.terminal-container{background:#0a0f18;border:1px solid rgba(245,200,66,0.15);border-radius:12px;overflow:hidden}
+.terminal-output{padding:16px 20px;min-height:340px;max-height:420px;overflow-y:auto;font-family:"SF Mono","Fira Code","Cascadia Code",monospace;font-size:0.82em;line-height:1.65;color:#c8d8e8}
+.term-line{margin-bottom:2px;white-space:pre-wrap;word-break:break-all}
+.term-welcome{color:#4ade80}
+.term-cmd{color:#f5c842}
+.term-out{color:#8899aa}
+.term-json{color:#4ade80}
+.term-error{color:#f87171}
+.term-info{color:#60a5fa}
+.term-typewriter{display:inline}
+.term-cursor{display:inline-block;width:8px;height:14px;background:#f5c842;animation:blink 0.8s infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.terminal-input-line{display:flex;align-items:center;padding:10px 16px;background:rgba(0,0,0,0.3);border-top:1px solid rgba(255,255,255,0.06)}
+.term-prompt{color:#4ade80;font-weight:700;font-family:"SF Mono","Fira Code",monospace;font-size:0.85em;margin-right:10px}
+.terminal-input{flex:1;background:transparent;border:none;outline:none;color:#e8e8e8;font-family:"SF Mono","Fira Code",monospace;font-size:0.85em;caret-color:#f5c842}
+.terminal-input::placeholder{color:#445566}
 </style>
 </head>
 <body>
@@ -137,6 +157,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('dashboard')">运营看板</button>
     <button class="tab-btn" onclick="switchTab('journey')">客户旅程</button>
+    <button class="tab-btn" onclick="switchTab('terminal')">终端</button>
   </div>
 
   <!-- ==================== Dashboard Tab ==================== -->
@@ -320,6 +341,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
         每一步都有 trace_id 可追踪，数据实时同步到运营看板。<br>
         切回「运营看板」标签页查看完整数据。
       </p>
+    </div>
+  </div>
+
+  <!-- ==================== Terminal Tab ==================== -->
+  <div class="tab-content" id="tab-terminal">
+    <div class="terminal-intro">
+      <span class="highlight">beerfest-terminal</span> — 输入 <code>help</code> 查看可用命令，<code>journey</code> 自动执行 Alice 完整旅程
+    </div>
+    <div class="terminal-container" id="terminalContainer">
+      <div class="terminal-output" id="terminalOutput">
+        <div class="term-line term-welcome">
+┌──────────────────────────────────────────────────────────────┐
+│        啤酒节 · 智能营促销系统  Terminal v1.0            │
+│        Agent Team: leader / RD / QA / dveops / Ops           │
+│                                                              │
+│  输入 help 查看命令   输入 journey 自动执行客户旅程           │
+│  ↑↓ 浏览历史命令                                             │
+└──────────────────────────────────────────────────────────────┘
+        </div>
+      </div>
+      <div class="terminal-input-line">
+        <span class="term-prompt">$</span>
+        <input type="text" class="terminal-input" id="terminalInput" autofocus placeholder="输入命令..." autocomplete="off">
+      </div>
     </div>
   </div>
 
@@ -735,6 +780,312 @@ function checkJourneyComplete() {
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// --- Terminal ---
+var termHistory = [];
+var termHistoryIdx = -1;
+var termRunning = false;
+
+function setupTerminal() {
+  var inp = document.getElementById('terminalInput');
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var cmd = inp.value.trim();
+      if (cmd) {
+        termHistory.push(cmd);
+        termHistoryIdx = termHistory.length;
+      }
+      inp.value = '';
+      if (cmd) runTermCmd(cmd);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (termHistoryIdx > 0) {
+        termHistoryIdx--;
+        inp.value = termHistory[termHistoryIdx];
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (termHistoryIdx < termHistory.length - 1) {
+        termHistoryIdx++;
+        inp.value = termHistory[termHistoryIdx];
+      } else {
+        termHistoryIdx = termHistory.length;
+        inp.value = '';
+      }
+    }
+  });
+  document.getElementById('terminalContainer').addEventListener('click', function() {
+    inp.focus();
+  });
+}
+
+function termPrint(text, cls) {
+  var out = document.getElementById('terminalOutput');
+  var line = document.createElement('div');
+  line.className = 'term-line ' + (cls || '');
+  line.textContent = text;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+}
+
+function termPrintHTML(html) {
+  var out = document.getElementById('terminalOutput');
+  var line = document.createElement('div');
+  line.className = 'term-line';
+  line.innerHTML = html;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+}
+
+async function runTermCmd(cmd) {
+  if (termRunning) { termPrint(' 请等待当前命令完成...', 'term-error'); return; }
+
+  termPrint('$ ' + cmd, 'term-cmd');
+  var parts = cmd.split(/\s+/);
+  var action = parts[0].toLowerCase();
+
+  switch (action) {
+    case 'help':
+      termPrint('');
+      termPrint('可用命令：', 'term-info');
+      termPrint('  journey          自动执行 Alice 完整客户旅程 (7步)', '');
+      termPrint('  step <1-7>       单步执行旅程', '');
+      termPrint('  curl <method> <path> [body]  手动 API 调用', '');
+      termPrint('  ping             检测 API 连通性', '');
+      termPrint('  whoami           当前系统信息', '');
+      termPrint('  date             显示当前时间', '');
+      termPrint('  clear            清屏', '');
+      termPrint('  help             显示此帮助', '');
+      termPrint('');
+      break;
+
+    case 'clear':
+      document.getElementById('terminalOutput').innerHTML = '';
+      break;
+
+    case 'ping':
+      try {
+        var res = await fetch(API + '/api/v1/health');
+        var data = await res.json();
+        termPrint('PONG — API ' + API + '/api/v1/health — ' + data.status + ' (' + res.status + ')', 'term-json');
+      } catch(e) {
+        termPrint('API 不可达: ' + e.message, 'term-error');
+      }
+      break;
+
+    case 'whoami':
+      termPrint('beerfest-terminal v1.0', 'term-info');
+      termPrint('Agent Team: leader-cc-air3 / beerfest-rd-cc-air3 / beerfest-qa-cc-air3 / dveops-cc-ubuntu / beerfest-ops-cc-air3', '');
+      termPrint('Backend: Go + Gin + TiDB + Redis', '');
+      break;
+
+    case 'date':
+      termPrint(new Date().toISOString(), '');
+      break;
+
+    case 'step':
+      var stepN = parseInt(parts[1]);
+      if (!stepN || stepN < 1 || stepN > 7) {
+        termPrint('用法: step <1-7>', 'term-error');
+        break;
+      }
+      termRunning = true;
+      try {
+        await runTermStep(stepN);
+      } finally {
+        termRunning = false;
+      }
+      break;
+
+    case 'journey':
+      termRunning = true;
+      try {
+        await runTermJourney();
+      } finally {
+        termRunning = false;
+      }
+      break;
+
+    case 'curl':
+      var method = (parts[1] || 'GET').toUpperCase();
+      var path = parts[2] || '';
+      var bodyStr = parts.slice(3).join(' ');
+      var body = null;
+      if (bodyStr) {
+        try { body = JSON.parse(bodyStr); } catch(e) {}
+      }
+      try {
+        var opts = {method: method, headers: {'Content-Type':'application/json'}};
+        if (body) opts.body = JSON.stringify(body);
+        var res = await fetch(API + path, opts);
+        var data = await res.json();
+        termPrint(method + ' ' + path + ' → ' + res.status, 'term-info');
+        termPrint(JSON.stringify(data, null, 2), 'term-json');
+      } catch(e) {
+        termPrint('Error: ' + e.message, 'term-error');
+      }
+      break;
+
+    default:
+      termPrint('未知命令: ' + action + '，输入 help 查看可用命令', 'term-error');
+  }
+}
+
+async function runTermStep(n) {
+  var activityId = document.getElementById('activitySelect').value;
+  if (!activityId) { termPrint('请先在运营看板中选择活动', 'term-error'); return; }
+
+  termPrint('▶ Step ' + n + ' 执行中...', 'term-info');
+
+  try {
+    switch (n) {
+      case 1:
+        var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+        var promos = await promosRes.json();
+        var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
+        if (!promoId) throw new Error('未找到促销');
+        var r1 = await fetch(API + '/api/v1/coupons', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({promotion_id: promoId, user_id: 'alice_terminal'})
+        });
+        var d1 = await r1.json();
+        journeyData.couponCode = d1.code;
+        termPrint('POST /api/v1/coupons → ' + r1.status + ' 券码: ' + (d1.code || 'N/A'), 'term-json');
+        break;
+      case 2:
+        var r2 = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+        var d2 = await r2.json();
+        termPrint('GET /api/v1/activities/' + activityId + '/promotions → ' + r2.status + ' ' + (Array.isArray(d2) ? d2.length + '条促销' : ''), 'term-json');
+        break;
+      case 3:
+        var r3 = await fetch(API + '/api/v1/simulate', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
+        });
+        var d3 = await r3.json();
+        termPrint('POST /api/v1/simulate (1天) → ' + r3.status + ' 营收:¥' + ((d3.summary||d3).total_revenue||0), 'term-json');
+        break;
+      case 4:
+        if (!journeyData.couponCode) { termPrint('请先执行 step 1 获取券码', 'term-error'); return; }
+        var r4 = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(journeyData.couponCode) + '/use', {method:'POST'});
+        var d4 = await r4.json();
+        termPrint('POST /api/v1/coupons/' + journeyData.couponCode + '/use → ' + r4.status + ' ' + JSON.stringify(d4), 'term-json');
+        break;
+      case 5:
+        var r5 = await fetch(API + '/api/v1/segments', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({name: '高频高消费用户', rule: {min_spend: 100, member_days: 7}})
+        });
+        var d5 = await r5.json();
+        termPrint('POST /api/v1/segments → ' + r5.status + ' id=' + (d5.id||'N/A'), 'term-json');
+        break;
+      case 6:
+        var r6 = await fetch(API + '/api/v1/experiments', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({activity_id: activityId, name: '折扣vs满减对比', variant_a: {type:'discount',rate:0.8}, variant_b: {type:'coupon',threshold:100,discount:30}})
+        });
+        var d6 = await r6.json();
+        if (d6.id) {
+          await fetch(API + '/api/v1/experiments/' + d6.id + '/start', {method:'POST'});
+          var r6c = await fetch(API + '/api/v1/experiments/' + d6.id + '/complete', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({result:'variant_a_win'})});
+          var d6c = await r6c.json();
+          termPrint('POST /api/v1/experiments → start → complete → ' + r6c.status + ' ' + JSON.stringify(d6c), 'term-json');
+        } else {
+          termPrint('POST /api/v1/experiments → ' + r6.status + ' ' + JSON.stringify(d6), 'term-json');
+        }
+        break;
+      case 7:
+        var r7 = await fetch(API + '/api/v1/dashboard/' + activityId);
+        var d7 = await r7.json();
+        termPrint('GET /api/v1/dashboard/' + activityId + ' → ' + r7.status, 'term-info');
+        termPrint('营收:¥' + (d7.total_revenue||0).toLocaleString() + ' | 用户:' + (d7.active_users||0) + ' | 核销率:' + ((d7.coupon_used_rate||0)*100).toFixed(1) + '% | 实验:' + (d7.experiment_win||'N/A'), 'term-json');
+        break;
+    }
+  } catch(e) {
+    termPrint('Step ' + n + ' 失败: ' + e.message, 'term-error');
+  }
+}
+
+async function runTermJourney() {
+  termPrint('');
+  termPrint('═══════════════════════════════════════════', 'term-info');
+  termPrint('  开始执行 Alice 完整客户旅程 (7 步)', 'term-info');
+  termPrint('═══════════════════════════════════════════', 'term-info');
+
+  var steps = [
+    {n:1, name:'抵达·扫码入场'},
+    {n:2, name:'浏览·查看促销'},
+    {n:3, name:'下单·购买啤酒'},
+    {n:4, name:'用券·核销优惠券'},
+    {n:5, name:'分群·智能识别'},
+    {n:6, name:'实验·A/B决策'},
+    {n:7, name:'离场·数据闭环'}
+  ];
+
+  for (var i = 0; i < steps.length; i++) {
+    var s = steps[i];
+    var title = '[' + s.n + '/7] ' + s.name;
+    // Typewriter effect
+    var chars = title.split('');
+    for (var j = 0; j < chars.length; j++) {
+      termPrint(chars.slice(0, j+1).join('') + (j < chars.length-1 ? '_' : ''), 'term-cmd');
+      var out = document.getElementById('terminalOutput');
+      if (out.lastChild && j < chars.length-1) {
+        out.removeChild(out.lastChild);
+      }
+      await sleep(25 + Math.random() * 15);
+    }
+    var out2 = document.getElementById('terminalOutput');
+    for (var k = 0; k < chars.length - 1; k++) {
+      if (out2.lastChild && out2.lastChild.classList.contains('term-cmd')) {
+        out2.removeChild(out2.lastChild);
+      }
+    }
+    termPrint(title, 'term-cmd');
+
+    await runTermStep(s.n);
+    await sleep(300);
+  }
+
+  termPrint('');
+  termPrint('═══════════════════════════════════════════', 'term-info');
+  termPrint('   Alice 旅程完成！7/7 步全部执行完毕', 'term-json');
+  termPrint('═══════════════════════════════════════════', 'term-info');
+  termPrint('');
+  termPrint('切回「运营看板」标签页查看最新数据。', 'term-info');
+
+  for (var i = 1; i <= 7; i++) {
+    var stepEl = document.getElementById('step-' + i);
+    if (stepEl) stepEl.classList.add('played');
+  }
+  checkJourneyComplete();
+}
+
+function sleep(ms) {
+  return new Promise(function(resolve) { setTimeout(resolve, ms); });
+}
+
+var termInitialized = false;
+var origSwitchTab = switchTab;
+switchTab = function(name) {
+  origSwitchTab(name);
+  if (name === 'terminal' && !termInitialized) {
+    setupTerminal();
+    termInitialized = true;
+    setTimeout(function() {
+      document.getElementById('terminalInput').focus();
+    }, 100);
+  }
+  if (name === 'terminal') {
+    setTimeout(function() {
+      document.getElementById('terminalInput').focus();
+    }, 100);
+  }
+};
 
 // --- Toast ---
 function showToast(msg, type) {
