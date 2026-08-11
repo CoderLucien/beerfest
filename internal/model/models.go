@@ -71,13 +71,31 @@ type User struct {
 }
 
 type Order struct {
-	ID          string     `json:"id"`
-	ActivityID  string     `json:"activity_id"`
-	UserID      string     `json:"user_id"`
-	Amount      float64    `json:"amount"`
-	TraceID     string     `json:"trace_id"`
-	CreatedAt   time.Time  `json:"created_at"`
-	CompletedAt *time.Time `json:"completed_at,omitempty"`
+	ID             string     `json:"id"`
+	ActivityID     string     `json:"activity_id"`
+	UserID         string     `json:"user_id"`
+	Amount         float64    `json:"amount"`
+	CouponCode     string     `json:"coupon_code,omitempty"`
+	OriginalAmount float64    `json:"original_amount"`
+	DiscountAmount float64    `json:"discount_amount"`
+	TraceID        string     `json:"trace_id"`
+	CreatedAt      time.Time  `json:"created_at"`
+	CompletedAt    *time.Time `json:"completed_at,omitempty"`
+}
+
+type PromotionStat struct {
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Type   string  `json:"type"`
+	Status string  `json:"status"`
+	Issued int64   `json:"issued"`
+	Used   int64   `json:"used"`
+	Rate   float64 `json:"rate"`
+}
+
+type AdminOrder struct {
+	Order
+	Phone string `json:"phone,omitempty"`
 }
 
 type DashboardMetrics struct {

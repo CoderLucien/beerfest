@@ -14,6 +14,9 @@ services:
       - DB_NAME=${DB_NAME:-sys}
       - DB_TLS=${DB_TLS:-}
       - REDIS_ADDR=redis:6379
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - LLM_MODEL=${LLM_MODEL:-}
     depends_on:
       redis:
         condition: service_healthy

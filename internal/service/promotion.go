@@ -71,6 +71,56 @@ func (s *PromotionService) Suspend(id string) error {
 	return err
 }
 
+func (s *PromotionService) UpdateRule(id, ruleJSON string) error {
+	var rule json.RawMessage
+	if ruleJSON == "" {
+		rule = json.RawMessage("{}")
+	} else {
+		rule = json.RawMessage(ruleJSON)
+	}
+	result, err := s.db.Exec(
+		`UPDATE promotions SET rule=?, updated_at=? WHERE id=?`,
+		string(rule), time.Now(), id,
+	)
+	if err != nil {
+		return err
+	}
+	n, _ := result.RowsAffected()
+	if n == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
+func (s *PromotionService) StatsByActivity(activityID string) ([]model.PromotionStat, error) {
+	rows, err := s.db.Query(
+		`SELECT p.id, p.name, p.type, p.status,
+		        COUNT(c.id) AS issued,
+		        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used
+		 FROM promotions p
+		 LEFT JOIN coupons c ON c.promotion_id = p.id
+		 WHERE p.activity_id = ?
+		 GROUP BY p.id, p.name, p.type, p.status
+		 ORDER BY p.created_at DESC`, activityID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var stats []model.PromotionStat
+	for rows.Next() {
+		var s model.PromotionStat
+		if err := rows.Scan(&s.ID, &s.Name, &s.Type, &s.Status, &s.Issued, &s.Used); err != nil {
+			return nil, err
+		}
+		if s.Issued > 0 {
+			s.Rate = float64(s.Used) / float64(s.Issued)
+		}
+		stats = append(stats, s)
+	}
+	return stats, nil
+}
+
 func (s *PromotionService) ListByActivity(activityID string) ([]model.Promotion, error) {
 	rows, err := s.db.Query(
 		`SELECT id,activity_id,name,type,rule,status,workflow_id,approved_by,created_at,updated_at

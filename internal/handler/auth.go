@@ -80,6 +80,22 @@ func AdminLogin(s *service.AuthService) gin.HandlerFunc {
 	}
 }
 
+func AdminRefreshToken(s *service.AuthService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		auth := c.GetHeader("Authorization")
+		if auth == "" || len(auth) < 8 || auth[:7] != "Bearer " {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization required"})
+			return
+		}
+		token, err := s.RefreshAdminToken(auth[7:])
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "token refresh failed: " + err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"token": token})
+	}
+}
+
 func DemoLogin(s *service.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, user, err := s.DemoLogin()

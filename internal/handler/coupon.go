@@ -29,9 +29,17 @@ func IssueCoupon(s *service.CouponService) gin.HandlerFunc {
 	}
 }
 
+type useCouponReq struct {
+	OrderID        string  `json:"order_id"`
+	OriginalAmount float64 `json:"original_amount"`
+	DiscountAmount float64 `json:"discount_amount"`
+}
+
 func UseCoupon(s *service.CouponService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if err := s.Use(c.Param("code")); err != nil {
+		var req useCouponReq
+		c.ShouldBindJSON(&req)
+		if err := s.UseWithOrder(c.Param("code"), req.OrderID, req.OriginalAmount, req.DiscountAmount); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

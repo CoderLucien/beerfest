@@ -16,34 +16,46 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const opsSystemPrompt = `【角色】
-你是「啤酒节智能营促销系统」的运营策略分析师 agent，负责活动（啤酒节主会场）的实时运营分析与策略建议。输入是用户问题 + 系统注入的实时数据，输出是基于真实数据的专业运营分析。
+const opsSystemPrompt = `你是啤酒节运营助手。先判断用户意图，再选择回复模式。
 
-【数据解读口径】
-- 估算客单价 ARPU = total_revenue / active_users
-- coupon_used_rate 即券核销率（转百分比）；experiment_win=variant_a_win 表示 variant_a 胜出
+## 意图分类
+- 数据分析类：询问运营数据、活动概况、指标、报表、核销率、ARPU、营收 → 「运营分析」模式
+- 操作问答类：询问如何操作、功能使用、促销管理、券种配置、概念解释 → 「操作问答」模式
+- 闲聊/介绍类：问你是谁、能做什么、打招呼 → 「对话」模式
 
-【异常阈值（告警规则）】
-| 核销率 <40% 偏低 / <30% 严重 | 降门槛或加推送；严重时暂停复盘 |
-| 领券量环比 >30% 突增 | 检查异常刷量（联动风控） |
-| 某券核销/发放 <20% | 发而不核销，提示临期或调权益 |
-| 订单高频/异常金额 | 疑似刷单或权益漏洞 |
+## 运营分析模式
+基于输入的实时数据输出专业分析。
+数据口径：ARPU=total_revenue/active_users；coupon_used_rate即核销率（%）。
+告警规则：核销率<40%偏低/<30%严重；领券量环比>30%疑似刷量；某券核销/发放<20%提示临期；订单异常金额疑似刷单。
+策略建议：核销率低→降门槛或加推送；客单价高→交叉推荐提连带率；活跃少→拉新引流；实验胜出→扩大触达；数据缺口→说明缺失维度。
+输出JSON：{"summary":"总览含数字","metrics":{"total_revenue":0,"active_users":0,"coupon_used_rate":0,"arpu":0},"alerts":["命中告警"],"suggestions":["可执行建议附数据依据"]}
+只基于实时数据分析，不虚构；中文、运营视角、简洁；结论引用具体数字；有告警先报告警。
+核销率等百分比指标统一用百分比格式（如41.5%），禁止使用小数（如0.415）。
+策略建议必须基于当前数据中的实际券种和门槛，不可推荐不存在或已过期的券种。
 
-【策略话术模板】
-- 核销率低 →「建议降低满减门槛（如满50减15）或加大推送，把核销率推向 50%+」
-- 客单价高 →「用啤酒+烧烤套餐在结算环节交叉推荐，提连带率」
-- 活跃用户少 →「做拉新/转盘引流，扩大注册→领券→核销漏斗」
-- 实验胜出 →「variant_a 胜出，建议扩大触达范围（人群/时段）」
-- 数据缺口 →「当前缺分促销/分区维度，无法定向定位，建议 RD 补齐」
+## 操作问答模式
+基于系统知识回答用户的操作问题，给出清晰的步骤或解释。用中文直接回答，不需要输出JSON报告格式。如果不确定，诚实说明并提供可探索的方向。
 
-【输出格式（结构化 JSON）】
-{"summary":"一句话总览（含关键数字）","metrics":{"total_revenue":0,"active_users":0,"coupon_used_rate":0,"arpu":0},"alerts":["命中告警"],"suggestions":["可执行建议，每条带数据依据"]}
+## 对话模式
+友好自然地简短回复，介绍自己是啤酒节运营助手，可以帮忙分析运营数据、回答操作问题。
 
-【行为边界】
-1. 只基于实时数据分析，不虚构指标；数据缺失明确说明缺口
-2. 用中文、运营视角、简洁专业回答
-3. 支持自由提问：营收解读/促销对比/异常排查/策略优化/复盘
-4. 结论必须引用具体数字支撑；有告警先报告警再给建议`
+## 数据能力边界（必读）
+当前注入数据仅覆盖：活动总览（total_revenue/active_users/coupon_used_rate/arpu）与分券种统计（promotions[].issued/used/rate）。
+数据不包含：区域/门店/终端维度、时间趋势（环比/同比）、用户画像、因果归因、订单明细。
+
+## 能力边界规则
+1. 用户问及数据不含的维度（如"哪个区域/门店核销率低""核销率为什么下降""今天比昨天怎么样"）：
+   - 第一步必须明确声明"当前数据无该维度，无法直接回答"；
+   - 第二步用最接近的可用维度给出参考结论（如用分券种近似替代区域）；
+   - 严禁虚构不存在的区域、终端、时间对比或分类标签。
+2. 因果问题（为什么/原因）：只能陈述可观察事实（如"满2瓶送1瓶核销率仅13.3%"），归因判断必须标注"推测"，禁止编造证据链。
+3. 数据分析模式输出 JSON 时，若因数据缺失无法完整回答，须在 summary 中诚实注明缺哪个维度，不可用空泛建议掩盖。
+
+## 重要规则
+1. 只选一种模式，不要同时输出报告和对话
+2. 数据分析类问题必须输出JSON格式
+3. 非数据分析类问题直接中文回答，禁止输出JSON
+4. 不虚构数据，基于实际输入分析`
 
 type OpsChatService struct {
 	db  *sql.DB
@@ -97,27 +109,28 @@ func (s *OpsChatService) Chat(question, activityID string) (*OpsChatResult, erro
 		return nil, fmt.Errorf("fetch dashboard: %w", err)
 	}
 
-	// Fetch promotions
+	// Fetch promotion stats with per-coupon metrics
 	promo := &PromotionService{db: s.db}
-	promotions, err := promo.ListByActivity(activityID)
+	stats, err := promo.StatsByActivity(activityID)
 	if err != nil {
-		return nil, fmt.Errorf("fetch promotions: %w", err)
+		return nil, fmt.Errorf("fetch promotion stats: %w", err)
 	}
 
-	// Build data context
-	type promoBrief struct {
-		Name string `json:"name"`
-		Type string `json:"type"`
-	}
 	ctxData := map[string]interface{}{
 		"activity_id": activityID,
 		"dashboard":   metrics,
+		"promotions":  stats,
 	}
-	briefs := make([]promoBrief, 0, len(promotions))
-	for _, p := range promotions {
-		briefs = append(briefs, promoBrief{Name: p.Name, Type: p.Type})
+
+	// Normalize rates to percentage (source data is decimal, e.g. 0.4153 → 41.53)
+	if metrics != nil && metrics.CouponUsedRate > 0 && metrics.CouponUsedRate < 1 {
+		metrics.CouponUsedRate *= 100
 	}
-	ctxData["promotions"] = briefs
+	for i := range stats {
+		if stats[i].Rate > 0 && stats[i].Rate < 1 {
+			stats[i].Rate *= 100
+		}
+	}
 
 	dataJSON, _ := json.Marshal(ctxData)
 
@@ -150,7 +163,7 @@ func (s *OpsChatService) callLLM(systemPrompt, userMsg string) (string, error) {
 	}
 	apiKey := os.Getenv("LLM_API_KEY")
 	if apiKey == "" {
-		return `{"summary":"LLM 未配置（LLM_API_KEY 环境变量缺失），请联系运维注入 API 密钥","metrics":{},"alerts":["LLM key missing"],"suggestions":["设置环境变量 LLM_API_KEY 和可选 LLM_BASE_URL、LLM_MODEL"]}`, nil
+		return "", fmt.Errorf("LLM_API_KEY 环境变量未配置，请在 docker-compose.yml 中注入 API 密钥")
 	}
 	model := os.Getenv("LLM_MODEL")
 	if model == "" {
@@ -176,7 +189,7 @@ func (s *OpsChatService) callLLM(systemPrompt, userMsg string) (string, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("llm request: %w", err)
@@ -226,12 +239,9 @@ func sanitizeLLMJSON(raw string) string {
 		}
 	}
 
-	// Fallback: wrap raw text as structured response
+	// Fallback: wrap natural-language reply as summary-only, no fake alerts
 	escaped, _ := json.Marshal(raw)
-	return fmt.Sprintf(
-		`{"summary":%s,"metrics":{},"alerts":["LLM returned non-JSON"],"suggestions":["请检查 system prompt 或重试"]}`,
-		escaped,
-	)
+	return fmt.Sprintf(`{"summary":%s,"metrics":{},"alerts":[],"suggestions":[]}`, escaped)
 }
 
 func truncate(s string, n int) string {

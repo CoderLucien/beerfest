@@ -25,6 +25,7 @@ func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 
 		// Admin auth (public)
 		api.POST("/admin/login", AdminLogin(s.Auth))
+		api.POST("/admin/refresh", AdminRefreshToken(s.Auth))
 
 		// Activities (read: public)
 		api.GET("/activities", ListActivities(s.Activity))
@@ -51,6 +52,7 @@ func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 		{
 			// Dashboard
 			admin.GET("/dashboard/:activity_id", Dashboard(s.Dashboard))
+			admin.GET("/orders", ListAdminOrders(s.Order))
 
 			// Activities (write)
 			admin.POST("/activities", CreateActivity(s.Activity))
@@ -58,8 +60,10 @@ func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 
 			// Promotions (write)
 			admin.POST("/promotions", CreatePromotion(s.Promotion))
+			admin.PUT("/promotions/:id/rule", UpdatePromotionRule(s.Promotion))
 			admin.POST("/promotions/:id/approve", ApprovePromotion(s.Promotion))
 			admin.POST("/promotions/:id/suspend", SuspendPromotion(s.Promotion))
+			admin.GET("/promotions/stats", PromotionStats(s.Promotion))
 
 			// Experiments
 			admin.POST("/experiments", CreateExperiment(s.Experiment))

@@ -27,12 +27,22 @@ func Seed(db *sql.DB, seed int64) error {
 		return fmt.Errorf("seed activity: %w", err)
 	}
 
-	// Create promotions and track their IDs
+	// Create promotions — 10 types aligned with game reward pool
 	promoTypes := []struct{ name, ptype, rule string }{
+		// Tier 1: new-player guarantee (weight 15 each)
+		{"全场9折", "discount", `{"rate":0.9}`},
+		{"满50减10", "coupon", `{"threshold":50,"discount":10}`},
+		// Tier 2: common rewards
+		{"满100减30", "coupon", `{"threshold":100,"discount":30}`},
+		{"啤酒+烧烤套餐", "bundle", `{"items":["beer","bbq"],"price":88}`},
+		{"满2瓶送1瓶", "coupon", `{"threshold":2,"discount":0,"desc":"买2得3"}`},
+		{"小食免单券", "coupon", `{"threshold":58,"discount":58}`},
+		// Tier 3: premium rewards
+		{"满200减60", "coupon", `{"threshold":200,"discount":60}`},
 		{"全场8折", "discount", `{"rate":0.8}`},
-		{"满200减50", "discount", `{"threshold":200,"amount":50}`},
-		{"新人专享券", "coupon", `{"amount":30,"min_spend":100}`},
-		{"啤酒节限定套餐", "bundle", `{"items":["beer","snack"],"discount":0.75}`},
+		{"满300减50", "coupon", `{"threshold":300,"discount":50}`},
+		// Tier 4: rare jackpot
+		{"满168减68", "coupon", `{"threshold":168,"discount":68}`},
 	}
 	var promoIDs []string
 	for _, pt := range promoTypes {

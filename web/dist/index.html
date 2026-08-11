@@ -43,6 +43,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,200,66,0.3);border-top-color:#f5c842;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+	/* Tables */
+	.data-table{width:100%;border-collapse:collapse;font-size:0.88em}
+	.data-table th{text-align:left;padding:10px 12px;background:rgba(0,0,0,0.25);color:#8ec8e8;font-weight:600;border-bottom:2px solid rgba(255,255,255,0.1);white-space:nowrap}
+	.data-table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#d0d8e0}
+	.data-table tr:hover{background:rgba(255,255,255,0.03)}
+	.data-table .anomaly{background:rgba(239,68,68,0.1)}
+
 /* Metrics grid */
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
 .metric-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px;backdrop-filter:blur(8px);transition:transform 0.2s}
@@ -269,6 +276,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
       <h2>模拟结果</h2>
       <div class="sim-output" id="simOutput"></div>
     </div>
+
+    <!-- Admin Orders -->
+    <div class="panel" id="ordersPanel" style="display:none">
+      <h2>异常订单监控（金额 >= ¥5,000）</h2>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>
+            <th>订单ID</th><th>用户手机</th><th>金额</th><th>原价</th><th>折扣</th><th>券码</th><th>时间</th>
+          </tr></thead>
+          <tbody id="ordersTbody"></tbody>
+        </table>
+      </div>
+      <div id="ordersEmpty" style="padding:24px;text-align:center;color:#667788;display:none">暂无异常订单（>5000 元）</div>
+    </div>
+
+    <!-- Promotion Stats -->
+    <div class="panel" id="statsPanel" style="display:none">
+      <h2>促销券发放 / 核销统计</h2>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>
+            <th>促销名称</th><th>类型</th><th>状态</th><th>已发放</th><th>已核销</th><th>核销率</th>
+          </tr></thead>
+          <tbody id="statsTbody"></tbody>
+        </table>
+      </div>
+    </div>
       </div><!-- /dashboard-main -->
       <div class="dashboard-chat">
         <div class="chat-container">
@@ -466,6 +500,45 @@ function adminAuthHeaders() {
   return h;
 }
 
+async function refreshAdminToken() {
+  if (!adminToken) return false;
+  try {
+    var res = await fetch(API + '/api/v1/admin/refresh', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer ' + adminToken}
+    });
+    if (!res.ok) return false;
+    var data = await res.json();
+    adminToken = data.token;
+    localStorage.setItem('adminToken', adminToken);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function fetchAdmin(url, opts) {
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  opts.headers['Content-Type'] = 'application/json';
+  if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
+
+  var res = await fetch(url, opts);
+
+  // Auto-refresh on 401: try refreshing the token once, then retry
+  if (res.status === 401 && adminToken) {
+    var refreshed = await refreshAdminToken();
+    if (refreshed) {
+      opts.headers['Authorization'] = 'Bearer ' + adminToken;
+      res = await fetch(url, opts);
+    } else {
+      // Refresh failed — force re-login
+      doLogout();
+      showToast('登录已过期，请重新登录', 'error');
+      throw new Error('auth expired');
+    }
+  }
+  return res;
+}
+
 async function doLogin() {
   var username = document.getElementById('loginUsername').value.trim();
   var password = document.getElementById('loginPassword').value.trim();
@@ -594,7 +667,7 @@ async function checkHealth() {
 // --- Activities ---
 async function loadActivities() {
   try {
-    var res = await fetch(API + '/api/v1/activities');
+    var res = await fetchAdmin(API + '/api/v1/activities');
     var list = await res.json();
     var sel = document.getElementById('activitySelect');
     sel.innerHTML = '<option value="">-- 选择活动 --</option>';
@@ -624,7 +697,7 @@ function onActivityChange() {
 // --- Dashboard ---
 async function loadDashboard(activityId) {
   try {
-    var res = await fetch(API + '/api/v1/dashboard/' + activityId, {headers: adminAuthHeaders()});
+    var res = await fetchAdmin(API + '/api/v1/dashboard/' + activityId);
     var m = await res.json();
     document.getElementById('mRevenue').textContent = '¥' + (m.total_revenue || 0).toLocaleString('zh-CN', {minimumFractionDigits:2,maximumFractionDigits:2});
     document.getElementById('mUsers').textContent = (m.active_users || 0).toLocaleString();
@@ -632,6 +705,68 @@ async function loadDashboard(activityId) {
     document.getElementById('mExp').textContent = m.experiment_win || '暂无数据';
   } catch(e) {
     console.error('dashboard:', e);
+  }
+  loadAdminOrders(activityId);
+  loadPromotionStats(activityId);
+}
+
+// --- Admin Orders ---
+async function loadAdminOrders(activityId) {
+  try {
+    var res = await fetchAdmin(API + '/api/v1/admin/orders?activity_id=' + activityId + '&min_amount=5000&limit=50');
+    var list = await res.json();
+    var panel = document.getElementById('ordersPanel');
+    var tbody = document.getElementById('ordersTbody');
+    var empty = document.getElementById('ordersEmpty');
+    if (!Array.isArray(list) || list.length === 0) {
+      panel.style.display = 'none';
+      return;
+    }
+    panel.style.display = 'block';
+    tbody.innerHTML = '';
+    list.forEach(function(o) {
+      var row = tbody.insertRow();
+      if (o.amount >= 5000) row.className = 'anomaly';
+      row.innerHTML =
+        '<td style="font-family:monospace;font-size:0.8em">' + escHtml(o.id || '').slice(0,12) + '...</td>' +
+        '<td>' + escHtml(o.phone || '--') + '</td>' +
+        '<td style="color:#ef4444;font-weight:700">¥' + (o.amount || 0).toLocaleString('zh-CN', {minimumFractionDigits:2}) + '</td>' +
+        '<td>¥' + (o.original_amount || 0).toLocaleString('zh-CN', {minimumFractionDigits:2}) + '</td>' +
+        '<td>' + (o.discount_amount > 0 ? '¥' + o.discount_amount.toFixed(2) : '--') + '</td>' +
+        '<td style="font-family:monospace;font-size:0.82em">' + (o.coupon_code ? escHtml(o.coupon_code).slice(0,16) : '--') + '</td>' +
+        '<td style="white-space:nowrap;font-size:0.85em">' + (o.created_at || '').replace('T',' ').slice(0,19) + '</td>';
+    });
+  } catch(e) {
+    console.error('admin orders:', e);
+  }
+}
+
+// --- Promotion Stats ---
+async function loadPromotionStats(activityId) {
+  try {
+    var res = await fetchAdmin(API + '/api/v1/admin/promotions/stats?activity_id=' + activityId);
+    var list = await res.json();
+    var panel = document.getElementById('statsPanel');
+    var tbody = document.getElementById('statsTbody');
+    if (!Array.isArray(list) || list.length === 0) {
+      panel.style.display = 'none';
+      return;
+    }
+    panel.style.display = 'block';
+    tbody.innerHTML = '';
+    list.forEach(function(s) {
+      var row = tbody.insertRow();
+      var rateClass = s.rate >= 0.5 ? 'color:#4ade80;font-weight:700' : (s.rate > 0 ? 'color:#fbbf24' : 'color:#667788');
+      row.innerHTML =
+        '<td>' + escHtml(s.name) + '</td>' +
+        '<td>' + escHtml(s.type) + '</td>' +
+        '<td>' + escHtml(s.status) + '</td>' +
+        '<td>' + (s.issued || 0).toLocaleString() + '</td>' +
+        '<td>' + (s.used || 0).toLocaleString() + '</td>' +
+        '<td style="' + rateClass + '">' + ((s.rate || 0)*100).toFixed(1) + '%</td>';
+    });
+  } catch(e) {
+    console.error('promotion stats:', e);
   }
 }
 
@@ -648,9 +783,8 @@ async function runSimulation() {
   document.getElementById('simBtn').disabled = true;
 
   try {
-    var res = await fetch(API + '/api/v1/simulate', {
+    var res = await fetchAdmin(API + '/api/v1/simulate', {
       method: 'POST',
-      headers: adminAuthHeaders(),
       body: JSON.stringify({activity_id: activityId, days: days, seed: Date.now()})
     });
     var data = await res.json();
@@ -824,7 +958,7 @@ async function journeyStep(n) {
 }
 
 async function doStep1(activityId, resultEl, stepEl) {
-  var promosRes = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+  var promosRes = await fetchAdmin(API + '/api/v1/activities/' + activityId + '/promotions');
   var promos = await promosRes.json();
   var promoId = (Array.isArray(promos) && promos.length > 0) ? promos[0].id : null;
   if (!promoId) throw new Error('请先在运营看板中创建并审批促销');
@@ -843,16 +977,15 @@ async function doStep1(activityId, resultEl, stepEl) {
 }
 
 async function doStep2(activityId, resultEl, stepEl) {
-  var res = await fetch(API + '/api/v1/activities/' + activityId + '/promotions');
+  var res = await fetchAdmin(API + '/api/v1/activities/' + activityId + '/promotions');
   var data = await res.json();
   resultEl.innerHTML = '<span class="step-http">GET /api/v1/activities/' + activityId + '/promotions → ' + res.status + '</span>' +
     '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
 }
 
 async function doStep3(activityId, resultEl, stepEl) {
-  var res = await fetch(API + '/api/v1/simulate', {
+  var res = await fetchAdmin(API + '/api/v1/simulate', {
     method: 'POST',
-    headers: adminAuthHeaders(),
     body: JSON.stringify({activity_id: activityId, days: 1, seed: Date.now()})
   });
   var data = await res.json();
@@ -896,9 +1029,8 @@ function useCouponInput() {
 }
 
 async function doStep5(activityId, resultEl, stepEl) {
-  var res = await fetch(API + '/api/v1/segments', {
+  var res = await fetchAdmin(API + '/api/v1/segments', {
     method: 'POST',
-    headers: adminAuthHeaders(),
     body: JSON.stringify({name: '高频高消费用户', rule: {min_spend: 100, member_days: 7}})
   });
   var data = await res.json();
@@ -909,7 +1041,6 @@ async function doStep5(activityId, resultEl, stepEl) {
 async function doStep6(activityId, resultEl, stepEl) {
   var res = await fetch(API + '/api/v1/experiments', {
     method: 'POST',
-    headers: adminAuthHeaders(),
     body: JSON.stringify({
       activity_id: activityId,
       name: '折扣vs满减效果对比',
@@ -921,10 +1052,8 @@ async function doStep6(activityId, resultEl, stepEl) {
   var expId = data.id;
 
   if (expId) {
-    await fetch(API + '/api/v1/experiments/' + expId + '/start', {method:'POST', headers: adminAuthHeaders()});
-    var completeRes = await fetch(API + '/api/v1/experiments/' + expId + '/complete', {
+    var completeRes = await fetchAdmin(API + '/api/v1/experiments/' + expId + '/complete', {
       method: 'POST',
-      headers: adminAuthHeaders(),
       body: JSON.stringify({result:'variant_a_win'})
     });
     var completeData = await completeRes.json();
@@ -937,7 +1066,6 @@ async function doStep6(activityId, resultEl, stepEl) {
 }
 
 async function doStep7(activityId, resultEl, stepEl) {
-  var res = await fetch(API + '/api/v1/dashboard/' + activityId, {headers: adminAuthHeaders()});
   var data = await res.json();
   resultEl.innerHTML = '<span class="step-http">GET /api/v1/dashboard/' + activityId + ' → ' + res.status + '</span>' +
     '<div class="step-json">' + escHtml(JSON.stringify(data, null, 2)) + '</div>';
@@ -1008,7 +1136,7 @@ function renderOpsReply(reply) {
       html += '<div class="chat-text" style="margin-top:6px">';
       if (m.total_revenue !== undefined) html += '<span class="metric-inline good">营收 ¥' + (m.total_revenue || 0).toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</span> ';
       if (m.active_users !== undefined) html += '<span class="metric-inline info">用户 ' + (m.active_users || 0).toLocaleString() + '</span> ';
-      if (m.coupon_used_rate !== undefined) html += '<span class="metric-inline warn">核销率 ' + ((m.coupon_used_rate || 0)*100).toFixed(1) + '%</span> ';
+      if (m.coupon_used_rate !== undefined) html += '<span class="metric-inline warn">核销率 ' + (m.coupon_used_rate || 0).toFixed(1) + '%</span> ';
       if (m.arpu !== undefined) html += '<span class="metric-inline info">ARPU ¥' + (m.arpu || 0).toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</span>';
       html += '</div>';
     }
@@ -1042,9 +1170,8 @@ async function processChat(text) {
 
   try {
     var aid = document.getElementById('activitySelect').value;
-    var res = await fetch(API + '/api/v1/ops/chat', {
+    var res = await fetchAdmin(API + '/api/v1/ops/chat', {
       method: 'POST',
-      headers: adminAuthHeaders(),
       body: JSON.stringify({question: text, activity_id: aid || undefined})
     });
     if (!res.ok) {

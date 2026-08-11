@@ -198,6 +198,45 @@ func (s *AuthService) AdminLogin(username, password, ip, userAgent string) (stri
 	return token, &u, nil
 }
 
+// ValidateTokenWithGrace validates a JWT and returns user_id. Unlike ValidateToken,
+// it accepts tokens whose exp is within gracePeriod past expiry, making it suitable
+// for token refresh endpoints where we want to re-issue an expired token.
+func ValidateTokenWithGrace(tokenStr string, gracePeriod time.Duration) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(jwtSecret), nil
+	}, jwt.WithLeeway(gracePeriod))
+	if err != nil {
+		return "", err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return "", fmt.Errorf("invalid token")
+	}
+	userID, _ := claims["user_id"].(string)
+	return userID, nil
+}
+
+func (s *AuthService) RefreshAdminToken(tokenStr string) (string, error) {
+	// Accept tokens up to 2 hours past expiry
+	userID, err := ValidateTokenWithGrace(tokenStr, 2*time.Hour)
+	if err != nil {
+		return "", err
+	}
+
+	// Verify the user is still an admin
+	var username, role string
+	err = s.db.QueryRow(`SELECT COALESCE(username,''), COALESCE(role,'user') FROM users WHERE id=? AND role='admin'`, userID).
+		Scan(&username, &role)
+	if err != nil {
+		return "", fmt.Errorf("admin user not found or deactivated")
+	}
+
+	return s.issueAdminToken(userID, username, role)
+}
+
 func ValidateToken(tokenStr string) (string, error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {

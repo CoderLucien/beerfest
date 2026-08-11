@@ -77,6 +77,41 @@ func SuspendPromotion(s *service.PromotionService) gin.HandlerFunc {
 	}
 }
 
+type updatePromotionRuleReq struct {
+	Rule string `json:"rule" binding:"required"`
+}
+
+func UpdatePromotionRule(s *service.PromotionService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req updatePromotionRuleReq
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "rule required"})
+			return
+		}
+		if err := s.UpdateRule(c.Param("id"), req.Rule); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "updated"})
+	}
+}
+
+func PromotionStats(s *service.PromotionService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		activityID := c.Query("activity_id")
+		if activityID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "activity_id required"})
+			return
+		}
+		stats, err := s.StatsByActivity(activityID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, stats)
+	}
+}
+
 func validPromotionType(t string) bool {
 	switch t {
 	case "discount", "coupon", "bundle":

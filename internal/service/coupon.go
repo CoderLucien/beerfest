@@ -50,7 +50,10 @@ func (s *CouponService) GetByCode(code string) (*model.Coupon, error) {
 }
 
 func (s *CouponService) Use(code string) error {
-	// Atomic UPDATE with WHERE guards against concurrent double-use and expiry.
+	return s.UseWithOrder(code, "", 0, 0)
+}
+
+func (s *CouponService) UseWithOrder(code, orderID string, originalAmount, discountAmount float64) error {
 	res, err := s.db.Exec(
 		`UPDATE coupons SET status='used' WHERE code=? AND status='issued' AND expires_at > NOW()`,
 		code,
@@ -60,7 +63,6 @@ func (s *CouponService) Use(code string) error {
 	}
 	n, _ := res.RowsAffected()
 	if n == 0 {
-		// Determine why: expired, already used, or doesn't exist.
 		c, _ := s.GetByCode(code)
 		if c == nil {
 			return fmt.Errorf("coupon %s not found", code)
@@ -69,6 +71,13 @@ func (s *CouponService) Use(code string) error {
 			return fmt.Errorf("coupon %s status is %s", code, c.Status)
 		}
 		return fmt.Errorf("coupon %s expired at %s", code, c.ExpiresAt.Format("2006-01-02"))
+	}
+
+	if orderID != "" {
+		s.db.Exec(
+			`UPDATE orders SET coupon_code=?, original_amount=?, discount_amount=? WHERE id=?`,
+			code, originalAmount, discountAmount, orderID,
+		)
 	}
 	return nil
 }

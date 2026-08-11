@@ -46,6 +46,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 .spinner-inline{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* Menu section */
+.menu-section{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin:16px 0}
+.menu-section h3{color:#f5c842;font-size:0.95em;margin-bottom:12px}
+.menu-cats{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+.menu-cat{padding:5px 12px;border-radius:16px;font-size:0.78em;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#8899aa;white-space:nowrap;flex-shrink:0;transition:all 0.2s}
+.menu-cat.active{border-color:#f5c842;background:rgba(245,200,66,0.1);color:#f5c842}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.menu-item{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.menu-item:active{transform:scale(0.96)}
+.menu-item .mi-name{font-size:0.82em;font-weight:600;color:#e8e8e8}
+.menu-item .mi-desc{font-size:0.7em;color:#667788;margin-top:2px}
+.menu-item .mi-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.menu-item .mi-price{font-size:0.88em;font-weight:700;color:#f5c842}
+.menu-item .mi-add{width:26px;height:26px;border-radius:50%;background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.3);color:#f5c842;font-size:1em;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+.menu-item .mi-add.in-cart{background:rgba(74,222,128,0.2);border-color:rgba(74,222,128,0.3);color:#4ade80}
+.cart-panel{background:rgba(0,0,0,0.25);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:none}
+.cart-panel.show{display:block}
+.cart-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.8em}
+.cart-item:last-child{border-bottom:none}
+.cart-item .ci-name{flex:1;color:#e0e0e0;min-width:0}
+.cart-item .ci-qty{display:flex;align-items:center;gap:6px;margin:0 10px}
+.cart-item .ci-qty button{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#8899aa;font-size:0.8em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cart-item .ci-price{color:#f5c842;font-weight:600;min-width:48px;text-align:right}
+.cart-total{display:flex;justify-content:space-between;padding-top:8px;margin-top:4px;border-top:1px solid rgba(255,255,255,0.08);font-size:0.85em;font-weight:700}
+.cart-total .ct-label{color:#8ec8d8}
+.cart-total .ct-amount{color:#f5c842}
+.cart-empty{color:#556677;font-size:0.78em;text-align:center;padding:8px}
+
 /* Checkout section */
 .checkout{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin:20px 0}
 .checkout h3{color:#f5c842;font-size:0.95em;margin-bottom:12px}
@@ -69,8 +97,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 .coupon-chip .chip-save.show{display:block}
 
 /* Calculation preview */
-.calc-preview{display:none;background:rgba(0,0,0,0.25);border-radius:10px;padding:14px;margin-bottom:12px;font-size:0.82em}
-.calc-preview.show{display:block}
+.calc-preview{background:rgba(0,0,0,0.25);border-radius:10px;padding:14px;margin-bottom:12px;font-size:0.82em}
+
 .calc-line{display:flex;justify-content:space-between;padding:4px 0;color:#8899aa}
 .calc-line.discount{color:#4ade80}
 .calc-line.total{color:#f5c842;font-weight:700;font-size:1.1em;border-top:1px solid rgba(255,255,255,0.08);margin-top:4px;padding-top:8px}
@@ -104,17 +132,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 .receipt-table tr.total td{color:#f5c842;font-weight:700;font-size:1.1em;border-top:1px dashed rgba(255,255,255,0.1);padding-top:10px}
 .receipt .order-id{font-family:"SF Mono","Fira Code",monospace;font-size:0.72em;color:#556677;margin-top:12px}
 
-/* Lucky Wheel */
-.wheel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
-.wheel-overlay.show{display:flex}
-.wheel-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#8899aa;font-size:1.2em;cursor:pointer}
-.wheel-title{color:#f5c842;font-size:1.1em;margin-bottom:20px;font-weight:700}
-.wheel-container{position:relative;width:280px;height:280px}
-.wheel-canvas{width:100%;height:100%}
-.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:24px solid #f5c842;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));z-index:2}
-.btn-spin{margin-top:20px;padding:12px 40px;border-radius:24px;font-size:1em;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628}
-.btn-spin:disabled{opacity:0.4;cursor:not-allowed}
-.spin-remain{color:#667788;font-size:0.78em;margin-top:8px}
+/* Ingot Game */
+.game-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
+.game-overlay.show{display:flex}
+.game-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#8899aa;font-size:1.2em;cursor:pointer;z-index:10}
+.game-title{color:#f5c842;font-size:1em;margin-bottom:8px;font-weight:700}
+.game-canvas-wrap{position:relative;background:linear-gradient(180deg,#1a0a2e 0%,#162447 40%,#0d3b1e 100%);border:2px solid rgba(245,200,66,0.25);border-radius:16px;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+.game-canvas{display:block;width:100%;height:100%}
+.game-hud{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;width:100%;max-width:340px;color:#e8e8e8;font-size:0.85em;font-weight:600}
+.game-hud .hud-score{color:#f5c842}
+.game-hud .hud-timer{color:#8ec8d8}
+.game-hud .hud-lives{color:#f87171}
+.game-result{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;flex-direction:column;z-index:5;border-radius:16px}
+.game-result.show{display:flex}
+.game-result .result-title{font-size:1.4em;font-weight:700;margin-bottom:8px}
+.game-result .result-title.win{color:#f5c842}
+.game-result .result-title.lose{color:#f87171}
+.game-result .result-score{color:#8899aa;font-size:0.9em;margin-bottom:12px}
+.game-result .result-coupon{color:#4ade80;font-size:0.85em;margin-bottom:16px;text-align:center;line-height:1.5}
+.btn-play{padding:12px 40px;border-radius:24px;font-size:1em;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#f5c842,#d4a832);color:#0a1628}
+.btn-play:disabled{opacity:0.4;cursor:not-allowed}
+.btn-play.retry{background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(139,92,246,0.15));border:1px solid rgba(139,92,246,0.3);color:#a78bfa}
+.game-remain{color:#667788;font-size:0.78em;margin-top:10px}
+.game-tip{color:#667788;font-size:0.72em;margin-top:6px;text-align:center;line-height:1.4}
 
 /* Game entry button */
 .game-entry{text-align:center;margin:16px 0}
@@ -154,6 +194,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 
 #appMain{display:none}
 #loginPage{display:block}
+.order-detail{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 14px;margin:-4px 0 8px 0;font-size:13px}
+.order-detail-row{display:flex;justify-content:space-between;padding:4px 0;color:#aab8c2}
+.order-detail-row:last-child{color:#f5c842;border-top:1px solid rgba(255,255,255,0.06);margin-top:2px;padding-top:6px}
 </style>
 </head>
 <body>
@@ -209,8 +252,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
   <div id="promoList"><div style="color:#556677;font-size:0.82em;text-align:center;padding:20px">请先选择会场</div></div>
 
   <div class="game-entry">
-    <button class="btn-game" onclick="openWheel()">🎰 幸运大转盘 · 抽券</button>
-    <div style="font-size:0.7em;color:#667788;margin-top:4px" id="spinRemainText">今日剩余 3 次</div>
+    <button class="btn-game" onclick="openGame()">👑 接元宝 · 赢优惠券</button>
+    <div style="font-size:0.7em;color:#667788;margin-top:4px" id="gameRemainText">今日剩余 3 次</div>
+  </div>
+
+  <div class="menu-section" id="menuSection">
+    <h3>🍽️ 点菜下单</h3>
+    <div class="menu-cats" id="menuCats"></div>
+    <div class="menu-grid" id="menuGrid"></div>
+    <div class="cart-panel" id="cartPanel">
+      <div id="cartItems"></div>
+      <div class="cart-total">
+        <span class="ct-label">合计</span>
+        <span class="ct-amount" id="cartTotal">¥0</span>
+      </div>
+    </div>
   </div>
 
   <div class="checkout" id="checkoutSection">
@@ -244,16 +300,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-
 </div>
 </div>
 
-<!-- Lucky Wheel Overlay -->
-<div class="wheel-overlay" id="wheelOverlay">
-  <button class="wheel-close" onclick="closeWheel()">✕</button>
-  <div class="wheel-title">🎰 幸运大转盘</div>
-  <div class="wheel-container">
-    <div class="wheel-pointer"></div>
-    <canvas class="wheel-canvas" id="wheelCanvas" width="280" height="280"></canvas>
+<!-- Ingot Game Overlay -->
+<div class="game-overlay" id="gameOverlay">
+  <button class="game-close" onclick="closeGame()">✕</button>
+  <div class="game-title" id="gameTitle">👑 接元宝</div>
+  <div class="game-hud" id="gameHud" style="display:none">
+    <span>🏆 <span class="hud-score" id="hudScore">0</span> 分</span>
+    <span class="hud-timer" id="hudTimer">30s</span>
+    <span class="hud-lives" id="hudLives">❤️❤️❤️</span>
   </div>
-  <button class="btn-spin" id="btnSpin" onclick="spinWheel()">开始抽奖</button>
-  <div class="spin-remain" id="spinRemain"></div>
+  <div class="game-canvas-wrap" id="gameCanvasWrap">
+    <canvas class="game-canvas" id="gameCanvas"></canvas>
+    <div class="game-result" id="gameResult">
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-coupon" id="resultCoupon"></div>
+      <button class="btn-play retry" id="btnRetry" onclick="retryGame()" style="display:none">再来一局</button>
+    </div>
+  </div>
+  <button class="btn-play" id="btnPlay" onclick="startGame()">开始游戏</button>
+  <div class="game-remain" id="gameRemain"></div>
+  <div class="game-tip">左右滑动屏幕移动啤酒杯<br>接元宝 +1分 · 金色大宝 +3分 · 💣 扣1命 · 🍺 +2命<br>30秒内 ≥15分 赢优惠券</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -263,23 +330,79 @@ var API = '';
 var myCoupons = {};     // {promoId: {code, name, promoData}}
 var selectedCoupon = null;
 var wheelSpinning = false;
-var spinRemaining = 3;
+var gameRemaining = 3;
+
+// ---- Ingot Game Config ----
+var GAME_DURATION = 30;
+var GAME_MAX_LIVES = 3;
+var GAME_PASS_SCORE = 15;
+var GAME_MAX_ON_SCREEN = 4;
+var GAME_CANVAS_W = 340;
+var GAME_CANVAS_H = 480;
+
+var gameRunning = false;
+var gameScore = 0;
+var gameLives = GAME_MAX_LIVES;
+var gameTimeLeft = GAME_DURATION;
+var gameItems = [];
+var gamePlayerX = GAME_CANVAS_W / 2;
+var gameLastSpawn = 0;
+var gameStartTime = 0;
+var gameAnimId = null;
+var gameFirstPlay = true;
+
+// 10-coupon reward pool (ops design)
+var rewardPool = [
+  {name:'全场9折', type:'discount', rule:{rate:0.9}, weight:15, tier:1},
+  {name:'满50减10', type:'coupon', rule:{threshold:50,discount:10}, weight:15, tier:1},
+  {name:'满100减30', type:'coupon', rule:{threshold:100,discount:30}, weight:12, tier:2},
+  {name:'满200减60', type:'coupon', rule:{threshold:200,discount:60}, weight:8, tier:3},
+  {name:'啤酒+烧烤套餐', type:'bundle', rule:{items:['beer','bbq'],price:88}, weight:10, tier:2},
+  {name:'满2瓶送1瓶', type:'coupon', rule:{threshold:2,discount:0,desc:'买2得3'}, weight:8, tier:2},
+  {name:'全场8折', type:'discount', rule:{rate:0.8}, weight:8, tier:3},
+  {name:'小食免单券', type:'coupon', rule:{threshold:58,discount:58}, weight:6, tier:2},
+  {name:'满300减50', type:'coupon', rule:{threshold:300,discount:50}, weight:6, tier:3},
+  {name:'满168减68', type:'coupon', rule:{threshold:168,discount:68}, weight:4, tier:4}
+];
+
+function getPhase(elapsedSec) {
+  if (elapsedSec < 7) return {name:'warmup', interval:900, speed:1.8, bombRate:0};
+  if (elapsedSec < 18) return {name:'buildup', interval:700, speed:2.8, bombRate:0.03};
+  return {name:'climax', interval:480, speed:4, bombRate:0.06};
+}
+
+function pickReward() {
+  // First play guarantee: tier-1 only (全场9折 / 满50减10)
+  var pool = gameFirstPlay ? rewardPool.filter(function(r){return r.tier===1;}) : rewardPool;
+  var totalW = 0;
+  pool.forEach(function(r){totalW += r.weight;});
+  var roll = Math.random() * totalW;
+  var acc = 0;
+  for (var i = 0; i < pool.length; i++) {
+    acc += pool[i].weight;
+    if (roll <= acc) return pool[i];
+  }
+  return pool[0];
+}
+
+function matchRewardToPromo(reward) {
+  var promos = window._loadedPromos || [];
+  for (var i = 0; i < promos.length; i++) {
+    var p = promos[i];
+    if (p.type !== reward.type) continue;
+    var r = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
+    if (reward.type === 'discount' && Math.abs(r.rate - reward.rule.rate) < 0.01) return p;
+    if (reward.type === 'coupon' && r.threshold === reward.rule.threshold && r.discount === reward.rule.discount) return p;
+    if (reward.type === 'bundle' && r.price === reward.rule.price) return p;
+  }
+  return null;
+}
 
 var token = null;
 var userId = null;
 var smsCountdown = 0;
 var smsTimer = null;
 
-var wheelPrizes = [
-  {label: '满100减30', color: '#f5c842'},
-  {label: '全场8折',   color: '#4ade80'},
-  {label: '啤酒套餐',  color: '#60a5fa'},
-  {label: '谢谢参与',  color: '#667788'},
-  {label: '满100减30', color: '#f5c842'},
-  {label: '再来一次',  color: '#8ec8d8'},
-  {label: '全场8折',   color: '#4ade80'},
-  {label: '啤酒套餐',  color: '#60a5fa'}
-];
 
 // ---- Auth helpers ----
 
@@ -413,7 +536,8 @@ function doLogout() {
   userId = null;
   myCoupons = {};
   selectedCoupon = null;
-  spinRemaining = 3;
+  gameRemaining = 3;
+  clearCart();
   document.getElementById('appMain').style.display = 'none';
   document.getElementById('loginPage').style.display = 'block';
   document.getElementById('loginPhone').value = '';
@@ -431,6 +555,7 @@ function showApp() {
 async function initApp() {
   await loadMyData();
   await loadActivities();
+  initMenu();
   renderHistory();
 }
 
@@ -497,6 +622,7 @@ async function loadPromos() {
     }
 
     window.promoMetas = {};
+    window._loadedPromos = promos;
     promos.forEach(function(p) {
       if (p.status !== 'approved' && p.status !== 'active') return;
 
@@ -509,7 +635,7 @@ async function loadPromos() {
           name = p.name; desc = '全场' + (rule.rate*100).toFixed(0) + '折优惠'; limit = '不限门槛';
         } else if (p.type === 'coupon') {
           iconCls = 'gold'; icon = '¥' + rule.discount;
-          name = p.name; desc = '满' + rule.threshold + '减' + rule.discount; limit = '满¥' + rule.threshold + '可用';
+          name = p.name; desc = rule.desc || ('满' + rule.threshold + '减' + rule.discount); limit = '满¥' + rule.threshold + '可用';
         } else if (p.type === 'bundle') {
           iconCls = 'blue'; icon = '套餐';
           name = p.name; desc = (rule.items||[]).join('+'); limit = '特价 ¥' + rule.price;
@@ -532,6 +658,18 @@ async function loadPromos() {
         (claimed ? '已领取 ✓' : '立即领取') +
         '</button>';
       list.appendChild(card);
+    });
+
+    // Backfill myCoupons metadata from promoMetas (fix refresh blank chips)
+    var ids = Object.keys(myCoupons);
+    ids.forEach(function(id) {
+      var meta = window.promoMetas[id];
+      if (meta && !myCoupons[id].type) {
+        myCoupons[id].type = meta.type;
+        myCoupons[id].desc = meta.desc;
+        myCoupons[id].limit = meta.limit;
+        myCoupons[id].name = myCoupons[id].name || meta.name;
+      }
     });
 
     updateCouponChips();
@@ -590,11 +728,22 @@ async function claimOne(promoId) {
 function updateCouponChips() {
   var container = document.getElementById('couponChips');
   var ids = Object.keys(myCoupons);
-  if (ids.length === 0) {
+  // Filter out orphaned coupons whose promotions no longer exist / have no metadata
+  var validIds = ids.filter(function(id) {
+    var c = myCoupons[id];
+    return c.type || c.name || c.desc;
+  });
+  // Drop orphaned entries so they don't accumulate
+  ids.forEach(function(id) {
+    var c = myCoupons[id];
+    if (!c.type && !c.name && !c.desc) delete myCoupons[id];
+  });
+  if (selectedCoupon && !myCoupons[selectedCoupon]) selectedCoupon = null;
+  if (validIds.length === 0) {
     container.innerHTML = '<span style="color:#556677;font-size:0.78em">请先领取优惠券</span>';
   } else {
     var html = '';
-    ids.forEach(function(id) {
+    validIds.forEach(function(id) {
       var c = myCoupons[id];
       var sel = selectedCoupon === id;
       var badgeCls = c.type === 'discount' ? 'discount-type' : (c.type === 'bundle' ? 'bundle-type' : 'coupon-type');
@@ -650,22 +799,22 @@ function selectCoupon(id) {
 
 function updateCalc() {
   var amount = parseFloat(document.getElementById('orderAmount').value) || 0;
-  var preview = document.getElementById('calcPreview');
   var btnPay = document.getElementById('btnPay');
+  updateChipSavings();
 
-  if (!selectedCoupon || amount <= 0) {
-    preview.classList.remove('show');
-    btnPay.disabled = true;
-    btnPay.textContent = '请先领券并选择优惠券';
-    updateChipSavings();
+  // Always show calc preview
+  document.getElementById('calcOrig').textContent = '¥' + amount.toFixed(2);
+
+  if (!selectedCoupon) {
+    // No coupon — allow pay at full price
+    document.getElementById('calcDiscount').textContent = '-¥0.00（未使用优惠券）';
+    document.getElementById('calcFinal').textContent = '¥' + amount.toFixed(2);
+    btnPay.disabled = amount <= 0;
+    btnPay.textContent = amount > 0 ? '原价支付' : '请输入金额';
     return;
   }
 
-  preview.classList.add('show');
-  btnPay.disabled = false;
-  btnPay.textContent = '确认支付';
-  updateChipSavings();
-
+  // Coupon selected — fetch and calculate discount
   try {
     var aid = document.getElementById('activitySelect').value;
     fetch(API + '/api/v1/activities/' + aid + '/promotions').then(function(res) {
@@ -684,9 +833,10 @@ function updateCalc() {
             disc = Math.max(0, amount - rule.price);
           }
           var final = Math.max(0, amount - disc);
-          document.getElementById('calcOrig').textContent = '¥' + amount.toFixed(2);
           document.getElementById('calcDiscount').textContent = '-¥' + disc.toFixed(2);
           document.getElementById('calcFinal').textContent = '¥' + final.toFixed(2);
+          btnPay.disabled = amount <= 0;
+          btnPay.textContent = disc > 0 ? '使用优惠支付 ¥' + final.toFixed(0) : '确认支付';
         }
       }
     });
@@ -699,8 +849,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function doPay() {
-  if (!selectedCoupon) { showToast('请选择一张优惠券', 'error'); return; }
-
   var amount = parseFloat(document.getElementById('orderAmount').value) || 0;
   if (amount <= 0) { showToast('请输入消费金额', 'error'); return; }
 
@@ -709,63 +857,75 @@ async function doPay() {
   btnPay.innerHTML = '<span class="spinner"></span>支付中...';
 
   try {
-    var coupon = myCoupons[selectedCoupon];
     var aid = document.getElementById('activitySelect').value;
+    var discount = 0, finalAmount = amount, discountLabel = '';
+    var coupon = selectedCoupon ? myCoupons[selectedCoupon] : null;
 
-    // Create real order for logged-in user
-    await fetch(API + '/api/v1/orders', {
+    if (coupon) {
+      // Calculate discount
+      var promosRes = await fetch(API + '/api/v1/activities/' + aid + '/promotions');
+      var promos = await promosRes.json();
+      var promo = (Array.isArray(promos) ? promos.find(function(x) { return x.id === selectedCoupon; }) : null);
+      var rule = promo ? (typeof promo.rule === 'string' ? JSON.parse(promo.rule) : promo.rule) : null;
+      discountLabel = coupon.name;
+      if (rule) {
+        if (promo.type === 'discount') discount = amount * (1 - rule.rate);
+        else if (promo.type === 'coupon') discount = amount >= rule.threshold ? rule.discount : 0;
+        else if (promo.type === 'bundle') discount = Math.max(0, amount - rule.price);
+      }
+      finalAmount = Math.max(0, amount - discount);
+    }
+
+    // Create order
+    var orderRes = await fetch(API + '/api/v1/orders', {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({activity_id: aid, amount: amount})
+      body: JSON.stringify({
+        activity_id: aid,
+        amount: finalAmount,
+        coupon_code: coupon ? coupon.code : '',
+        original_amount: amount,
+        discount_amount: discount
+      })
     });
+    var orderData = await orderRes.json();
+    var orderId = orderData.id || ('ORD-' + Date.now().toString(36).toUpperCase());
 
-    // Use coupon with auth
-    var useRes = await fetch(API + '/api/v1/coupons/' + encodeURIComponent(coupon.code) + '/use', {
-      method: 'POST',
-      headers: getAuthHeaders()
-    });
-
-    if (useRes.status === 401) {
-      showToast('登录已过期，请重新登录', 'error');
-      doLogout();
-      btnPay.disabled = false;
-	      btnPay.textContent = '确认支付';
-      return;
+    // Use coupon if selected
+    if (coupon) {
+      await fetch(API + '/api/v1/coupons/' + encodeURIComponent(coupon.code) + '/use', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          order_id: orderId,
+          original_amount: amount,
+          discount_amount: discount
+        })
+      });
     }
-
-    var useData = await useRes.json();
-
-    // Calculate discount
-    var promosRes = await fetch(API + '/api/v1/activities/' + aid + '/promotions');
-    var promos = await promosRes.json();
-    var promo = (Array.isArray(promos) ? promos.find(function(x) { return x.id === selectedCoupon; }) : null);
-    var rule = promo ? (typeof promo.rule === 'string' ? JSON.parse(promo.rule) : promo.rule) : null;
-    var discount = 0;
-    var discountLabel = coupon.name;
-    if (rule) {
-      if (promo.type === 'discount') discount = amount * (1 - rule.rate);
-      else if (promo.type === 'coupon') discount = amount >= rule.threshold ? rule.discount : 0;
-      else if (promo.type === 'bundle') discount = Math.max(0, amount - rule.price);
-    }
-    var finalAmount = Math.max(0, amount - discount);
-    var orderId = 'ORD-' + Date.now().toString(36).toUpperCase();
 
     // Show receipt
     var receipt = document.getElementById('receipt');
+    var couponLine = coupon
+      ? '<tr><td>优惠券</td><td style="color:#4ade80">-' + escHtml(discountLabel) + ' -¥' + discount.toFixed(2) + '</td></tr>'
+      : '<tr><td>优惠券</td><td style="color:#667788">未使用</td></tr>';
     receipt.innerHTML =
       '<h3>✅ 支付成功</h3>' +
       '<table class="receipt-table">' +
       '<tr><td>原价</td><td>¥' + amount.toFixed(2) + '</td></tr>' +
-      '<tr><td>优惠券</td><td style="color:#4ade80">-' + escHtml(discountLabel) + ' -¥' + discount.toFixed(2) + '</td></tr>' +
+      couponLine +
       '<tr class="total"><td>实付</td><td>¥' + finalAmount.toFixed(2) + '</td></tr>' +
       '</table>' +
       '<div class="order-id">订单号: ' + orderId + '</div>';
     receipt.classList.add('show');
     receipt.scrollIntoView({behavior:'smooth'});
 
-    // Clean up used coupon
-    delete myCoupons[selectedCoupon];
-    selectedCoupon = null;
+    // Clean up
+    if (coupon) {
+      delete myCoupons[selectedCoupon];
+      selectedCoupon = null;
+    }
+    clearCart();
     updateCouponChips();
     loadPromos();
 	    fetch(API + '/api/v1/orders/mine', {headers: getAuthHeaders()}).then(function(r){return r.json();}).then(function(orders){
@@ -780,122 +940,512 @@ async function doPay() {
   }
 }
 
-// --- Lucky Wheel ---
-function drawWheel() {
-  var canvas = document.getElementById('wheelCanvas');
-  var ctx = canvas.getContext('2d');
-  var cx = 140, cy = 140, r = 130;
-  var n = wheelPrizes.length;
-  var angle = 2 * Math.PI / n;
+// ---- Menu System ----
+var menuData = [
+  { id:'combo', name:'招牌套餐', items:[
+    {id:'c1',name:'啤酒+烧烤套餐',price:88,desc:'2杯精酿+烤串拼盘'},
+    {id:'c2',name:'海鲜+白啤套餐',price:168,desc:'海鲜拼盘+白啤畅饮'},
+    {id:'c3',name:'精酿品鉴套装',price:128,desc:'4款精酿品鉴杯'},
+    {id:'c4',name:'双人畅饮套餐',price:198,desc:'6杯精酿+佐酒小食'}
+  ]},
+  { id:'beer', name:'精酿啤酒', items:[
+    {id:'b1',name:'经典原浆',price:28,desc:'500ml 经典原浆'},
+    {id:'b2',name:'IPA精酿',price:38,desc:'330ml 印度淡色艾尔'},
+    {id:'b3',name:'白啤小麦',price:32,desc:'500ml 比利时小麦'},
+    {id:'b4',name:'黑啤世涛',price:35,desc:'330ml 浓郁世涛'}
+  ]},
+  { id:'snack', name:'佐酒小食', items:[
+    {id:'s1',name:'烤串拼盘',price:48,desc:'羊肉串+牛肉串各5串'},
+    {id:'s2',name:'花生毛豆',price:18,desc:'经典下酒组合'},
+    {id:'s3',name:'炸鸡翅',price:28,desc:'香辣炸鸡翅6只'},
+    {id:'s4',name:'海鲜小吃',price:38,desc:'鱿鱼圈+虾片'}
+  ]},
+  { id:'main', name:'下酒硬菜', items:[
+    {id:'m1',name:'烤羊排',price:88,desc:'炭烤羊排500g'},
+    {id:'m2',name:'德式香肠',price:58,desc:'巴伐利亚风味香肠拼盘'},
+    {id:'m3',name:'烤鱼',price:68,desc:'香辣烤鱼整条'},
+    {id:'m4',name:'麻辣小龙虾',price:98,desc:'麻辣小龙虾1斤'}
+  ]}
+];
+var menuCart = {};
+var menuActiveCat = 'combo';
 
-  wheelPrizes.forEach(function(prize, i) {
-    var start = i * angle - Math.PI/2;
-    var end = start + angle;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, end);
-    ctx.fillStyle = prize.color;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+function initMenu() {
+  renderMenuCats();
+  renderMenuItems();
+  renderCart();
+}
 
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + angle/2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#0a1628';
-    ctx.font = 'bold 12px -apple-system, sans-serif';
-    ctx.fillText(prize.label, r - 12, 4);
-    ctx.restore();
+function renderMenuCats() {
+  var html = '';
+  menuData.forEach(function(cat) {
+    html += '<button class="menu-cat' + (cat.id === menuActiveCat ? ' active' : '') + '" onclick="switchMenuCat(\'' + cat.id + '\')">' + escHtml(cat.name) + '</button>';
   });
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, 28, 0, 2*Math.PI);
-  ctx.fillStyle = '#f5c842';
-  ctx.fill();
-  ctx.fillStyle = '#0a1628';
-  ctx.font = 'bold 10px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('抽奖', cx, cy);
+  document.getElementById('menuCats').innerHTML = html;
 }
 
-function openWheel() {
-  document.getElementById('wheelOverlay').classList.add('show');
-  document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
-  drawWheel();
+function switchMenuCat(catId) {
+  menuActiveCat = catId;
+  renderMenuCats();
+  renderMenuItems();
 }
 
-function closeWheel() {
-  document.getElementById('wheelOverlay').classList.remove('show');
+function renderMenuItems() {
+  var cat = menuData.find(function(c) { return c.id === menuActiveCat; });
+  if (!cat) return;
+  var html = '';
+  cat.items.forEach(function(item) {
+    var inCart = menuCart[item.id];
+    html += '<div class="menu-item" onclick="addToCart(\'' + item.id + '\')">' +
+      '<div class="mi-name">' + escHtml(item.name) + '</div>' +
+      '<div class="mi-desc">' + escHtml(item.desc) + '</div>' +
+      '<div class="mi-foot">' +
+        '<span class="mi-price">¥' + item.price + '</span>' +
+        '<span class="mi-add' + (inCart ? ' in-cart' : '') + '" id="mi-add-' + item.id + '">' + (inCart ? '✓' : '+') + '</span>' +
+      '</div>' +
+      '</div>';
+  });
+  document.getElementById('menuGrid').innerHTML = html;
 }
 
-async function spinWheel() {
-  if (wheelSpinning || spinRemaining <= 0) return;
-  wheelSpinning = true;
-  spinRemaining--;
-
-  var btn = document.getElementById('btnSpin');
-  btn.disabled = true;
-  document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
-  document.getElementById('spinRemainText').textContent = '今日剩余 ' + spinRemaining + ' 次';
-
-  var target = Math.floor(Math.random() * wheelPrizes.length);
-  var spins = 5 + Math.floor(Math.random() * 3);
-  var totalDeg = spins * 360 + target * (360/wheelPrizes.length) + Math.random() * (360/wheelPrizes.length);
-
-  var canvas = document.getElementById('wheelCanvas');
-  var duration = 3000;
-  var startTime = Date.now();
-
-  function anim() {
-    var elapsed = Date.now() - startTime;
-    var progress = Math.min(elapsed / duration, 1);
-    var eased = 1 - Math.pow(1 - progress, 3);
-    var deg = eased * totalDeg;
-    canvas.style.transform = 'rotate(' + deg + 'deg)';
-    if (progress < 1) {
-      requestAnimationFrame(anim);
-    } else {
-      wheelSpinning = false;
-      btn.disabled = false;
-      var prizeIdx = target;
-      var prize = wheelPrizes[prizeIdx];
-      if (prize.label === '谢谢参与') {
-        showToast('谢谢参与！明天再来吧', 'error');
-      } else if (prize.label === '再来一次') {
-        spinRemaining++;
-        document.getElementById('spinRemain').textContent = '今日剩余 ' + spinRemaining + ' 次';
-        document.getElementById('spinRemainText').textContent = '今日剩余 ' + spinRemaining + ' 次';
-        showToast('再来一次！', 'success');
-      } else {
-        var aid = document.getElementById('activitySelect').value;
-        if (aid) {
-          fetch(API + '/api/v1/activities/' + aid + '/promotions').then(function(r) { return r.json(); }).then(function(promos) {
-            if (Array.isArray(promos)) {
-              var match = promos.find(function(p) {
-                var t = '';
-                try { var rule = typeof p.rule === 'string' ? JSON.parse(p.rule) : p.rule;
-                  if (p.type === 'discount') t = '全场' + (rule.rate*100).toFixed(0) + '折';
-                  else if (p.type === 'coupon') t = '满' + rule.threshold + '减' + rule.discount;
-                  else if (p.type === 'bundle') t = '啤酒套餐';
-                } catch(e) {}
-                return t === prize.label;
-              });
-              if (match && !myCoupons[match.id]) {
-                claimOne(match.id);
-                showToast('🎉 恭喜获得「' + prize.label + '」！已自动领取', 'success');
-              } else {
-                showToast('🎉 恭喜获得「' + prize.label + '」！', 'success');
-              }
-            }
-          });
-        }
-      }
+function findMenuItem(id) {
+  for (var i = 0; i < menuData.length; i++) {
+    var items = menuData[i].items;
+    for (var j = 0; j < items.length; j++) {
+      if (items[j].id === id) return items[j];
     }
   }
-  requestAnimationFrame(anim);
+  return null;
+}
+
+function addToCart(itemId) {
+  var item = findMenuItem(itemId);
+  if (!item) return;
+  if (menuCart[itemId]) {
+    menuCart[itemId].qty++;
+  } else {
+    menuCart[itemId] = {item: item, qty: 1};
+  }
+  renderMenuItems();
+  renderCart();
+  updateCartTotal();
+}
+
+function removeFromCart(itemId) {
+  if (!menuCart[itemId]) return;
+  menuCart[itemId].qty--;
+  if (menuCart[itemId].qty <= 0) {
+    delete menuCart[itemId];
+  }
+  renderMenuItems();
+  renderCart();
+  updateCartTotal();
+}
+
+function renderCart() {
+  var panel = document.getElementById('cartPanel');
+  var container = document.getElementById('cartItems');
+  var ids = Object.keys(menuCart);
+  if (ids.length === 0) {
+    container.innerHTML = '<div class="cart-empty">购物车为空，点击菜品添加</div>';
+  } else {
+    var html = '';
+    ids.forEach(function(id) {
+      var entry = menuCart[id];
+      html += '<div class="cart-item">' +
+        '<span class="ci-name">' + escHtml(entry.item.name) + '</span>' +
+        '<span class="ci-qty">' +
+          '<button onclick="event.stopPropagation();removeFromCart(\'' + id + '\')">−</button>' +
+          '<span>' + entry.qty + '</span>' +
+          '<button onclick="event.stopPropagation();addToCart(\'' + id + '\')">+</button>' +
+        '</span>' +
+        '<span class="ci-price">¥' + (entry.item.price * entry.qty).toFixed(0) + '</span>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+  }
+  panel.className = 'cart-panel' + (ids.length > 0 ? ' show' : '');
+}
+
+function updateCartTotal() {
+  var total = 0;
+  var ids = Object.keys(menuCart);
+  ids.forEach(function(id) {
+    var entry = menuCart[id];
+    total += entry.item.price * entry.qty;
+  });
+  document.getElementById('cartTotal').textContent = '¥' + total.toFixed(0);
+  if (total > 0) {
+    document.getElementById('orderAmount').value = total;
+    updateCalc();
+  }
+}
+
+function clearCart() {
+  menuCart = {};
+  renderCart();
+  renderMenuItems();
+}
+
+// --- Ingot Game ---
+function openGame() {
+  if (gameRemaining <= 0) {
+    showToast('今日游戏次数已用完，明天再来吧', 'error');
+    return;
+  }
+  document.getElementById('gameOverlay').classList.add('show');
+  document.getElementById('gameRemain').textContent = '今日剩余 ' + gameRemaining + ' 次';
+  document.getElementById('gameHud').style.display = 'none';
+  document.getElementById('gameResult').classList.remove('show');
+  document.getElementById('btnPlay').style.display = '';
+  document.getElementById('btnPlay').disabled = false;
+  document.getElementById('btnPlay').textContent = '开始游戏';
+  document.getElementById('btnPlay').className = 'btn-play';
+  document.getElementById('btnRetry').style.display = 'none';
+  document.getElementById('gameTitle').textContent = '👑 接元宝';
+  initCanvas();
+}
+
+function closeGame() {
+  if (gameRunning) return;
+  if (gameAnimId) { cancelAnimationFrame(gameAnimId); gameAnimId = null; }
+  gameRunning = false;
+  document.getElementById('gameOverlay').classList.remove('show');
+}
+
+function initCanvas() {
+  var canvas = document.getElementById('gameCanvas');
+  var wrap = document.getElementById('gameCanvasWrap');
+  var maxW = Math.min(340, window.innerWidth - 32);
+  canvas.width = GAME_CANVAS_W;
+  canvas.height = GAME_CANVAS_H;
+  canvas.style.width = maxW + 'px';
+  canvas.style.height = Math.round(maxW * GAME_CANVAS_H / GAME_CANVAS_W) + 'px';
+  wrap.style.width = maxW + 'px';
+  wrap.style.height = Math.round(maxW * GAME_CANVAS_H / GAME_CANVAS_W) + 'px';
+
+  // Draw idle state
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, GAME_CANVAS_W, GAME_CANVAS_H);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.font = 'bold 16px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('按「开始游戏」接元宝', GAME_CANVAS_W/2, GAME_CANVAS_H/2 - 10);
+  ctx.fillText('≥20分赢优惠券', GAME_CANVAS_W/2, GAME_CANVAS_H/2 + 18);
+
+  drawPlayer(ctx, GAME_CANVAS_W/2);
+  canvas.addEventListener('touchmove', handleGameTouch, {passive: false});
+  canvas.addEventListener('touchstart', handleGameTouch, {passive: false});
+  canvas.addEventListener('mousemove', handleGameMouse);
+  document.addEventListener('keydown', handleGameKey);
+}
+
+function drawPlayer(ctx, x) {
+  var pw = 64, ph = 40, py = GAME_CANVAS_H - 55;
+  ctx.save();
+  // Cup body
+  var grad = ctx.createLinearGradient(x - pw/2, py, x + pw/2, py + ph);
+  grad.addColorStop(0, '#f5c842');
+  grad.addColorStop(0.5, '#e6b800');
+  grad.addColorStop(1, '#c8920a');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(x - pw/2, py);
+  ctx.lineTo(x - pw/2 + 10, py + ph);
+  ctx.lineTo(x + pw/2 - 10, py + ph);
+  ctx.lineTo(x + pw/2, py);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Foam top
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.ellipse(x, py, pw/2 - 2, 6, 0, Math.PI, 0);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawItem(ctx, item) {
+  ctx.save();
+  if (item.type === 'bomb') {
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#f87171';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💣', item.x, item.y);
+  } else if (item.type === 'life') {
+    ctx.fillStyle = '#4ade80';
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🍺', item.x, item.y);
+  } else if (item.type === 'golden') {
+    // Golden ingot
+    var g = ctx.createRadialGradient(item.x-3, item.y-3, 2, item.x, item.y, item.r);
+    g.addColorStop(0, '#ffe066');
+    g.addColorStop(0.7, '#ff6b35');
+    g.addColorStop(1, '#cc4400');
+    ctx.fillStyle = g;
+    roundRect(ctx, item.x - item.r, item.y - item.r/1.5, item.r*2, item.r*2.5, 5);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('大宝', item.x, item.y);
+  } else {
+    // Normal ingot
+    var gn = ctx.createLinearGradient(item.x - item.r, item.y - item.r, item.x + item.r, item.y + item.r);
+    gn.addColorStop(0, '#f5c842');
+    gn.addColorStop(1, '#c8920a');
+    ctx.fillStyle = gn;
+    roundRect(ctx, item.x - item.r, item.y - item.r/1.5, item.r*2, item.r*2.5, 5);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function spawnItem(phase) {
+  if (gameItems.length >= GAME_MAX_ON_SCREEN) return;
+  var types = ['normal','normal','normal','normal','normal','normal','normal','normal','golden','life'];
+  // Determine if bomb based on phase bombRate
+  var isBomb = Math.random() < phase.bombRate;
+
+  var type;
+  if (isBomb) {
+    type = 'bomb';
+  } else {
+    // Weighted pick from normal(77%) / golden(15%) / life(8%) — relative when no bomb
+    var r = Math.random();
+    if (r < 0.08) type = 'life';
+    else if (r < 0.23) type = 'golden';
+    else type = 'normal';
+  }
+
+  var scoreMap = {normal:1, golden:3, bomb:0, life:0};
+  var rMap = {normal:16, golden:18, bomb:15, life:16};
+
+  gameItems.push({
+    type: type,
+    x: 30 + Math.random() * (GAME_CANVAS_W - 60),
+    y: -20,
+    r: rMap[type],
+    score: scoreMap[type],
+    speed: phase.speed + Math.random() * 0.8
+  });
+}
+
+function startGame() {
+  if (gameRemaining <= 0) {
+    showToast('今日游戏次数已用完', 'error');
+    return;
+  }
+
+  gameRunning = true;
+  gameScore = 0;
+  gameLives = GAME_MAX_LIVES;
+  gameTimeLeft = GAME_DURATION;
+  gameItems = [];
+  gamePlayerX = GAME_CANVAS_W / 2;
+  gameLastSpawn = 0;
+  gameStartTime = performance.now();
+  gameAnimId = null;
+
+  document.getElementById('btnPlay').style.display = 'none';
+  document.getElementById('gameResult').classList.remove('show');
+  document.getElementById('gameHud').style.display = 'flex';
+  document.getElementById('gameTitle').textContent = '游戏中...';
+  document.getElementById('gameRemain').textContent = '今日剩余 ' + gameRemaining + ' 次';
+  updateHUD();
+
+  gameAnimId = requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(timestamp) {
+  if (!gameRunning) return;
+
+  var elapsed = (timestamp - gameStartTime) / 1000;
+  gameTimeLeft = Math.max(0, GAME_DURATION - elapsed);
+  var phase = getPhase(elapsed);
+
+  // Spawn
+  if (timestamp - gameLastSpawn > phase.interval) {
+    spawnItem(phase);
+    gameLastSpawn = timestamp;
+  }
+
+  // Update items
+  for (var i = gameItems.length - 1; i >= 0; i--) {
+    var item = gameItems[i];
+    item.y += item.speed;
+
+    // Check collision with player
+    var pw = 64, ph = 40, py = GAME_CANVAS_H - 55;
+    if (item.y + item.r > py && item.y - item.r < py + ph &&
+        item.x + item.r > gamePlayerX - pw/2 && item.x - item.r < gamePlayerX + pw/2) {
+      if (item.type === 'bomb') {
+        gameLives--;
+      } else if (item.type === 'life') {
+        gameLives = Math.min(gameLives + 2, GAME_MAX_LIVES);
+      } else {
+        gameScore += item.score;
+      }
+      gameItems.splice(i, 1);
+      continue;
+    }
+
+    // Remove if off screen
+    if (item.y - item.r > GAME_CANVAS_H) {
+      gameItems.splice(i, 1);
+    }
+  }
+
+  // Check game over conditions
+  if (gameLives <= 0 || gameTimeLeft <= 0) {
+    endGame();
+    return;
+  }
+
+  // Render
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, GAME_CANVAS_W, GAME_CANVAS_H);
+
+  // Draw background particles
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  for (var j = 0; j < 8; j++) {
+    ctx.beginPath();
+    ctx.arc((j*47+timestamp*0.01)%GAME_CANVAS_W, (j*61+timestamp*0.03)%GAME_CANVAS_H, 2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Draw items
+  for (var k = 0; k < gameItems.length; k++) {
+    drawItem(ctx, gameItems[k]);
+  }
+
+  // Draw player
+  drawPlayer(ctx, gamePlayerX);
+
+  updateHUD();
+  gameAnimId = requestAnimationFrame(gameLoop);
+}
+
+function updateHUD() {
+  document.getElementById('hudScore').textContent = gameScore;
+  document.getElementById('hudTimer').textContent = Math.ceil(gameTimeLeft) + 's';
+  var hearts = '';
+  for (var i = 0; i < gameLives; i++) hearts += '❤️';
+  document.getElementById('hudLives').textContent = hearts || '💔';
+}
+
+function endGame() {
+  gameRunning = false;
+  if (gameAnimId) { cancelAnimationFrame(gameAnimId); gameAnimId = null; }
+
+  gameRemaining--;
+  document.getElementById('gameRemain').textContent = '今日剩余 ' + gameRemaining + ' 次';
+  document.getElementById('gameRemainText').textContent = '今日剩余 ' + gameRemaining + ' 次';
+  document.getElementById('gameTitle').textContent = '游戏结束';
+
+  var win = gameScore >= GAME_PASS_SCORE;
+  var resultDiv = document.getElementById('gameResult');
+  document.getElementById('resultTitle').textContent = win ? '🎉 通关！' : '😢 再接再厉';
+  document.getElementById('resultTitle').className = 'result-title ' + (win ? 'win' : 'lose');
+  document.getElementById('resultScore').textContent = '得分: ' + gameScore + ' (通关线 ' + GAME_PASS_SCORE + ' 分)';
+
+  if (win) {
+    var reward = pickReward();
+    document.getElementById('resultCoupon').innerHTML = '🏆 ' + escHtml(reward.name) + '<br><small style="color:#8899aa">正在领取...</small>';
+    document.getElementById('btnRetry').style.display = 'none';
+
+    // Try to claim matching promo
+    var aid = document.getElementById('activitySelect').value;
+    if (aid && window._loadedPromos && window._loadedPromos.length > 0) {
+      var match = matchRewardToPromo(reward);
+      if (match && !myCoupons[match.id]) {
+        claimOne(match.id);
+        document.getElementById('resultCoupon').innerHTML = '🏆 ' + escHtml(reward.name) + '<br><small style="color:#8899aa">游戏专属奖励 · 已自动领取，可与限时优惠叠加使用</small>';
+      } else if (match && myCoupons[match.id]) {
+        document.getElementById('resultCoupon').innerHTML = '🏆 ' + escHtml(reward.name) + '<br><small style="color:#8899aa">游戏专属奖励 · 该券已在你券包中</small>';
+      }
+    }
+    gameFirstPlay = false;
+  } else {
+    document.getElementById('resultCoupon').textContent = '';
+    if (gameRemaining > 0) {
+      document.getElementById('btnRetry').style.display = '';
+    }
+  }
+
+  resultDiv.classList.add('show');
+  document.getElementById('btnPlay').style.display = '';
+  document.getElementById('btnPlay').disabled = true;
+  document.getElementById('btnPlay').textContent = '今日次数用完';
+  document.getElementById('btnPlay').className = 'btn-play';
+  if (gameRemaining > 0) {
+    document.getElementById('btnPlay').disabled = false;
+    document.getElementById('btnPlay').textContent = '再玩一局';
+  }
+}
+
+function retryGame() {
+  document.getElementById('gameResult').classList.remove('show');
+  startGame();
+}
+
+function handleGameTouch(e) {
+  if (!gameRunning) return;
+  e.preventDefault();
+  var canvas = document.getElementById('gameCanvas');
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = GAME_CANVAS_W / rect.width;
+  var touch = e.touches[0];
+  gamePlayerX = Math.max(32, Math.min(GAME_CANVAS_W - 32, (touch.clientX - rect.left) * scaleX));
+}
+
+function handleGameMouse(e) {
+  if (!gameRunning) return;
+  var canvas = document.getElementById('gameCanvas');
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = GAME_CANVAS_W / rect.width;
+  gamePlayerX = Math.max(32, Math.min(GAME_CANVAS_W - 32, (e.clientX - rect.left) * scaleX));
+}
+
+function handleGameKey(e) {
+  if (!gameRunning) return;
+  if (e.key === 'ArrowLeft' || e.key === 'a') gamePlayerX = Math.max(32, gamePlayerX - 20);
+  if (e.key === 'ArrowRight' || e.key === 'd') gamePlayerX = Math.min(GAME_CANVAS_W - 32, gamePlayerX + 20);
 }
 
 function showToast(msg, type) {
@@ -914,6 +1464,11 @@ function switchHistoryTab(tab, btn) {
   tabs.forEach(function(t) { t.classList.remove('active'); });
   btn.classList.add('active');
   renderHistory();
+}
+
+function toggleOrderDetail(idx) {
+  var el = document.getElementById('orderDetail-' + idx);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 function renderHistory() {
@@ -937,9 +1492,21 @@ function renderHistory() {
       return;
     }
     var html = '';
-    myOrders.forEach(function(o) {
-      var dt = o.created_at ? o.created_at.substring(0, 10) : '';
-      html += '<div class="history-item"><span>' + escHtml(dt) + ' 订单</span><span style="color:#f5c842;font-weight:600">￥' + parseFloat(o.amount).toFixed(2) + '</span></div>';
+    myOrders.forEach(function(o, idx) {
+      var dt = o.created_at ? o.created_at.substring(0, 19).replace('T',' ') : '';
+      var hasCoupon = o.coupon_code && o.original_amount > 0;
+      var couponMark = hasCoupon ? ' <span style="color:#4ade80;font-size:12px">&#x1F3AB;</span>' : '';
+      html += '<div class="history-item" onclick="toggleOrderDetail(' + idx + ')" style="cursor:pointer">';
+      html += '<span>' + escHtml(dt) + couponMark + ' 订单</span>';
+      html += '<span style="color:#f5c842;font-weight:600">￥' + parseFloat(o.amount).toFixed(2) + '</span>';
+      html += '</div>';
+      if (hasCoupon) {
+        html += '<div id="orderDetail-' + idx + '" class="order-detail" style="display:none">';
+        html += '<div class="order-detail-row"><span>原价</span><span>¥' + parseFloat(o.original_amount).toFixed(2) + '</span></div>';
+        html += '<div class="order-detail-row"><span>优惠券 (' + escHtml(o.coupon_code) + ')</span><span style="color:#4ade80">-¥' + parseFloat(o.discount_amount).toFixed(2) + '</span></div>';
+        html += '<div class="order-detail-row" style="font-weight:600"><span>实付</span><span>¥' + parseFloat(o.amount).toFixed(2) + '</span></div>';
+        html += '</div>';
+      }
     });
     container.innerHTML = html;
   }
