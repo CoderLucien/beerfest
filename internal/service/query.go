@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -72,24 +73,32 @@ var templates = map[string]queryTemplate{
 		Name: "promotion_stats",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT p.name, COUNT(c.id) AS issued,
-			        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used
-			 FROM promotions p
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 WHERE p.activity_id = ? AND p.name LIKE ?
-			 GROUP BY p.name`, []any{activityID, "%" + toStr(params["coupon_hint"]) + "%"}
+				        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
+				        CASE WHEN COUNT(c.id) > 0
+				          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
+				          ELSE 0 END AS rate
+				 FROM promotions p
+				 LEFT JOIN coupons c ON c.promotion_id = p.id
+				 WHERE p.activity_id = ? AND p.name LIKE ?
+				 GROUP BY p.name`, []any{activityID, "%" + toStr(params["coupon_hint"]) + "%"}
 		},
 	},
 	"revenue_summary": {
 		Name: "revenue_summary",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT COALESCE(SUM(o.amount),0) AS total_revenue,
-			        COUNT(DISTINCT c.user_id) AS active_users,
-			        COUNT(DISTINCT c.id) AS total_coupons,
-			        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used_coupons
-			 FROM orders o
-			 LEFT JOIN promotions p ON p.activity_id = ?
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 WHERE o.activity_id = ?`, []any{activityID, activityID}
+				        COALESCE(u.active_users,0) AS active_users,
+				        COALESCE(u.total_coupons,0) AS total_coupons,
+				        COALESCE(u.used_coupons,0) AS used_coupons
+				 FROM orders o
+				 CROSS JOIN (
+				   SELECT COUNT(DISTINCT user_id) AS active_users,
+				          COUNT(*) AS total_coupons,
+				          SUM(CASE WHEN status='used' THEN 1 ELSE 0 END) AS used_coupons
+				   FROM coupons
+				   WHERE promotion_id IN (SELECT id FROM promotions WHERE activity_id=?)
+				 ) u
+				 WHERE o.activity_id = ?`, []any{activityID, activityID}
 		},
 	},
 	"coupon_breakdown": {
@@ -102,12 +111,15 @@ var templates = map[string]queryTemplate{
 				order = "used DESC"
 			}
 			return fmt.Sprintf(`SELECT p.name, COUNT(c.id) AS issued,
-			        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used
-			 FROM promotions p
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 WHERE p.activity_id = ?
-			 GROUP BY p.name
-			 ORDER BY %s`, order), []any{activityID}
+				        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
+				        CASE WHEN COUNT(c.id) > 0
+				          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
+				          ELSE 0 END AS rate
+				 FROM promotions p
+				 LEFT JOIN coupons c ON c.promotion_id = p.id
+				 WHERE p.activity_id = ?
+				 GROUP BY p.name
+				 ORDER BY %s`, order), []any{activityID}
 		},
 	},
 	"top_orders": {
@@ -118,58 +130,58 @@ var templates = map[string]queryTemplate{
 				limit = int(n)
 			}
 			return fmt.Sprintf(`SELECT o.id, o.amount, o.coupon_code,
-			        o.original_amount, o.discount_amount, o.created_at
-			 FROM orders o WHERE o.activity_id = ?
-			 ORDER BY o.amount DESC LIMIT %d`, limit), []any{activityID}
+				        o.original_amount, o.discount_amount, o.created_at
+				 FROM orders o WHERE o.activity_id = ?
+				 ORDER BY o.amount DESC LIMIT %d`, limit), []any{activityID}
 		},
 	},
 	"user_stats": {
 		Name: "user_stats",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT COUNT(DISTINCT user_id) AS active_users,
-			        COUNT(DISTINCT CASE WHEN status='used' THEN user_id END) AS paying_users
-			 FROM coupons WHERE promotion_id IN
-			 (SELECT id FROM promotions WHERE activity_id=?)`, []any{activityID}
+				        COUNT(DISTINCT CASE WHEN status='used' THEN user_id END) AS paying_users
+				 FROM coupons WHERE promotion_id IN
+				 (SELECT id FROM promotions WHERE activity_id=?)`, []any{activityID}
 		},
 	},
 	"revenue_by_type": {
 		Name: "revenue_by_type",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT p.type, COALESCE(SUM(o.amount),0) AS revenue,
-			        COUNT(DISTINCT o.id) AS order_count
-			 FROM promotions p
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 LEFT JOIN orders o ON o.coupon_code = c.code
-			 WHERE p.activity_id = ?
-			 GROUP BY p.type`, []any{activityID}
+				        COUNT(DISTINCT o.id) AS order_count
+				 FROM promotions p
+				 LEFT JOIN coupons c ON c.promotion_id = p.id
+				 LEFT JOIN orders o ON o.coupon_code = c.code
+				 WHERE p.activity_id = ?
+				 GROUP BY p.type`, []any{activityID}
 		},
 	},
 	"anomaly_check": {
 		Name: "anomaly_check",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT p.name, COUNT(c.id) AS issued,
-			        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
-			        CASE WHEN COUNT(c.id) > 0
-			          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
-			          ELSE 0 END AS rate
-			 FROM promotions p
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 WHERE p.activity_id = ?
-			 GROUP BY p.name`, []any{activityID}
+				        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
+				        CASE WHEN COUNT(c.id) > 0
+				          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
+				          ELSE 0 END AS rate
+				 FROM promotions p
+				 LEFT JOIN coupons c ON c.promotion_id = p.id
+				 WHERE p.activity_id = ?
+				 GROUP BY p.name`, []any{activityID}
 		},
 	},
 	"comparison": {
 		Name: "comparison",
 		Fn: func(activityID string, params map[string]any) (string, []any) {
 			return `SELECT p.name, COUNT(c.id) AS issued,
-			        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
-			        CASE WHEN COUNT(c.id) > 0
-			          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
-			          ELSE 0 END AS rate
-			 FROM promotions p
-			 LEFT JOIN coupons c ON c.promotion_id = p.id
-			 WHERE p.activity_id = ? AND (p.name LIKE ? OR p.name LIKE ?)
-			 GROUP BY p.name`, []any{activityID,
+				        SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END) AS used,
+				        CASE WHEN COUNT(c.id) > 0
+				          THEN SUM(CASE WHEN c.status='used' THEN 1 ELSE 0 END)*1.0/COUNT(c.id)
+				          ELSE 0 END AS rate
+				 FROM promotions p
+				 LEFT JOIN coupons c ON c.promotion_id = p.id
+				 WHERE p.activity_id = ? AND (p.name LIKE ? OR p.name LIKE ?)
+				 GROUP BY p.name`, []any{activityID,
 				"%" + toStr(params["coupon_a"]) + "%",
 				"%" + toStr(params["coupon_b"]) + "%"}
 		},
@@ -183,7 +195,27 @@ func toStr(v any) string {
 	if s, ok := v.(string); ok {
 		return s
 	}
+	if b, ok := v.([]byte); ok {
+		return string(b)
+	}
 	return fmt.Sprintf("%v", v)
+}
+
+
+// normalizeSQLValue converts []byte from MySQL driver to native Go types.
+func normalizeSQLValue(v any) any {
+	b, ok := v.([]byte)
+	if !ok {
+		return v
+	}
+	s := string(b)
+	if i, err := strconv.ParseInt(s, 10, 64); err == nil {
+		return i
+	}
+	if f, err := strconv.ParseFloat(s, 64); err == nil {
+		return f
+	}
+	return s
 }
 
 // --- LLM routing prompt ---
@@ -211,12 +243,12 @@ const routerPrompt = `你是促销智能问数路由。根据用户问题选择�
 }`
 
 type routerResult struct {
-	Intent         string         `json:"intent"`
-	Template       string         `json:"template"`
-	Params         map[string]any `json:"params"`
-	AnswerHint     string         `json:"answer_hint"`
-	BoundaryMissing []string      `json:"boundary_missing"`
-	AnalysisNote   string         `json:"analysis_note"`
+	Intent          string         `json:"intent"`
+	Template        string         `json:"template"`
+	Params          map[string]any `json:"params"`
+	AnswerHint      string         `json:"answer_hint"`
+	BoundaryMissing []string       `json:"boundary_missing"`
+	AnalysisNote    string         `json:"analysis_note"`
 }
 
 // --- Main entry point ---
@@ -263,7 +295,7 @@ func (s *QueryService) Inquire(question, activityID string) (*InquireResponse, e
 	dataJSON, _ := json.Marshal(dataCtx)
 	userMsg := fmt.Sprintf("数据上下文：%s\n\n用户问题：%s", string(dataJSON), question)
 
-	routeResult, err := s.route(userMsg)
+	routeResult, err := s.route(question, userMsg)
 	if err != nil {
 		log.Printf("[query] LLM route failed, falling back: %v", err)
 		routeResult = fallbackRoute(question)
@@ -279,6 +311,14 @@ func (s *QueryService) Inquire(question, activityID string) (*InquireResponse, e
 		if ok {
 			sqlStr, args := tmpl.Fn(activityID, routeResult.Params)
 			templateData, _ = s.executeSQL(sqlStr, args)
+			// Normalize raw SQL decimal rates to percentage (P1-2 fix)
+			for i := range templateData {
+				if r, ok := templateData[i]["rate"]; ok {
+					if f, ok2 := r.(float64); ok2 && f > 0 && f < 1 {
+						templateData[i]["rate"] = f * 100
+					}
+				}
+			}
 		}
 	}
 
@@ -295,7 +335,7 @@ func (s *QueryService) Inquire(question, activityID string) (*InquireResponse, e
 
 // --- LLM routing ---
 
-func (s *QueryService) route(userMsg string) (*routerResult, error) {
+func (s *QueryService) route(question, userMsg string) (*routerResult, error) {
 	baseURL := os.Getenv("LLM_BASE_URL")
 	if baseURL == "" {
 		baseURL = "https://api.hunyuan.cloud.tencent.com/v1"
@@ -404,7 +444,7 @@ func (s *QueryService) executeSQL(query string, args []any) ([]map[string]any, e
 		}
 		row := make(map[string]any)
 		for i, col := range cols {
-			row[col] = scanArgs[i]
+			row[col] = normalizeSQLValue(scanArgs[i])
 		}
 		results = append(results, row)
 	}
@@ -425,8 +465,8 @@ func (s *QueryService) buildResponse(question string, route *routerResult, metri
 	switch route.Intent {
 	case "boundary":
 		resp.Boundary = map[string]any{
-			"missing":     route.BoundaryMissing,
-			"suggestion":  "当前数据无该维度，已用最接近的可用维度给出参考",
+			"missing":    route.BoundaryMissing,
+			"suggestion": "当前数据无该维度，已用最接近的可用维度给出参考",
 		}
 		resp.Answer = buildBoundaryAnswer(question, route, coupons, tmplData)
 	case "analysis":
@@ -454,18 +494,29 @@ func buildDataAnswer(question string, route *routerResult, m *model.DashboardMet
 			name := fmt.Sprintf("%v", d["name"])
 			issued := fmt.Sprintf("%v", d["issued"])
 			used := fmt.Sprintf("%v", d["used"])
-			return name + " 发放" + issued + "张，核销" + used + "张，核销率" + fmt.Sprintf("%v", d["rate"]) + "%"
+			return name + " 发放" + issued + "张，核销" + used + "张，核销率" + fmt.Sprintf("%.1f", toFloat(d["rate"])) + "%"
 		}
 	case "coupon_breakdown":
-		if len(coupons) > 0 {
+		if len(data) > 0 {
 			var parts []string
-			for i, c := range coupons {
+			for i, d := range data {
 				if i >= 10 {
 					break
 				}
-				parts = append(parts, fmt.Sprintf("%s 核销率%.1f%%（%d/%d）", c.Name, c.Rate, c.Used, c.Issued))
+				rate := toFloat(d["rate"])
+				parts = append(parts, fmt.Sprintf("%s 核销率%.1f%%（%v/%v）", d["name"], rate, d["issued"], d["used"]))
 			}
-			return "券种统计：\n" + strings.Join(parts, "\n")
+			header := "券种统计："
+			if len(data) > 1 {
+				best := data[0]
+				worst := data[len(data)-1]
+				if strings.Contains(question, "最低") || strings.Contains(question, "最差") {
+					header = fmt.Sprintf("核销率最低：%s（%.1f%%）。全部券种：", worst["name"], toFloat(worst["rate"]))
+				} else if strings.Contains(question, "最高") || strings.Contains(question, "最好") {
+					header = fmt.Sprintf("核销率最高：%s（%.1f%%）。全部券种：", best["name"], toFloat(best["rate"]))
+				}
+			}
+			return header + "\n" + strings.Join(parts, "\n")
 		}
 	case "comparison":
 		if len(data) >= 2 {
@@ -476,6 +527,16 @@ func buildDataAnswer(question string, route *routerResult, m *model.DashboardMet
 	case "anomaly_check":
 		return buildAnomalyAnswer(coupons, m)
 	}
+	if len(data) == 0 && route.Template == "promotion_stats" {
+		hint := toStr(route.Params["coupon_hint"])
+		if hint == "" {
+			return "未找到该券种数据，请确认券名是否正确。"
+		}
+		return fmt.Sprintf("未找到「%s」相关券种数据，请确认券名是否正确。", hint)
+	}
+	if len(data) < 2 && route.Template == "comparison" {
+		return "未找到两个券种用于对比，请确认两个券名是否正确。"
+	}
 	return route.AnswerHint
 }
 
@@ -483,7 +544,12 @@ func buildBoundaryAnswer(question string, route *routerResult, coupons []CouponS
 	missing := strings.Join(route.BoundaryMissing, "、")
 	prefix := fmt.Sprintf("当前数据无%s维度，无法直接回答。", missing)
 	if len(coupons) > 0 {
-		lo := coupons[len(coupons)-1]
+		lo := coupons[0]
+		for _, c := range coupons[1:] {
+			if c.Rate < lo.Rate {
+				lo = c
+			}
+		}
 		return prefix + fmt.Sprintf(" 最接近的参考：分券种中 %s 核销率最低（%.1f%%）。", lo.Name, lo.Rate)
 	}
 	return prefix
@@ -602,6 +668,10 @@ func toFloat(v any) float64 {
 		return x
 	case int64:
 		return float64(x)
+	case []byte:
+		if f, err := strconv.ParseFloat(string(x), 64); err == nil {
+			return f
+		}
 	}
 	return 0
 }
@@ -658,9 +728,11 @@ func guessTemplate(question string) string {
 	}
 }
 
+var knownCouponNames = []string{"满100减30", "全场8折", "全场9折", "满200减50", "满200减60", "满168减68", "满50减10", "小食免单", "满2瓶送1瓶", "啤酒+烧烤"}
+
 func guessParams(question string) map[string]any {
 	params := make(map[string]any)
-	for _, name := range []string{"满100减30", "全场8折", "全场9折", "满200减50", "满200减60", "满168减68", "满50减10", "小食免单", "满2瓶送1瓶", "啤酒+烧烤"} {
+	for _, name := range knownCouponNames {
 		if strings.Contains(question, name) {
 			params["coupon_hint"] = name
 			break
@@ -671,6 +743,19 @@ func guessParams(question string) map[string]any {
 	}
 	if strings.Contains(question, "最高") || strings.Contains(question, "最好") {
 		params["sort_by"] = "rate"
+	}
+	// Fill coupon_a/coupon_b for comparison template
+	if strings.Contains(question, "和") || strings.Contains(question, "对比") || strings.Contains(question, "比较") {
+		var found []string
+		for _, name := range knownCouponNames {
+			if strings.Contains(question, name) {
+				found = append(found, name)
+			}
+		}
+		if len(found) >= 2 {
+			params["coupon_a"] = found[0]
+			params["coupon_b"] = found[1]
+		}
 	}
 	return params
 }
