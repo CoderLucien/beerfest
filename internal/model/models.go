@@ -102,5 +102,6 @@ type DashboardMetrics struct {
 	TotalRevenue   float64 `json:"total_revenue"`
 	ActiveUsers    int64   `json:"active_users"`
 	CouponUsedRate float64 `json:"coupon_used_rate"`
+	ARPU           float64 `json:"arpu"`
 	ExperimentWin  string  `json:"experiment_win"`
 }

@@ -79,6 +79,9 @@ func RegisterRoutes(r *gin.Engine, s *service.Registry) {
 
 			// Ops Chat (T4)
 			admin.POST("/ops/chat", OpsChat(s.OpsChat))
+
+			// Smart Inquiry (T5)
+			admin.POST("/ops/inquire", Inquire(s.Query))
 		}
 	}
 }

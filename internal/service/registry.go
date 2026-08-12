@@ -19,6 +19,7 @@ type Registry struct {
 	Segment    *SegmentService
 	Auth       *AuthService
 	OpsChat    *OpsChatService
+	Query      *QueryService
 }
 
 func NewRegistry(db *sql.DB, rdb *redis.Client) *Registry {
@@ -33,5 +34,6 @@ func NewRegistry(db *sql.DB, rdb *redis.Client) *Registry {
 	r.Segment = &SegmentService{db: db}
 	r.Auth = NewAuthService(db, rdb)
 	r.OpsChat = NewOpsChatService(db, rdb)
+	r.Query = NewQueryService(db, rdb)
 	return r
 }

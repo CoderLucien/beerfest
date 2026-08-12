@@ -142,6 +142,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
 .chat-send-btn:disabled{opacity:0.4;cursor:not-allowed}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
+/* Smart Inquiry Panel */
+.inquire-panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.inquire-panel h2{color:#f5c842;font-size:1.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.inquire-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.inquire-chip{background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:20px;padding:6px 14px;font-size:0.8em;color:#d0c080;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.inquire-chip:hover{background:rgba(245,200,66,0.18);border-color:rgba(245,200,66,0.4);color:#f5c842}
+.inquire-input-line{display:flex;gap:10px;margin-bottom:16px}
+.inquire-input-line input{flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#e8e8e8;font-size:14px;outline:none}
+.inquire-input-line input:focus{border-color:#f5c842}
+.inquire-send-btn{background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.3);color:#f5c842;padding:10px 20px;border-radius:10px;font-size:0.85em;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.inquire-send-btn:hover{background:rgba(245,200,66,0.25)}
+.inquire-send-btn:disabled{opacity:0.4;cursor:not-allowed}
+.inquire-result{display:none;margin-top:16px}
+.inquire-result.show{display:block}
+.inquire-answer{font-size:0.9em;color:#d0d8e0;line-height:1.6;margin-bottom:14px}
+.inquire-boundary{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:12px 14px;font-size:0.85em;color:#fbbf24;margin-bottom:12px}
+.inquire-analysis{background:rgba(142,200,232,0.08);border:1px solid rgba(142,200,232,0.2);border-radius:10px;padding:12px 14px;font-size:0.85em;color:#8ec8e8;margin-bottom:12px}
+.inquire-metric-cards{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.inquire-mcard{flex:1;min-width:110px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;text-align:center}
+.inquire-mcard .n{font-size:1.3em;font-weight:700;color:#f0f0f0}
+.inquire-mcard .n.good{color:#4ade80}
+.inquire-mcard .n.warn{color:#fbbf24}
+.inquire-mcard .n.bad{color:#f87171}
+.inquire-mcard .lbl{font-size:0.7em;color:#667788;margin-top:2px}
+.inquire-bar-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:0.8em}
+.inquire-bar-row .bname{width:110px;text-align:right;flex-shrink:0;color:#c0c8d0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inquire-bar-row .btrack{flex:1;background:rgba(255,255,255,0.06);border-radius:6px;height:16px;overflow:hidden}
+.inquire-bar-row .bfill{height:100%;border-radius:6px;transition:width 0.4s}
+.inquire-bar-row .bval{width:48px;flex-shrink:0;font-weight:600;font-size:0.85em}
+.precision-badge{display:inline-block;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.2);border-radius:4px;padding:1px 6px;font-size:0.7em;color:#4ade80;margin-left:4px;vertical-align:middle}
+
 /* Dashboard two-column layout */
 .dashboard-layout{display:flex;gap:20px;align-items:flex-start}
 .dashboard-main{flex:1.6;min-width:0}
@@ -303,6 +334,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-seri
         </table>
       </div>
     </div>
+      <!-- Smart Inquiry Panel -->
+      <div class="inquire-panel" id="inquirePanel">
+        <h2>智能问数</h2>
+        <div class="inquire-chips" id="inquireChips">
+          <span class="inquire-chip" onclick="askChip('满100减30发了多少张')">满100减30发了多少张？</span>
+          <span class="inquire-chip" onclick="askChip('哪个券核销率最低')">哪个券核销率最低？</span>
+          <span class="inquire-chip" onclick="askChip('当前总营收是多少')">当前总营收是多少？</span>
+          <span class="inquire-chip" onclick="askChip('整体核销率')">整体核销率</span>
+          <span class="inquire-chip" onclick="askChip('核销率是否告警')">核销率是否告警？</span>
+          <span class="inquire-chip" onclick="askChip('哪个区域核销率低')">哪个区域核销率低？</span>
+        </div>
+        <div class="inquire-input-line">
+          <input type="text" id="inquireInput" placeholder="输入问数，比如「全场8折核销率是多少」..." onkeydown="if(event.key==='Enter')askInquire()">
+          <button class="inquire-send-btn" onclick="askInquire()">问</button>
+        </div>
+        <div class="inquire-result" id="inquireResult"></div>
+      </div>
       </div><!-- /dashboard-main -->
       <div class="dashboard-chat">
         <div class="chat-container">
@@ -1087,6 +1135,109 @@ function checkJourneyComplete() {
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// --- Smart Inquiry (T5: hybrid engine) ---
+var inquireBusy = false;
+
+function askChip(text) {
+  document.getElementById('inquireInput').value = text;
+  askInquire();
+}
+
+async function askInquire() {
+  var inp = document.getElementById('inquireInput');
+  var text = inp.value.trim();
+  if (!text || inquireBusy) return;
+  inp.value = '';
+  inquireBusy = true;
+
+  var resultEl = document.getElementById('inquireResult');
+  resultEl.className = 'inquire-result';
+  resultEl.innerHTML = '<div style="color:#667788;font-size:0.85em">查询中...</div>';
+
+  try {
+    var aid = document.getElementById('activitySelect').value;
+    var res = await fetchAdmin(API + '/api/v1/ops/inquire', {
+      method: 'POST',
+      body: JSON.stringify({question: text, activity_id: aid || undefined})
+    });
+    if (!res.ok) {
+      var errData = await res.json().catch(function(){return{};});
+      resultEl.innerHTML = '<div class="inquire-answer" style="color:#f87171">请求失败 (' + res.status + ')：' + escHtml(errData.error || '未知错误') + '</div>';
+    } else {
+      var data = await res.json();
+      resultEl.innerHTML = renderInquire(data);
+    }
+  } catch(e) {
+    resultEl.innerHTML = '<div class="inquire-answer" style="color:#f87171">网络错误：' + escHtml(e.message) + '</div>';
+  }
+  resultEl.className = 'inquire-result show';
+  inquireBusy = false;
+}
+
+function renderInquire(data) {
+  var h = '';
+
+  // Answer
+  if (data.answer) {
+    h += '<div class="inquire-answer">' + escHtml(data.answer) + '</div>';
+  }
+
+  // Boundary
+  if (data.boundary && data.boundary.missing && data.boundary.missing.length > 0) {
+    h += '<div class="inquire-boundary">当前数据无' + data.boundary.missing.join('、') + '维度，已用最接近的可用维度给出参考。</div>';
+  }
+
+  // Analysis
+  if (data.analysis) {
+    h += '<div class="inquire-analysis">分析：' + escHtml(data.analysis) + '</div>';
+  }
+
+  // Metric cards
+  if (data.metrics) {
+    try {
+      var m = typeof data.metrics === 'string' ? JSON.parse(data.metrics) : data.metrics;
+      if (m.total_revenue || m.active_users || m.coupon_used_rate || m.arpu) {
+        h += '<div class="inquire-metric-cards">';
+        if (m.total_revenue !== undefined) h += '<div class="inquire-mcard"><div class="n good">' + (m.total_revenue || 0).toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</div><div class="lbl">总营收 (¥)</div></div>';
+        if (m.active_users !== undefined) h += '<div class="inquire-mcard"><div class="n">' + (m.active_users || 0).toLocaleString() + '</div><div class="lbl">活跃用户</div></div>';
+        if (m.coupon_used_rate !== undefined) {
+          var cls = (m.coupon_used_rate||0) < 30 ? 'bad' : ((m.coupon_used_rate||0) < 40 ? 'warn' : 'good');
+          h += '<div class="inquire-mcard"><div class="n ' + cls + '">' + (m.coupon_used_rate || 0).toFixed(1) + '%</div><div class="lbl">核销率 <span class="precision-badge">精确数字</span></div></div>';
+        }
+        if (m.arpu !== undefined) h += '<div class="inquire-mcard"><div class="n">' + (m.arpu || 0).toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</div><div class="lbl">ARPU (¥)</div></div>';
+        h += '</div>';
+      }
+    } catch(e) {}
+  }
+
+  // Coupon bar chart
+  if (data.coupons && data.coupons.length > 0) {
+    var maxRate = Math.max.apply(null, data.coupons.map(function(c){return c.rate || 0;}));
+    h += '<div style="margin-bottom:14px">';
+    data.coupons.forEach(function(c) {
+      var pct = maxRate > 0 ? ((c.rate || 0) / maxRate * 100) : 0;
+      var barCls = (c.rate || 0) < 30 ? '#f87171' : ((c.rate || 0) < 40 ? '#fbbf24' : '#4ade80');
+      h += '<div class="inquire-bar-row">';
+      h += '<span class="bname" title="' + escHtml(c.name) + '">' + escHtml((c.name || '').length > 10 ? (c.name || '').substring(0,9)+'…' : c.name) + '</span>';
+      h += '<span class="btrack"><span class="bfill" style="width:' + pct.toFixed(0) + '%;background:' + barCls + '"></span></span>';
+      h += '<span class="bval" style="color:' + barCls + '">' + (c.rate || 0).toFixed(1) + '%</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  // Chart / comparison table
+  if (data.chart && data.chart.type === 'table' && data.chart.data && data.chart.data.length >= 2) {
+    h += '<table class="data-table" style="margin-top:8px"><thead><tr><th>券种</th><th>核销率</th><th>发放量</th><th>核销量</th></tr></thead><tbody>';
+    data.chart.data.forEach(function(r) {
+      h += '<tr><td>' + escHtml(r.name || '-') + '</td><td>' + (r.rate || 0).toFixed(1) + '%</td><td>' + (r.issued || 0) + '</td><td>' + (r.used || 0) + '</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+
+  return h || '<div class="inquire-answer">查询完成</div>';
 }
 
 // --- AI Chat Assistant (T4: LLM-powered) ---
