@@ -350,6 +350,7 @@ var gameLastSpawn = 0;
 var gameStartTime = 0;
 var gameAnimId = null;
 var gameFirstPlay = true;
+var gameLastTs = 0;
 
 // 10-coupon reward pool (ops design)
 var rewardPool = [
@@ -366,9 +367,9 @@ var rewardPool = [
 ];
 
 function getPhase(elapsedSec) {
-  if (elapsedSec < 7) return {name:'warmup', interval:900, speed:1.8, bombRate:0};
-  if (elapsedSec < 18) return {name:'buildup', interval:700, speed:2.8, bombRate:0.03};
-  return {name:'climax', interval:480, speed:4, bombRate:0.06};
+  if (elapsedSec < 7) return {name:'warmup', interval:700, speed:2.7, bombRate:0};
+  if (elapsedSec < 18) return {name:'buildup', interval:550, speed:4.2, bombRate:0.03};
+  return {name:'climax', interval:400, speed:5.8, bombRate:0.06};
 }
 
 function pickReward() {
@@ -1131,7 +1132,7 @@ function initCanvas() {
   ctx.font = 'bold 16px -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('按「开始游戏」接元宝', GAME_CANVAS_W/2, GAME_CANVAS_H/2 - 10);
-  ctx.fillText('≥20分赢优惠券', GAME_CANVAS_W/2, GAME_CANVAS_H/2 + 18);
+  ctx.fillText('≥' + GAME_PASS_SCORE + '分赢优惠券', GAME_CANVAS_W/2, GAME_CANVAS_H/2 + 18);
 
   drawPlayer(ctx, GAME_CANVAS_W/2);
   canvas.addEventListener('touchmove', handleGameTouch, {passive: false});
@@ -1279,6 +1280,7 @@ function startGame() {
   gamePlayerX = GAME_CANVAS_W / 2;
   gameLastSpawn = 0;
   gameStartTime = performance.now();
+  gameLastTs = gameStartTime;
   gameAnimId = null;
 
   document.getElementById('btnPlay').style.display = 'none';
@@ -1297,6 +1299,8 @@ function gameLoop(timestamp) {
   var elapsed = (timestamp - gameStartTime) / 1000;
   gameTimeLeft = Math.max(0, GAME_DURATION - elapsed);
   var phase = getPhase(elapsed);
+  var dt = Math.min((timestamp - gameLastTs) / 1000, 0.1);
+  gameLastTs = timestamp;
 
   // Spawn
   if (timestamp - gameLastSpawn > phase.interval) {
@@ -1307,7 +1311,7 @@ function gameLoop(timestamp) {
   // Update items
   for (var i = gameItems.length - 1; i >= 0; i--) {
     var item = gameItems[i];
-    item.y += item.speed;
+    item.y += item.speed * dt * 60;
 
     // Check collision with player
     var pw = 64, ph = 40, py = GAME_CANVAS_H - 55;

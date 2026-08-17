@@ -10,11 +10,14 @@ vet: ## run go vet
 test: ## run Go tests
 	go test ./...
 
-up: ## start the compose stack
-	docker compose up -d
+up: ## start the compose stack (TiDB Cloud mode, needs .env)
+	docker compose -f docker/docker-compose.yml up -d
+
+dev: ## start the compose stack in local-MySQL dev mode (no .env needed)
+	docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d
 
 down: ## stop the compose stack
-	docker compose down
+	docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml down
 
 verify: ## health-check the running API
 	@curl -sf http://localhost:8080/api/v1/ping && echo " OK" || (echo " FAIL"; exit 1)

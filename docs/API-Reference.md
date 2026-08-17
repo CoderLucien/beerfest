@@ -1,6 +1,6 @@
 # API 参考文档
 
-Base URL: `http://<API_HOST>/api/v1`
+Base URL: `http://localhost:8080/api/v1`（示例；实际部署地址以你的环境为准）
 
 ## 通用说明
 

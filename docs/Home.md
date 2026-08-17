@@ -9,3 +9,6 @@
 - [📦 项目收尾总结](PROJECT-CLOSING-SUMMARY.md)
 - [🤝 多 Agent 协作实践](LOOP-COLLABORATION.md)
 - [📐 LOOP 实践方法论](LOOP-METHODOLOGY.md)
+- [📦 项目收尾总结](PROJECT-CLOSING-SUMMARY.md)
+- [🤝 多 Agent 协作实践](LOOP-COLLABORATION.md)
+- [📐 LOOP 实践方法论](LOOP-METHODOLOGY.md)

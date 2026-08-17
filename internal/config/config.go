@@ -2,6 +2,7 @@ package config
 
 import (
 	"crypto/tls"
+	"fmt"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -18,17 +19,21 @@ type Config struct {
 	RedisAddr string
 }
 
-func Load() *Config {
+func Load() (*Config, error) {
+	dbPass := os.Getenv("DB_PASSWORD")
+	if dbPass == "" {
+		return nil, fmt.Errorf("DB_PASSWORD is not set: copy .env.example to .env and fill in your database credentials")
+	}
 	return &Config{
 		Port:      env("PORT", "8080"),
 		DBHost:    env("DB_HOST", "localhost"),
 		DBPort:    env("DB_PORT", "4000"),
 		DBUser:    env("DB_USER", "beerfest"),
-		DBPass:    env("DB_PASSWORD", "beerfest"),
+		DBPass:    dbPass,
 		DBName:    env("DB_NAME", "beerfest"),
 		DBTLS:     env("DB_TLS", ""),
 		RedisAddr: env("REDIS_ADDR", "localhost:6379"),
-	}
+	}, nil
 }
 
 func (c *Config) DatabaseURL() string {

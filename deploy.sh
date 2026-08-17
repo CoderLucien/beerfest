@@ -9,10 +9,10 @@ if [ ! -f .env ]; then
 fi
 
 echo "==> Building images"
-docker compose build
+docker compose -f docker/docker-compose.yml build
 
 echo "==> Starting stack"
-docker compose up -d
+docker compose -f docker/docker-compose.yml up -d
 
 echo "==> Waiting for API health (max 90s)"
 for i in $(seq 1 30); do
@@ -28,5 +28,5 @@ for i in $(seq 1 30); do
 done
 
 echo "==> Stack status"
-docker compose ps
+docker compose -f docker/docker-compose.yml ps
 echo "==> Deploy OK"

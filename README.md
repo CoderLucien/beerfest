@@ -48,7 +48,8 @@ beerfest/
 │   └── adapter/mock.go         # Mock Payment/SMS/POS
 ├── docker/
 │   ├── Dockerfile              # 多阶段构建
-│   ├── docker-compose.yml      # 服务编排
+│   ├── docker-compose.yml      # 服务编排（默认形态：api + nginx + 外部 TiDB）
+│   ├── docker-compose.dev.yml  # dev override：本地 MySQL 8 一键试玩模式
 │   └── nginx.conf              # 反代配置
 ├── scripts/
 │   ├── seed.go                 # 种子数据
@@ -59,51 +60,78 @@ beerfest/
 └── go.mod / go.sum
 ```
 
-## 快速开始
+## 从零构建
 
-### 前置条件
+两条路径：**路径 A（推荐）** 使用 TiDB Cloud Serverless 作为数据库，适合生产/客户交付；**路径 B** 使用本地 MySQL 8 容器，适合没有 TiDB 账号时的开发/试玩。两条路径最终都能得到一套完整可用的前后端促销系统。
 
-- Go 1.22+
-- Docker + Docker Compose
-- TiDB Starter 集群（或 MySQL 8.0+）
+### 路径 A（推荐）：TiDB Cloud Serverless
 
-### 环境变量
+**第 1 步 — 准备环境**
+
+- Docker + Docker Compose（无需本地安装 Go/MySQL）
+- 一个 TiDB Cloud 账号（免费 Serverless 集群即可，注册地址 https://tidbcloud.com）
+
+**第 2 步 — 创建 TiDB Cloud Serverless 集群并获取连接信息**
+
+1. 登录 TiDB Cloud，创建免费 Serverless 集群（按引导选择 Region，约 1 分钟就绪）
+2. 打开集群的 **Connect** 面板，选择 MySQL 协议，复制连接参数（Host / Port=4000 / User / Password）
+3. 如需 TLS 加密连接，在 Connect 面板下载 CA 证书（`isrgrootx1.pem`），下文 DB_TLS 使用
+
+**第 3 步 — 配置环境变量**
 
 ```bash
 cp .env.example .env
-# 编辑 .env 填入 TiDB 连接信息：
-# DB_HOST=your-tidb-host
-# DB_PORT=4000
-# DB_USER=your-user
-# DB_PASS=your-password
-# DB_NAME=beerfest
-# DB_TLS=tidb
+# 编辑 .env 填入 TiDB Cloud 连接信息：
+#   DB_HOST=你的集群host
+#   DB_PORT=4000
+#   DB_USER=你的用户
+#   DB_PASSWORD=你的密码
+#   DB_NAME=beerfest
+#   DB_TLS=tidb        # 使用 TLS 连接；若无需 TLS 可留空
+# 可选：ADMIN_INIT_PASSWORD=xxx 设置管理员初始密码
 ```
 
-### 本地开发
+> `.env` 已被 .gitignore 忽略，不会进入版本库；请勿提交真实凭据。
+
+**第 4 步 — 一键启动**
 
 ```bash
-# 安装依赖
-go mod tidy
+docker compose -f docker/docker-compose.yml up -d
+```
 
-# 运行
+首次启动会自动建表（seed DDL）并创建默认管理员。
+
+**第 5 步 — 验证**
+
+```bash
+curl http://localhost/api/v1/ping          # 期望 {"status":"ok"}
+docker compose -f docker/docker-compose.yml logs api | grep "one-time password"
+```
+
+- 浏览器打开 `http://localhost` 即运营后台，`http://localhost/customer.html` 为客户端
+- 管理员账号 `admin`：若第 3 步设置了 `ADMIN_INIT_PASSWORD` 则用该密码；否则初始密码为随机一次性密码，见 api 启动日志
+
+### 路径 B（开发/试玩）：本地 MySQL 8 一键模式
+
+无需 TiDB 账号、无需 .env，一条命令拉起 api + nginx + redis + mysql 全套：
+
+```bash
+docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d
+curl http://localhost/api/v1/ping
+docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml logs api | grep "one-time password"
+```
+
+> `docker-compose.dev.yml` 中硬编码了 dev-only 凭据（如 `beerfest-dev`），仅用于本地试玩，**严禁用于生产**。生产一律走路径 A（.env 注入 TiDB Cloud 凭据）。
+
+### 本地开发（无 Docker）
+
+```bash
+# 前置：本地 MySQL 8 / TiDB + Redis，环境变量同 .env.example（DB_PASSWORD 必填）
+go mod tidy
 go run ./cmd/server/
 
 # 健康检查
 curl http://localhost:8080/api/v1/ping
-```
-
-### Docker 部署
-
-```bash
-# 一键部署
-./deploy.sh
-
-# 或手动
-docker compose up -d
-
-# 验证
-curl http://localhost/api/v1/ping
 ```
 
 ## API 端点

@@ -1,0 +1,49 @@
+# Dev / trial mode override: adds a local MySQL 8 container and points the API at it.
+# Use together with the base compose file (no .env needed):
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# The credentials below are hardcoded DEV-ONLY values so the stack starts with one
+# command. NEVER use this file in production or against a real database.
+# Production / customer deployments use the base compose file with TiDB Cloud
+# credentials from .env (see .env.example).
+name: beerfest
+services:
+  api:
+    environment:
+      - PORT=8080
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=beerfest
+      - DB_PASSWORD=beerfest-dev
+      - DB_NAME=beerfest
+      - DB_TLS=
+      - REDIS_ADDR=redis:6379
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - LLM_MODEL=${LLM_MODEL:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=root-dev-only
+      - MYSQL_DATABASE=beerfest
+      - MYSQL_USER=beerfest
+      - MYSQL_PASSWORD=beerfest-dev
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

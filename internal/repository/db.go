@@ -1,9 +1,12 @@
 package repository
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"log"
+	"math/big"
+	"os"
 	"strings"
 
 	"github.com/redis/go-redis/v9"
@@ -138,7 +141,18 @@ func seedAdmin(db *sql.DB) {
 	if count > 0 {
 		return
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte("<ADMIN_PASSWORD>"), bcrypt.DefaultCost)
+	pw := os.Getenv("ADMIN_INIT_PASSWORD")
+	random := false
+	if pw == "" {
+		var err error
+		pw, err = randomPassword(16)
+		if err != nil {
+			log.Printf("seed admin: generate password error: %v", err)
+			return
+		}
+		random = true
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("seed admin: bcrypt error: %v", err)
 		return
@@ -151,5 +165,22 @@ func seedAdmin(db *sql.DB) {
 		log.Printf("seed admin: insert error: %v", err)
 		return
 	}
-	log.Println("default admin user seeded (admin / <ADMIN_PASSWORD>)")
+	if random {
+		log.Printf("default admin user seeded: username=admin, one-time password=%s (set ADMIN_INIT_PASSWORD env to control it)", pw)
+	} else {
+		log.Println("default admin user seeded: username=admin, password from ADMIN_INIT_PASSWORD env")
+	}
+}
+
+func randomPassword(n int) (string, error) {
+	const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+	b := make([]byte, n)
+	for i := range b {
+		idx, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = chars[idx.Int64()]
+	}
+	return string(b), nil
 }
