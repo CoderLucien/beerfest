@@ -234,6 +234,44 @@ make deploy      # 一键部署
 | beerfest-qa-cc-air3 | 质量保障 | 测试策略、回归验证、缺陷追踪 |
 | dveops-cc-ubuntu | DevOps | 部署运维、CI/CD、环境管理 |
 
+## 基于 Loop 开发入门
+
+本项目由 Loop 多 Agent 协作平台开发（leader + RD + QA + DevOps 分工）。以下是从零接手、基于 Loop 继续开发本系统的最小上手路径。
+
+### 1. Loop 工作区三要素
+
+| 概念 | 作用 |
+|------|------|
+| 频道（Channel） | 团队共享上下文，本项目所有协作在同一个频道内进行 |
+| 线程（Thread） | 一个需求 = 一个线程，讨论、验收、决策均在对应线程闭环 |
+| 任务（#tN） | 任务板驱动 `todo → in_progress → in_review → done` 状态机，每个任务有独立负责人 |
+
+### 2. 新手接入步骤
+
+1. **跑起系统**：按上文「从零构建」任选一条路径，本地起一套完整环境
+2. **配置 Agent**：在 Loop 平台创建自己的 Agent，并写入角色职责（唤醒时自动携带职责上下文，无需每次重复交代）
+3. **认领任务**：在频道任务板认领，或等 leader 派单（@mention 指派）
+4. **交付**：完成开发自检（`make ci`）后交付变更，由 QA 验收、leader 集成推送 GitHub
+
+### 3. 日常开发循环
+
+```
+需求（线程提出）→ leader 拆解任务 #tN → @agent 派单
+→ 开发 + 自检（make ci）→ QA 验收放行 → leader 集成推送 → 回归 → 闭环
+```
+
+### 4. 关键约定
+
+- **敏感信息零容忍**：数据库凭据、服务器 IP、个人姓名/邮箱一律变量化或脱敏，git 历史同样受检
+- **品牌词口径**：代码与文档统一使用泛化词（如「国际啤酒节」），避免绑定真实地名/届数
+- **集成由 leader 统一推送**：成员不直接推 main，避免并行冲突
+- **验收驱动**：任何变更以 QA 验收 + 双模式部署验证为准
+
+### 5. 深入阅读
+
+- [Loop 多 Agent 软件开发实践方法论](docs/LOOP-METHODOLOGY.md) — 组织/流程/质量/沟通/度量六层体系
+- [Loop 多 Agent 丝滑协作实践总结](docs/LOOP-COLLABORATION.md) — 本项目踩坑经验与协作技巧
+
 ## 里程碑
 
 | # | 里程碑 | 状态 |
@@ -250,6 +288,9 @@ MIT
 
 ## 文档
 
+- [基于 Loop 开发入门](#基于-loop-开发入门) — 基于 Loop 平台的开发上手路径（见上文）
 - [开发指南](docs/Development.md) — 架构、数据模型、状态机、开发流程
 - [API 参考](docs/API-Reference.md) — 全部 REST API 端点及请求示例
 - [部署指南](docs/Deployment.md) — Docker 部署、环境变量、TiDB 配置
+- [Loop 多 Agent 实践方法论](docs/LOOP-METHODOLOGY.md) — 组织/流程/质量/沟通/度量六层体系
+- [Loop 丝滑协作实践](docs/LOOP-COLLABORATION.md) — 项目踩坑经验与协作技巧
