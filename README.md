@@ -75,7 +75,7 @@ beerfest/
 
 1. 登录 TiDB Cloud，创建免费 Serverless 集群（按引导选择 Region，约 1 分钟就绪）
 2. 打开集群的 **Connect** 面板，选择 MySQL 协议，复制连接参数（Host / Port=4000 / User / Password）
-3. 如需 TLS 加密连接，在 Connect 面板下载 CA 证书（`isrgrootx1.pem`），下文 DB_TLS 使用
+3. TLS 加密连接无需下载 CA 文件：TiDB Cloud 使用 ISRG Root X1 证书，已包含在系统根证书池中（镜像内置 ca-certificates），`.env` 中设 `DB_TLS=tidb` 即可
 
 **第 3 步 — 配置环境变量**
 

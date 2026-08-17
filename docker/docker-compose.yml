@@ -3,7 +3,9 @@
 name: beerfest
 services:
   api:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -12,7 +14,7 @@ services:
       - DB_PORT=${DB_PORT:-4000}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME:-sys}
+      - DB_NAME=${DB_NAME:-beerfest}
       - DB_TLS=${DB_TLS:-}
       - REDIS_ADDR=redis:6379
       - LLM_API_KEY=${LLM_API_KEY}
