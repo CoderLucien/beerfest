@@ -39,6 +39,7 @@ test.describe("V1 Visitor Main Flow", () => {
     await expect(page.locator("text=精酿主会场")).toBeVisible();
     await expect(page.locator("text=文创美食区")).toBeVisible();
     await expect(page.locator("text=进行中的活动")).toBeVisible();
+    await expect(page.locator("text=精酿专场")).toBeVisible();
     const noCampaigns = page.locator("text=暂无活动");
     await expect(noCampaigns).toHaveCount(0, { timeout: 15000 });
   });

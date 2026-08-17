@@ -30,9 +30,17 @@ REDIS_STATUS=$(echo "$HEALTH" | grep -o '"redis":{"status":"[^"]*"' | cut -d'"' 
 echo "  → DB: $DB_STATUS  Redis: $REDIS_STATUS"
 [[ "$HEALTH" == *'"healthy"'* ]] && echo -e "  $OK 全组件健康" || echo -e "  $ERR 组件异常"
 
-# ── 2. 创建活动 ──
+# ── 2. 查看 seed 多活动列表 + 创建活动 ──
 echo ""
-echo -e "$STEP 2/10 创建啤酒节活动"
+echo -e "$STEP 2/10 查看多活动列表 + 创建活动"
+LIST=$(curl -s "$API/api/v1/activities")
+ACT_COUNT=$(echo "$LIST" | grep -o '"id":"[^"]*"' | wc -l | tr -d ' ')
+echo "  GET /api/v1/activities → seed 活动数: $ACT_COUNT"
+if [[ "$ACT_COUNT" -ge 3 ]]; then
+  echo -e "  $OK 多活动 demo 数据就绪（n≥3：主会场/精酿专场/音乐嘉年华）"
+else
+  echo -e "  $ERR 活动数不足 3（当前 $ACT_COUNT），请先运行 seed 初始化"
+fi
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 END=$(date -u -v+14d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d"+14 days" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "2026-08-20T23:59:59Z")
 ACTIVITY=$(curl -s -X POST "$API/api/v1/activities" \

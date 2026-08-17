@@ -110,6 +110,7 @@ test.describe("V2 Family Segment Regression", () => {
     await page.goto("/", { waitUntil: "networkidle" });
     await page.waitForTimeout(5000);
     await expect(page.locator("text=啤酒节")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator("text=精酿专场")).toBeVisible({ timeout: 15000 });
     await expect(page.locator("text=进行中的活动")).toBeVisible({ timeout: 5000 });
 
     await setAdminCookie(page);
