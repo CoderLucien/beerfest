@@ -1,6 +1,6 @@
 # API 参考文档
 
-Base URL: `http://<DB_HOST>/api/v1`
+Base URL: `http://<API_HOST>/api/v1`
 
 ## 通用说明
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 # 啤酒节智能营促销系统 — 完整业务流程演示脚本
 # 用法: bash demo-test.sh [API_BASE]
-# 默认: http://<DB_HOST>
+# 默认: http://<API_HOST>
 
-API="${1:-http://<DB_HOST>}"
+API="${1:-http://<API_HOST>}"
 OK="\033[32m✓\033[0m"
 ERR="\033[31m✗\033[0m"
 STEP="\033[1;33m▶\033[0m"

@@ -9,7 +9,7 @@
 
 基于 Loop 多 Agent 协作平台构建的智能营销促销系统，服务国际啤酒节。覆盖活动管理、促销规则引擎、优惠券发放核销、运营看板、AI 智能问数、游客 H5 商城与小游戏等能力。
 
-**线上地址**：http://<SERVER_IP>/ （管理后台）+ http://<SERVER_IP>/customer （游客端）
+**线上地址**：管理后台 `/` + 游客端 `/customer`（部署 IP 不公开，见 `docs/Deployment.md`）
 
 ## 2. 交付成果清单
 
@@ -106,7 +106,7 @@
 
 ## 6. 部署形态
 
-- 云主机 <SERVER_IP>：Docker Compose（api + nginx），TiDB Cloud Serverless + Redis 7
+- 云主机（部署 IP 不公开）：Docker Compose（api + nginx），TiDB Cloud Serverless + Redis 7
 - 静态页 nginx bind mount 热部署（inode 保留覆盖），后端变更走容器重建
 - 部署验收标准：served 内容与交付物全等、关键参数命中、公网可达、零页面 JS 错误
 
