@@ -80,8 +80,8 @@ beerfest/
 **第 3 步 — 配置环境变量**
 
 ```bash
-cp .env.example .env
-# 编辑 .env 填入 TiDB Cloud 连接信息：
+cp .env.example docker/.env
+# 编辑 docker/.env 填入 TiDB Cloud 连接信息：
 #   DB_HOST=你的集群host
 #   DB_PORT=4000
 #   DB_USER=你的用户
@@ -91,7 +91,7 @@ cp .env.example .env
 # 可选：ADMIN_INIT_PASSWORD=xxx 设置管理员初始密码
 ```
 
-> `.env` 已被 .gitignore 忽略，不会进入版本库；请勿提交真实凭据。
+> `docker/.env` 已被 .gitignore 忽略，不会进入版本库；请勿提交真实凭据。
 
 **第 4 步 — 一键启动**
 

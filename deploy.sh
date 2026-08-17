@@ -3,8 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-if [ ! -f .env ]; then
-  echo "ERROR: .env not found. Copy .env.example and fill in DB_* values." >&2
+if [ ! -f docker/.env ]; then
+  echo "ERROR: docker/.env not found. Copy .env.example to docker/.env and fill in DB_* values." >&2
   exit 1
 fi
 

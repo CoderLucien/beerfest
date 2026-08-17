@@ -14,10 +14,10 @@
 ### 1. 配置环境变量
 
 ```bash
-cp .env.example .env
+cp .env.example docker/.env
 ```
 
-编辑 `.env`:
+编辑 `docker/.env`:
 ```ini
 DB_HOST=your-tidb-cloud-host
 DB_PORT=4000

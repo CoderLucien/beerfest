@@ -10,7 +10,7 @@ vet: ## run go vet
 test: ## run Go tests
 	go test ./...
 
-up: ## start the compose stack (TiDB Cloud mode, needs .env)
+up: ## start the compose stack (TiDB Cloud mode, needs docker/.env)
 	docker compose -f docker/docker-compose.yml up -d
 
 dev: ## start the compose stack in local-MySQL dev mode (no .env needed)
