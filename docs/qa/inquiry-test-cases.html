@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>促销智能问数 · 测试用例设计</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--amber:#f59e0b;--green:#22c55e;--blue:#3b82f6;--red:#ef4444;--purple:#a855f7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-size:22px;margin-bottom:6px}
+h2{font-size:17px;margin:28px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:14px;margin:16px 0 8px;color:var(--amber)}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase}
+.pass{color:var(--green);font-weight:600}
+.fail{color:var(--red);font-weight:600}
+.warn{color:var(--amber)}
+.tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tag-auto{background:#1e3a5f;color:var(--blue)}
+.tag-manual{background:#5f3a1e;color:var(--amber)}
+.tag-ui{background:#3a1e5f;color:var(--purple)}
+.tag-reg{background:#1e4a1e;color:var(--green)}
+.summary-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stat{flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.stat .n{font-size:24px;font-weight:700}
+.stat .l{font-size:11px;color:var(--muted);margin-top:4px}
+code{background:#0f172a;padding:1px 6px;border-radius:3px;font-size:12px;color:var(--amber)}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>促销智能问数 · 测试用例设计</h1>
+<p class="sub">QA + Ops 联合设计 | 覆盖后端 API 自动化 loadtest + 前端页面展示效果 | 方案 B 混合方案</p>
+
+<div class="summary-row">
+  <div class="stat"><div class="n" style="color:var(--blue)">20</div><div class="l">自动化 Loadtest（ops 已交付）</div></div>
+  <div class="stat"><div class="n" style="color:var(--purple)">24</div><div class="l">前端页面展示用例</div></div>
+  <div class="stat"><div class="n" style="color:var(--amber)">10</div><div class="l">业务场景用例</div></div>
+  <div class="stat"><div class="n" style="color:var(--green)">8</div><div class="l">回归 / 边界用例</div></div>
+  <div class="stat"><div class="n" style="color:var(--text)">62</div><div class="l">总计</div></div>
+</div>
+
+<!-- PART 1: LOADTEST -->
+<h2>一、后端 API Loadtest（自动化）</h2>
+<p class="sub">已由 @beerfest-ops-cc-air3 交付 <code>inquiry_loadtest.py</code>，以下为完整用例清单与执行方式。QA 补充业务场景变体。</p>
+
+<div class="card">
+<h3>1.1 准确性 A1–A9（自动化）<span class="tag tag-auto">auto</span></h3>
+<table>
+<tr><th>ID</th><th>用例</th><th>断言方式</th><th>验收标准</th></tr>
+<tr><td>A1</td><td>「当前总营收是多少」→ metrics.total_revenue</td><td>与 dashboard total_revenue 比对，容差 ±0.1</td><td class="pass">PASS</td></tr>
+<tr><td>A2</td><td>「当前核销率是多少」→ metrics.coupon_used_rate</td><td>与 dashboard coupon_used_rate 比对</td><td class="pass">PASS</td></tr>
+<tr><td>A3</td><td>「ARPU 是多少」→ metrics.arpu</td><td>与 dashboard arpu 比对</td><td class="pass">PASS</td></tr>
+<tr><td>A4</td><td>「活跃用户多少人」→ metrics.active_users</td><td>与 dashboard active_users 比对</td><td class="pass">PASS</td></tr>
+<tr><td>A5.0–A5.2</td><td>Top3 券种单券查询（「XX发了多少张」）</td><td>answer 含 issued + used 数字</td><td class="pass">PASS</td></tr>
+<tr><td>A6</td><td>「哪个券核销率最低」→ 识别最低券种</td><td>answer 含券名 + 核销率</td><td class="pass">PASS</td></tr>
+<tr><td>A7</td><td>「哪个券核销率最高」→ 识别最高券种</td><td>answer 含券名 + 核销率</td><td class="pass">PASS</td></tr>
+<tr><td>A8</td><td>「满100减30和全场9折哪个核销率高」</td><td>answer 含正确结论 + 数据</td><td class="pass">PASS</td></tr>
+<tr><td>A9</td><td>「整体核销率是否告警」→ 口径判断</td><td>answer 含正常/未告警/不告警</td><td class="pass">PASS</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>1.2 完整性 B1–B4（自动化）<span class="tag tag-auto">auto</span></h3>
+<table>
+<tr><th>ID</th><th>用例</th><th>断言方式</th><th>验收标准</th></tr>
+<tr><td>B1</td><td>全部 10 个券种逐一问"XX核销率是多少"</td><td>每个 answer 含对应券名</td><td class="pass">0 遗漏</td></tr>
+<tr><td>B2</td><td>同义问法一致性（3 种问法问同一券发放量）</td><td>3 次 answer 均含相同 issued 数字</td><td class="pass">全部一致</td></tr>
+<tr><td>B3</td><td>响应结构完整性（answer/intent/metrics）</td><td>必填字段齐全，intent 为 data/analysis</td><td class="pass">全部齐全</td></tr>
+<tr><td>B4</td><td>无虚构券名（问"核销率低怎么办"）</td><td>answer 不含"满150减50""满1瓶送1瓶"等假券名</td><td class="pass">0 虚构</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>1.3 诚实边界 C1–C3（自动化）<span class="tag tag-auto">auto</span></h3>
+<table>
+<tr><th>ID</th><th>用例</th><th>断言方式</th><th>验收标准</th></tr>
+<tr><td>C1</td><td>「哪个区域核销率低」→ 诚实声明无区域维度</td><td>answer 含"无区域"/"无该维度"/"没有"</td><td class="pass">100% 不虚构</td></tr>
+<tr><td>C2</td><td>「核销率为什么下降了」→ 不编造因果</td><td>answer 含"无时间"/"推测"/"无该维度"</td><td class="pass">100% 不虚构</td></tr>
+<tr><td>C3</td><td>「今天和昨天相比怎么样」→ 声明无趋势数据</td><td>answer 含"无时间"/"环比"/"同比"/"无该维度"</td><td class="pass">100% 不虚构</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>1.4 易用性 D1–D4（自动化）<span class="tag tag-auto">auto</span></h3>
+<table>
+<tr><th>ID</th><th>用例</th><th>断言方式</th><th>验收标准</th></tr>
+<tr><td>D1</td><td>确定性问数延迟（8 次采样）</td><td>p95 &lt; 1000ms</td><td class="pass">PASS</td></tr>
+<tr><td>D2</td><td>分析类延迟（3 次采样）</td><td>p95 &lt; 3000ms</td><td class="pass">PASS</td></tr>
+<tr><td>D3</td><td>无 Token 请求 → 401</td><td>HTTP 401</td><td class="pass">PASS</td></tr>
+<tr><td>D4</td><td>闲聊兜底（"你好"）→ 200</td><td>HTTP 200 + 非空 answer</td><td class="pass">PASS</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>1.5 QA 补充：业务场景扩展用例（手动 + 可脚本化）<span class="tag tag-manual">manual</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>输入</th><th>预期</th></tr>
+<tr><td>E1</td><td>空输入</td><td>question=""</td><td>400 或友好提示"请输入问题"</td></tr>
+<tr><td>E2</td><td>超长输入</td><td>question=500+ 中文字符</td><td>200 + 合理截断或提示过长</td></tr>
+<tr><td>E3</td><td>不存在的券种</td><td>「满500减100核销率是多少」</td><td>诚实声明"未找到该券种"或建议最近似券种</td></tr>
+<tr><td>E4</td><td>纯数字输入</td><td>question="12345"</td><td>200 + 兜底回答（不报 500）</td></tr>
+<tr><td>E5</td><td>特殊字符</td><td>question="<script>alert(1)</script>"</td><td>200 + 无 XSS（answer 不含 script 标签）</td></tr>
+<tr><td>E6</td><td>SQL 注入尝试</td><td>question="'; DROP TABLE orders; --"</td><td>200 + 安全兜底（参数化查询防御）</td></tr>
+<tr><td>E7</td><td>英文输入</td><td>"What is the total revenue"</td><td>200 + 中文回答或友好提示使用中文</td></tr>
+<tr><td>E8</td><td>模糊问题</td><td>「怎么样」</td><td>200 + 澄清追问或活动总览兜底</td></tr>
+<tr><td>E9</td><td>activity_id 缺失</td><td>不传 activity_id</td><td>默认 b0a13055 或 400 提示必填</td></tr>
+<tr><td>E10</td><td>并发 3 请求</td><td>同时发 3 个不同问数</td><td>均返回正确结果，无数据串扰</td></tr>
+</table>
+</div>
+
+<!-- PART 2: UI TEST CASES -->
+<h2>二、前端页面展示效果用例</h2>
+<p class="sub">页面交互 & 视觉渲染验证（手动测试，需浏览器实际操作）</p>
+
+<div class="card">
+<h3>2.1 页面布局 & 基础元素<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>检查项</th><th>验证方法</th><th>预期</th></tr>
+<tr><td>U1</td><td>智能问数面板入口可见</td><td>打开管理后台，确认"智能问数"Tab 或面板存在</td><td>面板在 Ops Chat 区域可见</td></tr>
+<tr><td>U2</td><td>快捷提问 chips 渲染</td><td>检查预设快捷提问按钮列表</td><td>≥6 个 chips（券种排名/营收/对比/异常等），可点击</td></tr>
+<tr><td>U3</td><td>输入框 + 发送按钮</td><td>确认输入框 placeholder 文本 + 发送按钮可点击</td><td>placeholder="输入问题，如：各券种核销率排名"</td></tr>
+<tr><td>U4</td><td>空输入保护</td><td>不输入文字直接点发送</td><td>按钮 disabled 或提示"请输入问题"</td></tr>
+<tr><td>U5</td><td>活动 ID 状态显示</td><td>检查面板 header 是否显示当前活动</td><td>"已连接 · b0a13055" 或类似标识</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>2.2 数据问答渲染（指标卡片）<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>输入</th><th>预期渲染效果</th></tr>
+<tr><td>U6</td><td>单券指标卡片</td><td>「满100减30发了多少张」</td><td>显示 2-4 个指标卡片（发放量/核销量/核销率/整体核销率），数字大而醒目，label 小字灰色</td></tr>
+<tr><td>U7</td><td>活动总览卡片</td><td>「当前营收和核销率」</td><td>显示多指标卡片（营收/用户/核销率/ARPU），一行排列</td></tr>
+<tr><td>U8</td><td>卡片数字格式</td><td>检查展示的数字格式</td><td>营收带千分位（¥943,251.05），百分比保留 1 位小数（44.1%），整数不显示小数点</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>2.3 数据问答渲染（柱状图 / 图表）<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>输入</th><th>预期渲染效果</th></tr>
+<tr><td>U9</td><td>排名柱状图</td><td>「各券种核销率排名」</td><td>渲染横向柱状图，券名在左，柱体在中间，数值在右；按核销率降序排列</td></tr>
+<tr><td>U10</td><td>柱状图颜色编码</td><td>同上</td><td>高核销率（≥40%）绿色、中等（20-40%）蓝色、低（&lt;20%）红色</td></tr>
+<tr><td>U11</td><td>对比表格</td><td>「全场8折 vs 满100减30」</td><td>渲染对比表格，两列并排，指标行对齐，差异数据高亮</td></tr>
+<tr><td>U12</td><td>图表响应式</td><td>缩窄浏览器窗口</td><td>柱状图和表格自适应宽度，不溢出、不重叠</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>2.4 分析类 & 边界类渲染<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>输入</th><th>预期渲染效果</th></tr>
+<tr><td>U13</td><td>分析标注"推测"</td><td>「核销率为什么低」</td><td>回答中包含醒目的"推测"/"分析"标注（橙色背景框或前缀标签），与精确数据视觉区分</td></tr>
+<tr><td>U14</td><td>诚实边界提示样式</td><td>「哪个区域核销率低」</td><td>显示橙色/黄色警告边框的边界提示卡片，含"⚠️"图标 +"当前无该维度数据"+ 最近似参考</td></tr>
+<tr><td>U15</td><td>边界提示不混入数据卡片</td><td>同上</td><td>边界提示以独立样式呈现，不与指标卡片/图表混排，避免运营误读为数据</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>2.5 快捷提问 & 交互<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>操作</th><th>预期</th></tr>
+<tr><td>U16</td><td>点击快捷提问 chip</td><td>点击"各券种核销率排名" chip</td><td>自动填入输入框并发送，结果正常渲染</td></tr>
+<tr><td>U17</td><td>连续提问</td><td>先问"满100减30发了多少张"，再问"全场8折呢"</td><td>两次问答均正确渲染（P1 需支持上文承接）</td></tr>
+<tr><td>U18</td><td>加载状态</td><td>发送问题后等待响应</td><td>显示 loading 动画或"思考中..."（不卡死 UI）</td></tr>
+<tr><td>U19</td><td>错误状态</td><td>断网或后端 500 时提问</td><td>显示友好错误提示"查询失败，请稍后重试"，不白屏</td></tr>
+<tr><td>U20</td><td>历史记录列表</td><td>检查侧栏历史区域</td><td>有历史记录时列表显示最近问题摘要；无记录时显示"无历史记录"</td></tr>
+<tr><td>U21</td><td>键盘提交</td><td>输入问题后按 Enter</td><td>触发发送（与点击按钮行为一致）</td></tr>
+<tr><td>U22</td><td>滚动行为</td><td>连续发 5+ 个问题，使对话超出可视区</td><td>新消息自动滚动到底部；手动上滚查看历史时不被新消息打断</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>2.6 跨浏览器 & 响应式<span class="tag tag-ui">UI</span></h3>
+<table>
+<tr><th>ID</th><th>场景</th><th>验证方法</th><th>预期</th></tr>
+<tr><td>U23</td><td>Chrome 兼容</td><td>Chrome 最新版打开页面</td><td>所有功能正常</td></tr>
+<tr><td>U24</td><td>移动端响应式</td><td>Chrome DevTools 模拟 iPhone 14 / 375px 宽</td><td>面板可滚动，卡片不溢出，柱状图可横滑或自适应缩小</td></tr>
+</table>
+</div>
+
+<!-- PART 3: REGRESSION -->
+<h2>三、回归测试用例</h2>
+<p class="sub">确保现有功能不受新接口影响</p>
+
+<div class="card">
+<table>
+<tr><th>ID</th><th>回归对象</th><th>验证方法</th><th>预期</th></tr>
+<tr><td>R1</td><td>现有 Ops Chat <code>/ops/chat</code></td><td>发送"当前营收和核销率如何"到 Ops Chat</td><td>正常返回分析报告，不受新增 /ops/inquire 影响</td></tr>
+<tr><td>R2</td><td>Dashboard <code>/dashboard/:id</code></td><td>访问 Dashboard 页面</td><td>数据正常展示，无性能退化</td></tr>
+<tr><td>R3</td><td>Promotions Stats <code>/admin/promotions/stats</code></td><td>调用 stats 接口</td><td>返回 10 个券种完整数据</td></tr>
+<tr><td>R4</td><td>Admin 鉴权</td><td>用非 admin 账号登录后访问 /ops/inquire</td><td>返回 401/403，无权访问</td></tr>
+<tr><td>R5</td><td>并发稳定性</td><td>同时使用 Ops Chat + Inquire + Dashboard</td><td>三个功能独立运行，无资源竞争导致的超时或 500</td></tr>
+<tr><td>R6</td><td>DeepSeek 通道复用</td><td>检查 inquire 调用时 Ops Chat 是否仍可用</td><td>共用一个 LLM 通道，但互相不影响响应</td></tr>
+<tr><td>R7</td><td>数据口径一致性</td><td>同一指标在 Dashboard、Ops Chat、Inquire 三处对比</td><td>数字一致（同源 TiDB），偏差 &lt;0.1</td></tr>
+<tr><td>R8</td><td>审计日志</td><td>检查 inquire 请求是否写入 ops:chat 审计</td><td>每次 inquire 调用有审计记录</td></tr>
+</table>
+</div>
+
+<!-- PART 4: EXECUTION PLAN -->
+<h2>四、执行计划</h2>
+
+<div class="card">
+<h3>4.1 执行阶段</h3>
+<table>
+<tr><th>阶段</th><th>内容</th><th>工具</th><th>负责人</th></tr>
+<tr>
+  <td><b>Phase 1</b></td>
+  <td>自动化 Loadtest（A1–D4，20 条）<br>准确性/完整性/边界/易用性 全部跑通</td>
+  <td><code>python3 inquiry_loadtest.py</code></td>
+  <td>QA 执行，Ops 复核</td>
+</tr>
+<tr>
+  <td><b>Phase 2</b></td>
+  <td>业务场景扩展（E1–E10，10 条）<br>安全/异常输入/并发/边界</td>
+  <td>手动 + curl/Postman</td>
+  <td>QA</td>
+</tr>
+<tr>
+  <td><b>Phase 3</b></td>
+  <td>前端页面展示（U1–U24，24 条）<br>布局/渲染/交互/跨浏览器</td>
+  <td>浏览器手动验证</td>
+  <td>QA</td>
+</tr>
+<tr>
+  <td><b>Phase 4</b></td>
+  <td>回归测试（R1–R8，8 条）<br>现有功能不受影响</td>
+  <td>手动 + 脚本</td>
+  <td>QA</td>
+</tr>
+<tr>
+  <td><b>Phase 5</b></td>
+  <td>分析类人工评分（L2）<br>抽样 10+ 条分析类回答人工打分</td>
+  <td>人工评分表</td>
+  <td>Ops 主责，QA 辅助</td>
+</tr>
+</table>
+</div>
+
+<div class="card">
+<h3>4.2 验收门禁</h3>
+<table>
+<tr><th>指标</th><th>阈值</th><th>不通过时的处理</th></tr>
+<tr><td>L1 数据精确匹配率</td><td class="pass">≥ 95%</td><td>逐条排查 FAIL，修复后重跑全部 A 类用例</td></tr>
+<tr><td>L2 分析可接受率</td><td class="warn">≥ 80%</td><td>分析 FAIL 项反馈 RD 调整 prompt/template</td></tr>
+<tr><td>L3 防虚构率</td><td class="pass">100%（不可妥协）</td><td>任何虚构 → 阻塞上线，必须修复</td></tr>
+<tr><td>意图分类准确率</td><td class="pass">≥ 90%</td><td>低于阈值需调整路由规则</td></tr>
+<tr><td>确定性问题 p95 延迟</td><td class="pass">&lt; 1000ms</td><td>排查 SQL 查询性能或网络延迟</td></tr>
+<tr><td>前端 UI 用例通过率</td><td class="pass">100%</td><td>渲染异常 → 阻塞上线</td></tr>
+<tr><td>回归用例通过率</td><td class="pass">100%</td><td>任何回归 → 阻塞上线</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>4.3 与 Ops Loadtest 的分工</h3>
+<table>
+<tr><th>范围</th><th>Ops Loadtest</th><th>QA 测试用例</th></tr>
+<tr><td>后端 API 自动化</td><td>✅ A1–D4（20 条，已交付脚本）</td><td>E1–E10 补充（安全/异常/并发）</td></tr>
+<tr><td>前端页面展示</td><td>—</td><td>✅ U1–U24（布局/渲染/交互）</td></tr>
+<tr><td>回归测试</td><td>—</td><td>✅ R1–R8</td></tr>
+<tr><td>分析类人工评分</td><td>✅ L2 抽样评分</td><td>辅助复核</td></tr>
+</table>
+</div>
+
+<p class="note" style="text-align:center;margin-top:24px">Beerfest QA · 测试用例 v1.0 · 与 @beerfest-ops-cc-air3 联合设计 · 待方案确认后执行</p>
+</div>
+</body>
+</html>
